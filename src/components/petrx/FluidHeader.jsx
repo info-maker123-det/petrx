@@ -147,44 +147,54 @@ export default function FluidHeader() {
         </div>
       </header>
 
-      {/* Mobile Nav — rendered outside header so backdrop-blur doesn't trap the fixed panel */}
+      {/* Mobile Nav — right-side slide-in drawer (outside header to escape backdrop-blur) */}
       <AnimatePresence>
           {mobileOpen && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.2 }}
-              className="lg:hidden fixed inset-0 top-0 z-[60] bg-porcelain flex flex-col"
-            >
-              <div className="flex items-center justify-between px-5 py-4 border-b border-border">
-                <Logo heightClass="h-10" />
-                <button
-                  className="p-2 hover:bg-secondary rounded-xl transition-colors"
-                  onClick={() => setMobileOpen(false)}
-                  aria-label="Close menu"
-                >
-                  <X className="w-6 h-6" />
-                </button>
-              </div>
-              <div className="flex-1 overflow-y-auto px-5 py-6 space-y-1">
-                {renderNavLinks(true)}
-                <Link
-                  to="/dashboard"
-                  onClick={() => setMobileOpen(false)}
-                  className="block py-3 px-4 mt-3 bg-ink text-white rounded-xl text-sm font-semibold text-center"
-                >
-                  My Account
-                </Link>
-                <a
-                  href="/admin"
-                  onClick={() => setMobileOpen(false)}
-                  className="block py-3 px-4 text-ink/50 hover:text-ink rounded-xl text-sm font-medium text-center"
-                >
-                  Staff Portal
-                </a>
-              </div>
-            </motion.div>
+            <>
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.2 }}
+                className="lg:hidden fixed inset-0 z-[60] bg-black/40"
+                onClick={() => setMobileOpen(false)}
+              />
+              <motion.div
+                initial={{ x: "100%" }}
+                animate={{ x: 0 }}
+                exit={{ x: "100%" }}
+                transition={{ type: "tween", duration: 0.25, ease: "easeOut" }}
+                className="lg:hidden fixed right-0 top-0 bottom-0 z-[61] w-[80vw] max-w-sm bg-porcelain flex flex-col shadow-2xl"
+              >
+                <div className="flex items-center justify-between px-5 py-4 border-b border-border">
+                  <Logo heightClass="h-10" />
+                  <button
+                    className="p-2 hover:bg-secondary rounded-xl transition-colors"
+                    onClick={() => setMobileOpen(false)}
+                    aria-label="Close menu"
+                  >
+                    <X className="w-6 h-6" />
+                  </button>
+                </div>
+                <div className="flex-1 overflow-y-auto px-5 py-6 space-y-1 no-scrollbar">
+                  {renderNavLinks(true)}
+                  <Link
+                    to="/dashboard"
+                    onClick={() => setMobileOpen(false)}
+                    className="block py-3 px-4 mt-3 bg-ink text-white rounded-xl text-sm font-semibold text-center"
+                  >
+                    My Account
+                  </Link>
+                  <a
+                    href="/admin"
+                    onClick={() => setMobileOpen(false)}
+                    className="block py-3 px-4 text-ink/50 hover:text-ink rounded-xl text-sm font-medium text-center"
+                  >
+                    Staff Portal
+                  </a>
+                </div>
+              </motion.div>
+            </>
           )}
       </AnimatePresence>
     </>
