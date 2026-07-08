@@ -145,9 +145,10 @@ export default function FluidHeader() {
             </button>
           </div>
         </div>
+      </header>
 
-        {/* Mobile Nav — full-screen fixed panel */}
-        <AnimatePresence>
+      {/* Mobile Nav — rendered outside header so backdrop-blur doesn't trap the fixed panel */}
+      <AnimatePresence>
           {mobileOpen && (
             <motion.div
               initial={{ opacity: 0 }}
@@ -185,8 +186,7 @@ export default function FluidHeader() {
               </div>
             </motion.div>
           )}
-        </AnimatePresence>
-      </header>
+      </AnimatePresence>
     </>
   );
 }
