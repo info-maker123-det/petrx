@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { useCart } from "@/lib/cartContext";
-import { Star, ShoppingBag, Check, PawPrint, Truck } from "lucide-react";
+import { ShoppingBag, Check, PawPrint, Truck } from "lucide-react";
 import FilterLink from "./FilterLink";
 
 const enhanceImage = (url) => {
@@ -103,18 +103,6 @@ export default function ProductCard({ product, index = 0 }) {
             {product.brand}
           </FilterLink>
           <h3 className="font-display text-sm sm:text-lg text-ink mb-3 leading-tight line-clamp-2">{product.name}</h3>
-
-          <div className="flex items-center gap-2 mb-4">
-            <div className="flex items-center gap-0.5">
-              {[...Array(5)].map((_, i) => (
-                <Star
-                  key={i}
-                  className={`w-3 h-3 ${i < Math.floor(product.rating || 0) ? "fill-ochre text-ochre" : "text-border"}`}
-                />
-              ))}
-            </div>
-            <span className="text-xs text-ink/40">{product.rating} ({product.review_count})</span>
-          </div>
 
           {/* Price + per-unit */}
           <div className="mb-3">

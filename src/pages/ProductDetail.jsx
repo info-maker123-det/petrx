@@ -6,7 +6,6 @@ import { useCart } from "@/lib/cartContext";
 import {
   ShieldCheck,
   Stethoscope,
-  Star,
   ShoppingBag,
   RefreshCw,
   ArrowLeft,
@@ -147,21 +146,6 @@ export default function ProductDetail() {
               {product.brand}
             </Link>
             <h1 className="font-display text-3xl md:text-4xl text-ink mb-4 leading-tight">{product.name}</h1>
-
-            {/* Rating */}
-            <div className="flex items-center gap-2 mb-6">
-              <div className="flex gap-0.5">
-                {[...Array(5)].map((_, i) => (
-                  <Star
-                    key={i}
-                    className={`w-4 h-4 ${i < Math.floor(product.rating || 0) ? "fill-ochre text-ochre" : "text-border"}`}
-                  />
-                ))}
-              </div>
-              <span className="text-sm text-ink/40">
-                {product.rating} ({product.review_count} reviews)
-              </span>
-            </div>
 
             {/* Transparency Tier */}
             <div className="flex flex-wrap gap-3 mb-6">

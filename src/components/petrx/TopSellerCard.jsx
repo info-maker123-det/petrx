@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
-import { ShoppingBag, Check, Star, PawPrint } from "lucide-react";
+import { ShoppingBag, Check, PawPrint } from "lucide-react";
 import { useCart } from "@/lib/cartContext";
 
 const enhanceImage = (url) => {
@@ -36,11 +36,7 @@ export default function TopSellerCard({ product }) {
       </div>
       <div className="p-3.5">
         <p className="text-sage text-[10px] font-semibold tracking-wider uppercase mb-1 truncate">{product.brand}</p>
-        <h3 className="text-sm font-medium text-ink leading-snug line-clamp-2 mb-1.5 min-h-[2.5rem]">{product.name}</h3>
-        <div className="flex items-center gap-1 mb-2">
-          <Star className="w-3 h-3 fill-ochre text-ochre" />
-          <span className="text-xs text-ink/40">{product.rating} ({product.review_count})</span>
-        </div>
+        <h3 className="text-sm font-medium text-ink leading-snug line-clamp-2 mb-2 min-h-[2.5rem]">{product.name}</h3>
         <div className="flex items-center justify-between">
           <div>
             <p className="text-base font-semibold text-ink">${Number(product.price).toFixed(2)}</p>
