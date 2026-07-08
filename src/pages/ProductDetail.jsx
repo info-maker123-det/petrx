@@ -29,7 +29,7 @@ export default function ProductDetail() {
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
   const [autoship, setAutoship] = useState(true);
-  const [quantity, setQuantity] = useState(1);
+  const [supplyMonths, setSupplyMonths] = useState(1);
   const [weight, setWeight] = useState(50);
   const [added, setAdded] = useState(false);
 
@@ -59,13 +59,22 @@ export default function ProductDetail() {
       </div>
     );
 
-  const unitPrice = autoship ? product.price * 0.95 : product.price;
-  const savings = (product.price - unitPrice).toFixed(2);
-  const sizeRec =
-    weight < 25 ? "Small — under 25 lbs" : weight < 60 ? "Medium — 25–60 lbs" : "Large — 60+ lbs";
+  const perUnit = autoship ? product.price * 0.95 : product.price;
+  const totalPrice = perUnit * supplyMonths;
+  const autoshipSavings = (product.price - product.price * 0.95) * supplyMonths;
+  const weightOptions = [
+    { label: "Small", range: "Under 25 lbs", value: 20 },
+    { label: "Medium", range: "25–60 lbs", value: 45 },
+    { label: "Large", range: "60+ lbs", value: 80 },
+  ];
+  const supplyOptions = [
+    { months: 1, label: "1-Month", desc: null },
+    { months: 3, label: "3-Month", desc: "Most Popular" },
+    { months: 6, label: "6-Month", desc: "Best Value" },
+  ];
 
   const handleAdd = () => {
-    addItem(product, quantity, autoship);
+    addItem(product, supplyMonths, autoship);
     setAdded(true);
     setTimeout(() => setAdded(false), 2000);
   };
@@ -135,107 +144,145 @@ export default function ProductDetail() {
             </div>
 
             {/* Price */}
-            <div className="flex items-baseline gap-3 mb-8">
-              <span className="font-display text-4xl text-ink">${unitPrice.toFixed(2)}</span>
-              {autoship && <span className="text-ink/40 line-through text-lg">${product.price.toFixed(2)}</span>}
+            <div className="flex items-baseline gap-3 mb-2 flex-wrap">
+              <span className="font-display text-4xl text-ink">${totalPrice.toFixed(2)}</span>
               {autoship && (
-                <span className="text-sage text-sm font-semibold">Save ${savings} with AutoShip</span>
+                <span className="text-ink/40 line-through text-lg">${(product.price * supplyMonths).toFixed(2)}</span>
               )}
             </div>
+            {autoship ? (
+              <p className="text-sage text-sm font-semibold mb-8">Save ${autoshipSavings.toFixed(2)} with AutoShip · ${perUnit.toFixed(2)}/month</p>
+            ) : (
+              <p className="text-ink/40 text-sm mb-8">${perUnit.toFixed(2)}/month</p>
+            )}
 
             {/* Subscription Engine */}
             {product.autoship_eligible && (
-              <div className="cellular-card p-5 mb-5">
+              <div className="mb-5">
                 <p className="text-xs text-ink/40 uppercase tracking-wider font-semibold mb-3">Delivery Option</p>
                 <div className="space-y-2.5">
                   <button
                     onClick={() => setAutoship(true)}
-                    className={`w-full flex items-center justify-between p-4 rounded-2xl border-[0.5px] transition-all text-left ${
-                      autoship ? "border-sage bg-sage/5" : "border-border"
+                    className={`w-full flex items-center justify-between p-5 rounded-2xl border-2 transition-all text-left ${
+                      autoship ? "border-sage bg-sage/5 shadow-sm" : "border-border hover:border-sage/40"
                     }`}
                   >
                     <div className="flex items-center gap-3">
-                      <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${autoship ? "border-sage" : "border-border"}`}>
+                      <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 ${autoship ? "border-sage" : "border-border"}`}>
                         {autoship && <div className="w-2.5 h-2.5 rounded-full bg-sage" />}
                       </div>
                       <div>
                         <p className="text-sm font-semibold text-ink flex items-center gap-2">
                           <RefreshCw className="w-3.5 h-3.5 text-sage" /> AutoShip
+                          {autoship && (
+                            <span className="px-2 py-0.5 bg-sage text-white rounded-full text-[10px] font-bold uppercase tracking-wide">Recommended</span>
+                          )}
                         </p>
-                        <p className="text-xs text-ink/40">Save 5% · Cancel anytime</p>
+                        <p className="text-xs text-ink/40 mt-0.5">Save 5% on every refill · Cancel anytime</p>
                       </div>
                     </div>
-                    <span className="text-sm font-semibold text-sage">${(product.price * 0.95).toFixed(2)}</span>
+                    <div className="text-right">
+                      <p className="text-sm font-bold text-sage">${(product.price * 0.95 * supplyMonths).toFixed(2)}</p>
+                      <p className="text-xs text-ink/40 line-through">${(product.price * supplyMonths).toFixed(2)}</p>
+                    </div>
                   </button>
                   <button
                     onClick={() => setAutoship(false)}
-                    className={`w-full flex items-center justify-between p-4 rounded-2xl border-[0.5px] transition-all text-left ${
-                      !autoship ? "border-sage bg-sage/5" : "border-border"
+                    className={`w-full flex items-center justify-between p-5 rounded-2xl border-[0.5px] transition-all text-left ${
+                      !autoship ? "border-sage bg-sage/5" : "border-border hover:border-sage/40"
                     }`}
                   >
                     <div className="flex items-center gap-3">
-                      <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${!autoship ? "border-sage" : "border-border"}`}>
+                      <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 ${!autoship ? "border-sage" : "border-border"}`}>
                         {!autoship && <div className="w-2.5 h-2.5 rounded-full bg-sage" />}
                       </div>
                       <div>
                         <p className="text-sm font-semibold text-ink">One-Time Purchase</p>
-                        <p className="text-xs text-ink/40">Ships once</p>
+                        <p className="text-xs text-ink/40 mt-0.5">Ships once, no subscription</p>
                       </div>
                     </div>
-                    <span className="text-sm font-semibold text-ink">${product.price.toFixed(2)}</span>
+                    <span className="text-sm font-semibold text-ink">${(product.price * supplyMonths).toFixed(2)}</span>
                   </button>
                 </div>
               </div>
             )}
 
-            {/* Dosage Calculator */}
+            {/* Weight / Dosage Selector */}
             <div className="cellular-card p-5 mb-5">
-              <p className="text-xs text-ink/40 uppercase tracking-wider font-semibold mb-3">Dosage Calculator</p>
-              <p className="text-sm text-ink/60 mb-3">Enter your pet's weight to find the right size</p>
-              <input
-                type="range"
-                min="5"
-                max="120"
-                value={weight}
-                onChange={(e) => setWeight(parseInt(e.target.value))}
-                className="w-full accent-[#4F6D7A] mb-3"
-              />
-              <div className="flex items-center justify-between">
-                <span className="text-sm text-ink/50">{weight} lbs</span>
-                <div className="px-3 py-1.5 bg-sage/10 text-sage rounded-full text-sm font-semibold">
-                  Recommended: {sizeRec}
-                </div>
+              <p className="text-xs text-ink/40 uppercase tracking-wider font-semibold mb-3">Select Your Pet's Weight</p>
+              <div className="grid grid-cols-3 gap-2.5">
+                {weightOptions.map((opt) => {
+                  const active = weight === opt.value;
+                  return (
+                    <button
+                      key={opt.label}
+                      onClick={() => setWeight(opt.value)}
+                      className={`flex flex-col items-center gap-1 py-4 rounded-2xl border-2 transition-all ${
+                        active ? "border-sage bg-sage/5" : "border-border hover:border-sage/40"
+                      }`}
+                    >
+                      <span className={`text-sm font-semibold ${active ? "text-sage" : "text-ink"}`}>{opt.label}</span>
+                      <span className="text-xs text-ink/40">{opt.range}</span>
+                    </button>
+                  );
+                })}
               </div>
             </div>
 
-            {/* Qty + Add to Cart */}
-            <div className="flex gap-3 mb-8">
-              <div className="flex items-center gap-3 px-4 cellular-card">
-                <button onClick={() => setQuantity(Math.max(1, quantity - 1))} className="text-ink/50 hover:text-ink">
-                  −
-                </button>
-                <span className="font-semibold w-6 text-center">{quantity}</span>
-                <button onClick={() => setQuantity(quantity + 1)} className="text-ink/50 hover:text-ink">
-                  +
-                </button>
+            {/* Supply Size Selector */}
+            <div className="mb-5">
+              <p className="text-xs text-ink/40 uppercase tracking-wider font-semibold mb-3">Supply Size</p>
+              <div className="grid grid-cols-3 gap-2.5">
+                {supplyOptions.map((opt) => {
+                  const active = supplyMonths === opt.months;
+                  return (
+                    <button
+                      key={opt.months}
+                      onClick={() => setSupplyMonths(opt.months)}
+                      className={`flex flex-col items-center gap-1 py-4 rounded-2xl border-2 transition-all relative ${
+                        active ? "border-sage bg-sage/5" : "border-border hover:border-sage/40"
+                      }`}
+                    >
+                      {opt.desc && active && (
+                        <span className="absolute -top-2 px-2 py-0.5 bg-sage text-white rounded-full text-[9px] font-bold uppercase tracking-wide">{opt.desc}</span>
+                      )}
+                      <span className={`text-sm font-semibold ${active ? "text-sage" : "text-ink"}`}>{opt.label}</span>
+                      <span className="text-xs text-ink/40">${perUnit.toFixed(2)}/mo</span>
+                    </button>
+                  );
+                })}
               </div>
-              <button
-                onClick={handleAdd}
-                className={`flex-1 flex items-center justify-center gap-2 py-4 rounded-full font-semibold text-sm transition-all ${
-                  added ? "bg-green-600 text-white" : "bg-sage text-white hover:bg-[#3d5a66]"
-                }`}
-              >
-                {added ? (
-                  <>
-                    <Check className="w-4 h-4" /> Added to Cart
-                  </>
-                ) : (
-                  <>
-                    <ShoppingBag className="w-4 h-4" /> Add to Cart
-                  </>
-                )}
-              </button>
             </div>
+
+            {/* Add to Cart */}
+            <button
+              onClick={handleAdd}
+              className={`w-full flex items-center justify-center gap-2 py-4 rounded-full font-semibold text-sm transition-all mb-3 ${
+                added ? "bg-green-600 text-white" : "bg-sage text-white hover:bg-[#3d5a66]"
+              }`}
+            >
+              {added ? (
+                <>
+                  <Check className="w-4 h-4" /> Added to Cart
+                </>
+              ) : (
+                <>
+                  <ShoppingBag className="w-4 h-4" /> Add to Cart · ${totalPrice.toFixed(2)}
+                </>
+              )}
+            </button>
+
+            {/* Rx Reassurance */}
+            {product.requires_prescription ? (
+              <div className="flex items-start gap-2.5 p-4 bg-sage/5 rounded-2xl border-[0.5px] border-sage/20 mb-8">
+                <Stethoscope className="w-4 h-4 text-sage flex-shrink-0 mt-0.5" />
+                <p className="text-xs text-ink/60 leading-relaxed">
+                  <span className="font-semibold text-ink">Prescription approval made easy</span> — add this to your cart now and we'll contact your vet clinic to verify the prescription. No paperwork needed upfront.
+                </p>
+              </div>
+            ) : (
+              <div className="mb-8" />
+            )}
 
             {/* Collapsible info sections */}
             <div className="diagnostic-line pt-8">
