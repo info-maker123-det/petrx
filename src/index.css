@@ -93,6 +93,13 @@
   .diagnostic-line {
     @apply border-t-[0.5px] border-border;
   }
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
 }
 
 /* Autoship pulse animation */

@@ -6,7 +6,6 @@ import FeaturedProducts from "@/components/petrx/FeaturedProducts";
 import AutoShipSection from "@/components/petrx/AutoShipSection";
 import HowItWorks from "@/components/petrx/HowItWorks";
 import WhyPetRx from "@/components/petrx/WhyPetRx";
-import Testimonials from "@/components/petrx/Testimonials";
 
 export default function Home() {
   return (
@@ -18,7 +17,6 @@ export default function Home() {
       <AutoShipSection />
       <HowItWorks />
       <WhyPetRx />
-      <Testimonials />
     </div>
   );
 }

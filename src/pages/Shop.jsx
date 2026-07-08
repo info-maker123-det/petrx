@@ -3,6 +3,7 @@ import { base44 } from "@/api/base44Client";
 import ProductCard from "@/components/petrx/ProductCard";
 import ShopSidebar from "@/components/petrx/ShopSidebar";
 import GuidedShop, { HEALTH_ISSUES } from "@/components/petrx/GuidedShop";
+import TopSellersCarousel from "@/components/petrx/TopSellersCarousel";
 import { Search, PawPrint, SlidersHorizontal, X, RotateCcw } from "lucide-react";
 
 export default function Shop() {
@@ -94,12 +95,16 @@ export default function Shop() {
         </div>
 
         {brand === "all" && category === "All" && (
-          <GuidedShop
-            petType={petType}
-            setPetType={setPetType}
-            healthIssue={healthIssue}
-            setHealthIssue={setHealthIssue}
-          />
+          <>
+            <GuidedShop
+              products={products}
+              petType={petType}
+              setPetType={setPetType}
+              healthIssue={healthIssue}
+              setHealthIssue={setHealthIssue}
+            />
+            <TopSellersCarousel products={products} />
+          </>
         )}
 
         <div className="flex gap-3 mb-8">

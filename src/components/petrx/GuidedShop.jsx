@@ -21,7 +21,18 @@ export const HEALTH_ISSUES = [
   { id: "supplements", label: "Vitamins & Supplements", icon: Pill, categories: ["Supplements"] },
 ];
 
-export default function GuidedShop({ petType, setPetType, healthIssue, setHealthIssue }) {
+export default function GuidedShop({ products = [], petType, setPetType, healthIssue, setHealthIssue }) {
+  const enhanceImage = (url) => {
+    if (!url) return url;
+    if (url.includes("cdn.shopify.com")) return url + (url.includes("?") ? "&width=200" : "?width=200");
+    return url;
+  };
+
+  const getIssueThumb = (issue) => {
+    const match = products.find((p) => issue.categories.includes(p.category) && p.image_url);
+    return match ? enhanceImage(match.image_url) : null;
+  };
+
   const petSelected = petType !== "all";
   const issueSelected = healthIssue !== null;
 
@@ -88,14 +99,15 @@ export default function GuidedShop({ petType, setPetType, healthIssue, setHealth
                       : "border-border bg-porcelain hover:border-sage/40 hover:bg-sage/5"
                   }`}
                 >
-                  <div className={`w-9 h-9 rounded-full flex items-center justify-center ${!issueSelected ? "bg-sage text-white" : "bg-sage/10 text-sage"}`}>
-                    <LayoutGrid className="w-4 h-4" />
+                  <div className={`w-14 h-14 rounded-full overflow-hidden flex items-center justify-center border-2 transition-all ${!issueSelected ? "border-sage bg-sage/10" : "border-border bg-sage/10"}`}>
+                    <LayoutGrid className={`w-5 h-5 ${!issueSelected ? "text-sage" : "text-sage/50"}`} />
                   </div>
                   <span className={`text-xs font-medium text-center ${!issueSelected ? "text-ink" : "text-ink/60"}`}>All issues</span>
                 </button>
                 {HEALTH_ISSUES.map((issue) => {
                   const active = healthIssue === issue.id;
                   const Icon = issue.icon;
+                  const thumb = getIssueThumb(issue);
                   return (
                     <button
                       key={issue.id}
@@ -106,8 +118,14 @@ export default function GuidedShop({ petType, setPetType, healthIssue, setHealth
                           : "border-border bg-porcelain hover:border-sage/40 hover:bg-sage/5"
                       }`}
                     >
-                      <div className={`w-9 h-9 rounded-full flex items-center justify-center ${active ? "bg-sage text-white" : "bg-sage/10 text-sage"}`}>
-                        <Icon className="w-4 h-4" />
+                      <div className={`w-14 h-14 rounded-full overflow-hidden border-2 transition-all ${active ? "border-sage" : "border-border"}`}>
+                        {thumb ? (
+                          <img src={thumb} alt={issue.label} className="w-full h-full object-cover" />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center bg-sage/10 text-sage">
+                            <Icon className="w-5 h-5" />
+                          </div>
+                        )}
                       </div>
                       <span className={`text-xs font-medium text-center leading-tight ${active ? "text-ink" : "text-ink/60"}`}>{issue.label}</span>
                     </button>
