@@ -13,7 +13,7 @@ const PHARMACY_LINKS = [
 ];
 
 const COMPANY_LINKS = [
-  { label: "About Us", href: "#why-petrx" },
+  { label: "About Us", to: "/about" },
   { label: "How It Works", href: "#" },
   { label: "AutoShip Program", href: "#autoship" },
   { label: "Prescription Policy", href: "#" },
@@ -93,9 +93,15 @@ export default function Footer() {
             <ul className="space-y-3">
               {COMPANY_LINKS.map((link) => (
                 <li key={link.label}>
-                  <a href={link.href} className="text-white/40 hover:text-sage transition-colors text-sm">
-                    {link.label}
-                  </a>
+                  {link.to ? (
+                    <Link to={link.to} className="text-white/40 hover:text-sage transition-colors text-sm">
+                      {link.label}
+                    </Link>
+                  ) : (
+                    <a href={link.href} className="text-white/40 hover:text-sage transition-colors text-sm">
+                      {link.label}
+                    </a>
+                  )}
                 </li>
               ))}
             </ul>

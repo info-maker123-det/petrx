@@ -25,6 +25,7 @@ import AutoShip from './pages/AutoShip';
 import PrivacyPolicy from './pages/PrivacyPolicy';
 import TermsOfService from './pages/TermsOfService';
 import Accessibility from './pages/Accessibility';
+import About from './pages/About';
 // Add page imports here
 
 const AuthenticatedApp = () => {
@@ -60,6 +61,7 @@ const AuthenticatedApp = () => {
         <Route path="/reset-password" element={<ResetPassword />} />
         <Route element={<Layout />}>
           <Route path="/" element={<Home />} />
+          <Route path="/about" element={<About />} />
           <Route path="/shop" element={<Shop />} />
           <Route path="/privacy" element={<PrivacyPolicy />} />
           <Route path="/terms" element={<TermsOfService />} />
