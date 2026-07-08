@@ -47,6 +47,7 @@ export default function AdvisorChat({ pet }) {
   const [error, setError] = useState(null);
   const contextSentRef = useRef(false);
   const scrollRef = useRef(null);
+  const containerRef = useRef(null);
 
   useEffect(() => {
     if (!pet?.id) return;
@@ -110,7 +111,8 @@ export default function AdvisorChat({ pet }) {
   };
 
   useEffect(() => {
-    scrollRef.current?.scrollIntoView({ behavior: "smooth" });
+    const el = containerRef.current;
+    if (el) el.scrollTo({ top: el.scrollHeight, behavior: "smooth" });
   }, [messages, sending]);
 
   const showTyping = sending && messages[messages.length - 1]?.role === "user";
@@ -118,7 +120,7 @@ export default function AdvisorChat({ pet }) {
 
   return (
     <div className="flex flex-col h-[600px] cellular-card overflow-hidden">
-      <div className="flex-1 overflow-y-auto p-5 md:p-6 space-y-5 bg-secondary/30">
+      <div ref={containerRef} className="flex-1 overflow-y-auto p-5 md:p-6 space-y-5 bg-secondary/30">
         {initializing ? (
           <div className="flex flex-col items-center justify-center h-full text-center">
             <Loader2 className="w-6 h-6 text-sage animate-spin mb-3" />
