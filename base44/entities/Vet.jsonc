@@ -1,0 +1,38 @@
+{
+  "name": "Vet",
+  "type": "object",
+  "properties": {
+    "clinic_name": {
+      "type": "string"
+    },
+    "vet_name": {
+      "type": "string"
+    },
+    "address": {
+      "type": "string"
+    },
+    "city": {
+      "type": "string"
+    },
+    "state": {
+      "type": "string",
+      "default": "CA"
+    },
+    "zip": {
+      "type": "string"
+    },
+    "phone": {
+      "type": "string"
+    },
+    "email": {
+      "type": "string"
+    },
+    "website": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "clinic_name",
+    "city"
+  ]
+}

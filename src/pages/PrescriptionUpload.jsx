@@ -2,8 +2,9 @@ import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { base44 } from "@/api/base44Client";
-import { Upload, FileText, Check, ArrowRight, Stethoscope, PawPrint } from "lucide-react";
+import { Upload, FileText, Check, ArrowRight, Stethoscope, PawPrint, MapPin, Phone, Mail, X } from "lucide-react";
 import MedicationSearch from "@/components/petrx/MedicationSearch";
+import VetSearch from "@/components/petrx/VetSearch";
 
 export default function PrescriptionUpload() {
   const [submitting, setSubmitting] = useState(false);
@@ -13,6 +14,8 @@ export default function PrescriptionUpload() {
   const [pets, setPets] = useState([]);
   const [selectedPetId, setSelectedPetId] = useState("");
   const [checkingPets, setCheckingPets] = useState(true);
+  const [selectedVet, setSelectedVet] = useState(null);
+  const [manualVet, setManualVet] = useState(false);
   const [form, setForm] = useState({
     pet_name: "",
     pet_species: "dog",
@@ -191,28 +194,96 @@ export default function PrescriptionUpload() {
               <Stethoscope className="w-5 h-5 text-sage" />
               <h2 className="font-display text-xl text-ink">Veterinarian Information</h2>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className="text-xs text-ink/50 font-medium uppercase tracking-wider">Clinic Name *</label>
-                <input name="vet_clinic_name" value={form.vet_clinic_name} onChange={handleChange} className="mt-1 w-full px-4 py-3 bg-secondary rounded-2xl border-[0.5px] border-transparent focus:border-sage focus:outline-none transition-all" />
+
+            {selectedVet ? (
+              <div className="p-5 bg-sage/5 rounded-2xl border-[0.5px] border-sage/30">
+                <div className="flex items-start justify-between">
+                  <div className="flex items-start gap-3">
+                    <div className="w-10 h-10 rounded-full bg-sage/10 flex items-center justify-center flex-shrink-0">
+                      <Check className="w-5 h-5 text-sage" />
+                    </div>
+                    <div>
+                      <p className="font-semibold text-ink">{selectedVet.clinic_name}</p>
+                      {selectedVet.vet_name && selectedVet.vet_name !== "Not listed" && (
+                        <p className="text-sm text-ink/50">Dr. {selectedVet.vet_name}</p>
+                      )}
+                      <div className="mt-2 space-y-1 text-sm text-ink/60">
+                        {selectedVet.address && (
+                          <p className="flex items-center gap-1.5"><MapPin className="w-3.5 h-3.5 text-sage" />{selectedVet.address}, {selectedVet.city}, CA {selectedVet.zip}</p>
+                        )}
+                        {selectedVet.phone && (
+                          <p className="flex items-center gap-1.5"><Phone className="w-3.5 h-3.5 text-sage" />{selectedVet.phone}</p>
+                        )}
+                        {selectedVet.email && (
+                          <p className="flex items-center gap-1.5"><Mail className="w-3.5 h-3.5 text-sage" />{selectedVet.email}</p>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setSelectedVet(null);
+                      setForm({ ...form, vet_clinic_name: "", vet_name: "", vet_phone: "", vet_email: "", vet_address: "" });
+                    }}
+                    className="p-2 hover:bg-white/60 rounded-full transition-colors"
+                  >
+                    <X className="w-4 h-4 text-ink/40" />
+                  </button>
+                </div>
               </div>
-              <div>
-                <label className="text-xs text-ink/50 font-medium uppercase tracking-wider">Vet's Name</label>
-                <input name="vet_name" value={form.vet_name} onChange={handleChange} className="mt-1 w-full px-4 py-3 bg-secondary rounded-2xl border-[0.5px] border-transparent focus:border-sage focus:outline-none transition-all" />
-              </div>
-              <div>
-                <label className="text-xs text-ink/50 font-medium uppercase tracking-wider">Phone</label>
-                <input name="vet_phone" value={form.vet_phone} onChange={handleChange} className="mt-1 w-full px-4 py-3 bg-secondary rounded-2xl border-[0.5px] border-transparent focus:border-sage focus:outline-none transition-all" />
-              </div>
-              <div>
-                <label className="text-xs text-ink/50 font-medium uppercase tracking-wider">Email</label>
-                <input name="vet_email" type="email" value={form.vet_email} onChange={handleChange} className="mt-1 w-full px-4 py-3 bg-secondary rounded-2xl border-[0.5px] border-transparent focus:border-sage focus:outline-none transition-all" />
-              </div>
-              <div className="md:col-span-2">
-                <label className="text-xs text-ink/50 font-medium uppercase tracking-wider">Clinic Address</label>
-                <input name="vet_address" value={form.vet_address} onChange={handleChange} className="mt-1 w-full px-4 py-3 bg-secondary rounded-2xl border-[0.5px] border-transparent focus:border-sage focus:outline-none transition-all" />
-              </div>
-            </div>
+            ) : (
+              <>
+                <p className="text-sm text-ink/40 mb-3">Search our California vet directory and select your clinic — we'll fill in the rest.</p>
+                <VetSearch
+                  selectedClinic={form.vet_clinic_name}
+                  onSelect={(vet) => {
+                    setSelectedVet(vet);
+                    setManualVet(false);
+                    setForm({
+                      ...form,
+                      vet_clinic_name: vet.clinic_name,
+                      vet_name: vet.vet_name && vet.vet_name !== "Not listed" ? vet.vet_name : "",
+                      vet_phone: vet.phone || "",
+                      vet_email: vet.email || "",
+                      vet_address: vet.address ? `${vet.address}, ${vet.city}, CA ${vet.zip || ""}`.trim() : "",
+                    });
+                  }}
+                />
+                <button
+                  type="button"
+                  onClick={() => setManualVet(!manualVet)}
+                  className="mt-3 text-xs text-sage hover:underline font-medium"
+                >
+                  {manualVet ? "Cancel manual entry" : "Can't find your vet? Enter manually"}
+                </button>
+
+                {manualVet && (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                    <div>
+                      <label className="text-xs text-ink/50 font-medium uppercase tracking-wider">Clinic Name *</label>
+                      <input name="vet_clinic_name" value={form.vet_clinic_name} onChange={handleChange} className="mt-1 w-full px-4 py-3 bg-secondary rounded-2xl border-[0.5px] border-transparent focus:border-sage focus:outline-none transition-all" />
+                    </div>
+                    <div>
+                      <label className="text-xs text-ink/50 font-medium uppercase tracking-wider">Vet's Name</label>
+                      <input name="vet_name" value={form.vet_name} onChange={handleChange} className="mt-1 w-full px-4 py-3 bg-secondary rounded-2xl border-[0.5px] border-transparent focus:border-sage focus:outline-none transition-all" />
+                    </div>
+                    <div>
+                      <label className="text-xs text-ink/50 font-medium uppercase tracking-wider">Phone</label>
+                      <input name="vet_phone" value={form.vet_phone} onChange={handleChange} className="mt-1 w-full px-4 py-3 bg-secondary rounded-2xl border-[0.5px] border-transparent focus:border-sage focus:outline-none transition-all" />
+                    </div>
+                    <div>
+                      <label className="text-xs text-ink/50 font-medium uppercase tracking-wider">Email</label>
+                      <input name="vet_email" type="email" value={form.vet_email} onChange={handleChange} className="mt-1 w-full px-4 py-3 bg-secondary rounded-2xl border-[0.5px] border-transparent focus:border-sage focus:outline-none transition-all" />
+                    </div>
+                    <div className="md:col-span-2">
+                      <label className="text-xs text-ink/50 font-medium uppercase tracking-wider">Clinic Address</label>
+                      <input name="vet_address" value={form.vet_address} onChange={handleChange} className="mt-1 w-full px-4 py-3 bg-secondary rounded-2xl border-[0.5px] border-transparent focus:border-sage focus:outline-none transition-all" />
+                    </div>
+                  </div>
+                )}
+              </>
+            )}
           </div>
 
           {/* File Upload */}
