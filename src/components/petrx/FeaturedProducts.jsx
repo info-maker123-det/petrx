@@ -38,7 +38,7 @@ export default function FeaturedProducts() {
       <div className="bg-porcelain border-y border-border">
         <div className="max-w-7xl mx-auto px-5 md:px-8 py-8 flex flex-col md:flex-row md:items-center md:justify-between gap-6">
           <div>
-            <p className="text-sage text-sm font-semibold tracking-widest uppercase mb-2">The Pharmacy</p>
+            <p className="text-sage text-sm font-semibold tracking-widest uppercase mb-2">Curated by Pharmacists</p>
             <h2 className="font-display text-3xl md:text-4xl text-ink">Shop the Catalog</h2>
           </div>
           <div className="flex flex-wrap gap-1.5 p-1.5 bg-secondary rounded-full self-start md:self-auto">
@@ -78,7 +78,7 @@ export default function FeaturedProducts() {
               <div className="max-w-7xl mx-auto px-5 md:px-8 py-20 md:py-28">
                 <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4 mb-10">
                   <div>
-                    <p className="text-ink/40 text-sm font-semibold tracking-widest uppercase mb-2">Everything</p>
+                    <p className="text-ink/40 text-sm font-semibold tracking-widest uppercase mb-2">Prescriptions &amp; Supplements</p>
                     <h3 className="font-display text-3xl md:text-4xl text-ink">The full catalog</h3>
                   </div>
                   <Link to="/shop" className="flex items-center gap-2 text-sm font-semibold text-sage hover:gap-3 transition-all">

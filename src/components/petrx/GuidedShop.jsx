@@ -53,7 +53,7 @@ export default function GuidedShop({ products = [], petType, setPetType, healthI
             </button>
           )}
         </div>
-        <h2 className="font-display text-2xl md:text-3xl text-ink mb-6">What kind of pet do you have?</h2>
+        <h2 className="font-display text-2xl md:text-3xl text-ink mb-6">Who are we caring for today?</h2>
         <div className="grid grid-cols-3 gap-3">
           {PETS.map((pet) => {
             const active = petType === pet.key;
@@ -89,7 +89,7 @@ export default function GuidedShop({ products = [], petType, setPetType, healthI
           >
             <div className="pt-8 mt-8 border-t border-border">
               <p className="text-sage text-sm font-semibold tracking-widest uppercase mb-2">Step 2</p>
-              <h2 className="font-display text-2xl md:text-3xl text-ink mb-6">What can we help with?</h2>
+              <h2 className="font-display text-2xl md:text-3xl text-ink mb-6">What brings you in today?</h2>
               <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
                 <button
                   onClick={() => setHealthIssue(null)}

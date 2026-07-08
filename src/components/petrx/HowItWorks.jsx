@@ -6,20 +6,20 @@ const STEPS = [
   {
     icon: Search,
     step: "01",
-    title: "Find Your Medication",
-    desc: "Search our full pharmacy catalog for your pet's prescription or over-the-counter medications.",
+    title: "Find Their Treatment",
+    desc: "Browse our full formulary — prescription therapies and everyday supplements, all in one place.",
   },
   {
     icon: FileText,
     step: "02",
-    title: "Submit Your Prescription",
-    desc: "Upload your vet's prescription or let us contact your veterinarian directly for approval.",
+    title: "We Handle the Rx",
+    desc: "Upload a photo of your vet's prescription, or let us reach out to their clinic directly — no phone tag required.",
   },
   {
     icon: Package,
     step: "03",
-    title: "Delivered to Your Door",
-    desc: "Your pet's medications arrive safely at your home — with free shipping on orders over $49.",
+    title: "Care, Delivered",
+    desc: "Your pet's medications ship from our California pharmacy and arrive at your door — free on orders over $49.",
   },
 ];
 
@@ -29,12 +29,12 @@ export default function HowItWorks() {
       <div className="max-w-7xl mx-auto px-5 md:px-8">
         {/* Section Header */}
         <div className="text-center mb-20">
-          <p className="text-sage text-sm font-semibold tracking-widest uppercase mb-3">Process</p>
+          <p className="text-sage text-sm font-semibold tracking-widest uppercase mb-3">From Order to Doorstep</p>
           <h2 className="font-display text-3xl md:text-4xl lg:text-5xl text-ink mb-4">
             How It Works
           </h2>
           <p className="text-ink/50 max-w-md mx-auto text-base">
-            Three simple steps to get your pet's medications delivered on schedule.
+            Three steps from prescription to doorstep — no pharmacy lines, no waiting.
           </p>
         </div>
 

@@ -356,7 +356,7 @@ export default function ProductDetail() {
                 <AccordionItem value="details" className="border-border">
                   <AccordionTrigger className="text-ink font-display text-lg hover:no-underline">
                     <span className="flex items-center gap-2">
-                      <FileText className="w-4 h-4 text-sage" /> Product Details
+                      <FileText className="w-4 h-4 text-sage" /> Overview &amp; Indications
                     </span>
                   </AccordionTrigger>
                   <AccordionContent className="text-ink/60 text-sm leading-relaxed">
@@ -373,7 +373,7 @@ export default function ProductDetail() {
                 <AccordionItem value="safety" className="border-border">
                   <AccordionTrigger className="text-ink font-display text-lg hover:no-underline">
                     <span className="flex items-center gap-2">
-                      <ShieldAlert className="w-4 h-4 text-ochre" /> Safety Info
+                      <ShieldAlert className="w-4 h-4 text-ochre" /> Safety &amp; Warnings
                     </span>
                   </AccordionTrigger>
                   <AccordionContent className="text-ink/60 text-sm leading-relaxed space-y-3">
@@ -423,7 +423,7 @@ export default function ProductDetail() {
                 <AccordionItem value="additional" className="border-border">
                   <AccordionTrigger className="text-ink font-display text-lg hover:no-underline">
                     <span className="flex items-center gap-2">
-                      <Info className="w-4 h-4 text-sage" /> Additional Info
+                      <Info className="w-4 h-4 text-sage" /> Ingredients &amp; Directions
                     </span>
                   </AccordionTrigger>
                   <AccordionContent className="text-sm">

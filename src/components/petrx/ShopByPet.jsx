@@ -21,7 +21,7 @@ export default function ShopByPet() {
         {/* Section Header */}
         <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4 mb-16">
           <div>
-            <p className="text-sage text-sm font-semibold tracking-widest uppercase mb-3">Browse</p>
+            <p className="text-sage text-sm font-semibold tracking-widest uppercase mb-3">Pharmacy by Species</p>
             <h2 className="font-display text-3xl md:text-4xl lg:text-5xl text-ink">
               Shop by Pet
             </h2>

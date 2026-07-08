@@ -51,15 +51,15 @@ export default function CartDrawer() {
                 <div className="w-16 h-16 rounded-2xl bg-sage/10 flex items-center justify-center mb-5">
                   <ShoppingBag className="w-7 h-7 text-sage" />
                 </div>
-                <p className="text-sage text-xs font-semibold tracking-widest uppercase mb-2">Empty Cart</p>
-                <p className="font-display text-xl text-ink mb-2">Your cart is empty</p>
-                <p className="text-sm text-ink/40 mb-6 max-w-xs">Browse our pharmacy to find your pet's medications and supplements.</p>
+                <p className="text-sage text-xs font-semibold tracking-widest uppercase mb-2">Ready When You Are</p>
+                <p className="font-display text-xl text-ink mb-2">Your cart is ready when you are</p>
+                <p className="text-sm text-ink/40 mb-6 max-w-xs">Search the formulary for your pet's prescriptions, supplements, and essentials.</p>
                 <Link
                   to="/shop"
                   onClick={closeCart}
                   className="inline-flex items-center gap-2 px-6 py-3 bg-sage text-white rounded-full text-sm font-semibold hover:bg-[#3d5a66] transition-colors"
                 >
-                  Browse the Catalog <ArrowRight className="w-4 h-4" />
+                  Browse the Formulary <ArrowRight className="w-4 h-4" />
                 </Link>
               </div>
             ) : (

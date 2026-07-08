@@ -23,7 +23,7 @@ export default function WhyPetRx() {
       <div className="relative max-w-7xl mx-auto px-5 md:px-8">
         {/* Section Header */}
         <div className="text-center mb-20">
-          <p className="text-sage text-sm font-semibold tracking-widest uppercase mb-3">Our Promise</p>
+          <p className="text-sage text-sm font-semibold tracking-widest uppercase mb-3">Why Families Trust Us</p>
           <h2 className="font-display text-3xl md:text-4xl lg:text-5xl text-white mb-4">
             A pharmacy built on trust
           </h2>
