@@ -3,7 +3,7 @@ import { base44 } from "@/api/base44Client";
 import { Printer, Send, CheckCircle, XCircle, Truck, Package, RefreshCw, AlertCircle, Loader2, Stethoscope, Phone, Mail, MapPin, Upload, FileCheck } from "lucide-react";
 import { effectiveRxStatus, CUSTOMER_STATUS_MAP, printHtml } from "@/lib/adminUtils";
 import PrivateFileLink from "@/components/admin/PrivateFileLink";
-import { generateVetVerificationPacket, generateSisterPharmacyPacket } from "@/lib/prescriptionPackets";
+import { generateVetVerificationPacket, generateVetVerificationText, generateSisterPharmacyPacket } from "@/lib/prescriptionPackets";
 
 const METHODS = [
   { value: "fax", label: "Fax" },
@@ -26,6 +26,8 @@ export default function PrescriptionWorkflow({ rx, onUpdate }) {
   const [verifiedFileName, setVerifiedFileName] = useState("");
   const [uploadingVerified, setUploadingVerified] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [emailing, setEmailing] = useState(false);
+  const [emailSent, setEmailSent] = useState(false);
   const [error, setError] = useState(null);
 
   const update = async (data) => {
@@ -42,6 +44,29 @@ export default function PrescriptionWorkflow({ rx, onUpdate }) {
   };
 
   const now = () => new Date().toISOString();
+
+  const emailVetPacket = async () => {
+    if (!rx.vet_email) {
+      setError("No vet email on file. Add the vet's email or use print/fax instead.");
+      return;
+    }
+    setEmailing(true);
+    setError(null);
+    try {
+      await base44.integrations.Core.SendEmail({
+        to: rx.vet_email,
+        subject: `Prescription Verification Request — ${rx.pet_name} / ${rx.medication_name}`,
+        body: generateVetVerificationText(rx),
+        from_name: "PetRx Pharmacy",
+      });
+      setEmailSent(true);
+      setTimeout(() => setEmailSent(false), 4000);
+    } catch (err) {
+      setError("Failed to send email to vet. Please try again or use print/fax.");
+    } finally {
+      setEmailing(false);
+    }
+  };
 
   return (
     <div className="bg-white rounded-2xl border border-slate-200 p-5">
@@ -107,12 +132,25 @@ export default function PrescriptionWorkflow({ rx, onUpdate }) {
           <div>
             <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Step 1: Vet Verification</p>
             <p className="text-sm text-slate-600 mb-3">Generate a verification request to send to the prescribing veterinarian.</p>
-            <button
-              onClick={() => printHtml("Vet Verification Request", generateVetVerificationPacket(rx))}
-              className="w-full flex items-center justify-center gap-2 py-2.5 border border-slate-300 rounded-xl text-sm font-medium text-slate-700 hover:bg-slate-50 transition-colors mb-3"
-            >
-              <Printer className="w-4 h-4" /> Print Verification Packet
-            </button>
+            <div className="grid grid-cols-2 gap-2 mb-3">
+              <button
+                onClick={() => printHtml("Vet Verification Request", generateVetVerificationPacket(rx))}
+                className="flex items-center justify-center gap-2 py-2.5 border border-slate-300 rounded-xl text-sm font-medium text-slate-700 hover:bg-slate-50 transition-colors"
+              >
+                <Printer className="w-4 h-4" /> Print
+              </button>
+              <button
+                onClick={emailVetPacket}
+                disabled={emailing || !rx.vet_email}
+                className="flex items-center justify-center gap-2 py-2.5 border border-slate-300 rounded-xl text-sm font-medium text-slate-700 hover:bg-slate-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {emailSent ? <CheckCircle className="w-4 h-4 text-green-600" /> : emailing ? <Loader2 className="w-4 h-4 animate-spin" /> : <Mail className="w-4 h-4" />}
+                {emailSent ? "Sent" : "Email Vet"}
+              </button>
+            </div>
+            {!rx.vet_email && (
+              <p className="text-xs text-slate-400 mb-3">No vet email on file — print or fax instead.</p>
+            )}
           </div>
           <div>
             <p className="text-xs text-slate-400 mb-2">Method used to send:</p>
@@ -321,12 +359,25 @@ export default function PrescriptionWorkflow({ rx, onUpdate }) {
                 <p className="text-xs text-orange-700">{rx.vet_response_notes}</p>
               </div>
             )}
-            <button
-              onClick={() => printHtml("Vet Verification Request", generateVetVerificationPacket(rx))}
-              className="w-full flex items-center justify-center gap-2 py-2.5 border border-slate-300 rounded-xl text-sm font-medium text-slate-700 hover:bg-slate-50 transition-colors mb-3"
-            >
-              <Printer className="w-4 h-4" /> Print Verification Packet
-            </button>
+            <div className="grid grid-cols-2 gap-2 mb-3">
+              <button
+                onClick={() => printHtml("Vet Verification Request", generateVetVerificationPacket(rx))}
+                className="flex items-center justify-center gap-2 py-2.5 border border-slate-300 rounded-xl text-sm font-medium text-slate-700 hover:bg-slate-50 transition-colors"
+              >
+                <Printer className="w-4 h-4" /> Print
+              </button>
+              <button
+                onClick={emailVetPacket}
+                disabled={emailing || !rx.vet_email}
+                className="flex items-center justify-center gap-2 py-2.5 border border-slate-300 rounded-xl text-sm font-medium text-slate-700 hover:bg-slate-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {emailSent ? <CheckCircle className="w-4 h-4 text-green-600" /> : emailing ? <Loader2 className="w-4 h-4 animate-spin" /> : <Mail className="w-4 h-4" />}
+                {emailSent ? "Sent" : "Email Vet"}
+              </button>
+            </div>
+            {!rx.vet_email && (
+              <p className="text-xs text-slate-400 mb-3">No vet email on file — print or fax instead.</p>
+            )}
             <p className="text-xs text-slate-400 mb-2">Method to re-send:</p>
             <div className="grid grid-cols-3 gap-2 mb-3">
               {METHODS.map((m) => (
