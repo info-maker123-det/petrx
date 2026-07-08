@@ -8,6 +8,7 @@ import MegaMenu from "@/components/petrx/MegaMenu";
 
 const NAV_LINKS = [
   { label: "Shop", type: "route", target: "/shop" },
+  { label: "Advisor", type: "route", target: "/advisor" },
   { label: "Pharmacy", type: "section", target: "#products" },
   { label: "AutoShip", type: "section", target: "#autoship" },
   { label: "Prescriptions", type: "route", target: "/prescription" },

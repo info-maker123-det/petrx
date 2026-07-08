@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { base44 } from "@/api/base44Client";
 import AdvisorMessageBubble from "./AdvisorMessageBubble";
-import { Send, Loader2, Bot } from "lucide-react";
+import { Send, Loader2, Bot, Sparkles } from "lucide-react";
 
 function buildPetProfile(pet) {
   const lines = [];
@@ -31,19 +31,21 @@ function buildPetProfile(pet) {
   return lines.join("\n");
 }
 
-const SUGGESTIONS = [
+const STARTER_QUESTIONS = [
   "What products do you recommend for my pet's conditions?",
   "Are there supplements for joint support?",
   "Which of these need a prescription?",
+  "Any interactions with their current medications?",
 ];
 
 export default function AdvisorChat({ pet }) {
   const [conversation, setConversation] = useState(null);
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
-  const [starting, setStarting] = useState(true);
+  const [initializing, setInitializing] = useState(true);
   const [sending, setSending] = useState(false);
   const [error, setError] = useState(null);
+  const contextSentRef = useRef(false);
   const scrollRef = useRef(null);
 
   useEffect(() => {
@@ -52,10 +54,11 @@ export default function AdvisorChat({ pet }) {
     let unsub = () => {};
 
     (async () => {
-      setStarting(true);
+      setInitializing(true);
       setMessages([]);
       setError(null);
       setConversation(null);
+      contextSentRef.current = false;
       try {
         const conv = await base44.agents.createConversation({
           agent_name: "medication_advisor",
@@ -66,22 +69,13 @@ export default function AdvisorChat({ pet }) {
         });
         if (cancelled) return;
         setConversation(conv);
-
         unsub = base44.agents.subscribeToConversation(conv.id, (data) => {
           if (!cancelled) setMessages(data.messages || []);
         });
-
-        const profile = buildPetProfile(pet);
-        const initialContent = `I'd like medication and supplement recommendations for my pet. Here is their profile:\n\n${profile}\n\nPlease review this and suggest the best products from the PetRx catalog for ${pet.name}'s medical needs, considering their conditions, allergies, and current medications. Indicate which require a prescription. Include a link to each product.`;
-        const updated = await base44.agents.addMessage(conv, {
-          role: "user",
-          content: initialContent,
-        });
-        if (!cancelled) setMessages(updated.messages || []);
       } catch (e) {
         if (!cancelled) setError(e.message || "Failed to start conversation");
       } finally {
-        if (!cancelled) setStarting(false);
+        if (!cancelled) setInitializing(false);
       }
     })();
 
@@ -97,9 +91,15 @@ export default function AdvisorChat({ pet }) {
     setInput("");
     setSending(true);
     try {
+      let messageContent = content;
+      if (!contextSentRef.current) {
+        const profile = buildPetProfile(pet);
+        messageContent = `Here is my pet's profile for context:\n\n${profile}\n\nMy question: ${content}`;
+        contextSentRef.current = true;
+      }
       const updated = await base44.agents.addMessage(conversation, {
         role: "user",
-        content,
+        content: messageContent,
       });
       setMessages(updated.messages || []);
     } catch (e) {
@@ -113,16 +113,38 @@ export default function AdvisorChat({ pet }) {
     scrollRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, sending]);
 
-  const showTyping =
-    starting || (sending && messages[messages.length - 1]?.role === "user");
+  const showTyping = sending && messages[messages.length - 1]?.role === "user";
+  const showStarters = messages.length === 0 && !initializing && !sending;
 
   return (
     <div className="flex flex-col h-[600px] cellular-card overflow-hidden">
       <div className="flex-1 overflow-y-auto p-5 md:p-6 space-y-5 bg-secondary/30">
-        {starting && messages.length === 0 ? (
+        {initializing ? (
           <div className="flex flex-col items-center justify-center h-full text-center">
             <Loader2 className="w-6 h-6 text-sage animate-spin mb-3" />
-            <p className="text-sm text-ink/50">Reviewing {pet.name}'s profile…</p>
+            <p className="text-sm text-ink/50">Setting up advisor for {pet.name}…</p>
+          </div>
+        ) : showStarters ? (
+          <div className="flex flex-col items-center justify-center h-full text-center px-4">
+            <div className="w-14 h-14 rounded-full bg-sage/10 flex items-center justify-center mb-4">
+              <Sparkles className="w-7 h-7 text-sage" />
+            </div>
+            <h3 className="font-display text-xl text-ink mb-2">Ask about {pet.name}'s care</h3>
+            <p className="text-sm text-ink/50 mb-6 max-w-sm">
+              I've reviewed {pet.name}'s profile. Pick a question below or ask your own.
+            </p>
+            <div className="flex flex-col gap-2.5 w-full max-w-md">
+              {STARTER_QUESTIONS.map((q) => (
+                <button
+                  key={q}
+                  onClick={() => send(q)}
+                  className="text-left px-4 py-3 bg-white border border-border rounded-2xl text-sm font-medium text-ink hover:border-sage hover:bg-sage/5 transition-all flex items-center justify-between group"
+                >
+                  <span>{q}</span>
+                  <Send className="w-3.5 h-3.5 text-ink/30 group-hover:text-sage transition-colors flex-shrink-0 ml-3" />
+                </button>
+              ))}
+            </div>
           </div>
         ) : (
           <>
@@ -136,18 +158,9 @@ export default function AdvisorChat({ pet }) {
                 </div>
                 <div className="px-4 py-3 bg-white border border-border rounded-2xl rounded-tl-sm">
                   <div className="flex gap-1">
-                    <span
-                      className="w-1.5 h-1.5 bg-sage/40 rounded-full animate-bounce"
-                      style={{ animationDelay: "0ms" }}
-                    />
-                    <span
-                      className="w-1.5 h-1.5 bg-sage/40 rounded-full animate-bounce"
-                      style={{ animationDelay: "150ms" }}
-                    />
-                    <span
-                      className="w-1.5 h-1.5 bg-sage/40 rounded-full animate-bounce"
-                      style={{ animationDelay: "300ms" }}
-                    />
+                    <span className="w-1.5 h-1.5 bg-sage/40 rounded-full animate-bounce" style={{ animationDelay: "0ms" }} />
+                    <span className="w-1.5 h-1.5 bg-sage/40 rounded-full animate-bounce" style={{ animationDelay: "150ms" }} />
+                    <span className="w-1.5 h-1.5 bg-sage/40 rounded-full animate-bounce" style={{ animationDelay: "300ms" }} />
                   </div>
                 </div>
               </div>
@@ -156,20 +169,6 @@ export default function AdvisorChat({ pet }) {
         )}
         <div ref={scrollRef} />
       </div>
-
-      {messages.length > 0 && !sending && !starting && (
-        <div className="px-5 md:px-6 py-3 border-t border-border flex flex-wrap gap-2 bg-white">
-          {SUGGESTIONS.map((s) => (
-            <button
-              key={s}
-              onClick={() => send(s)}
-              className="px-3 py-1.5 text-xs font-medium text-sage bg-sage/5 hover:bg-sage/10 rounded-full transition-colors"
-            >
-              {s}
-            </button>
-          ))}
-        </div>
-      )}
 
       <div className="p-4 border-t border-border bg-white">
         <div className="flex gap-2">
