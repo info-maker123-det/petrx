@@ -22,6 +22,20 @@ import {
 } from "@/components/ui/accordion";
 import { ShieldAlert, Info, FileText, AlertTriangle } from "lucide-react";
 
+function getOption1Label(optionName, values) {
+  const sample = (values[0] || "").toLowerCase();
+  if (/lb|kg/.test(sample)) return "Select Your Pet's Weight";
+  if (/mg|mcg|ml/.test(sample)) return "Select Strength";
+  return `Select ${optionName || "Size"}`;
+}
+
+function getOption2Label(optionName, values) {
+  const sample = (values[0] || "").toLowerCase();
+  if (/month/.test(sample)) return "Supply Size";
+  if (/tablet|ct|count|cap|chew|dose/.test(sample)) return "Select Quantity";
+  return `Select ${optionName || "Count"}`;
+}
+
 export default function ProductDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -29,8 +43,8 @@ export default function ProductDetail() {
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
   const [autoship, setAutoship] = useState(true);
-  const [supplyMonths, setSupplyMonths] = useState(1);
-  const [weight, setWeight] = useState(null);
+  const [selectedOption1, setSelectedOption1] = useState(null);
+  const [selectedOption2, setSelectedOption2] = useState(null);
   const [added, setAdded] = useState(false);
 
   useEffect(() => {
@@ -40,10 +54,10 @@ export default function ProductDetail() {
       .then((p) => {
         setProduct(p);
         if (p?.variants?.length > 0) {
-          const wbs = [...new Set(p.variants.map((v) => v.weight_band))].filter((w) => w && w !== "All weights");
-          const scs = [...new Set(p.variants.map((v) => v.supply_months))].filter((s) => s > 0).sort((a, b) => a - b);
-          if (wbs.length > 0) setWeight(wbs[0]);
-          if (scs.length > 0) setSupplyMonths(scs[0]);
+          const o1vals = [...new Set(p.variants.map((v) => v.option1))].filter(Boolean);
+          const o2vals = [...new Set(p.variants.map((v) => v.option2))].filter(Boolean);
+          if (o1vals.length > 0) setSelectedOption1(o1vals[0]);
+          if (o2vals.length > 0) setSelectedOption2(o2vals[0]);
         }
       })
       .catch(() => setProduct(null))
@@ -67,60 +81,36 @@ export default function ProductDetail() {
       </div>
     );
 
-  // Real variant data sourced from PetRx Shopify
+  // Generic variant data — works for weight-dosed, strength-dosed, and count-based products
   const variants = product.variants || [];
   const hasVariants = variants.length > 0;
 
-  const weightBands = hasVariants
-    ? [...new Set(variants.map((v) => v.weight_band))].filter((w) => w && w !== "All weights")
+  const option1Values = hasVariants
+    ? [...new Set(variants.map((v) => v.option1))].filter(Boolean)
     : [];
-  const supplyCounts = hasVariants
-    ? [...new Set(variants.map((v) => v.supply_months))].filter((s) => s > 0).sort((a, b) => a - b)
+  const option2Values = hasVariants
+    ? [...new Set(variants.map((v) => v.option2))].filter(Boolean)
     : [];
 
-  const hasWeightSelection = weightBands.length > 1;
-  const hasSupplySelection = supplyCounts.length > 1;
+  const hasOption1Selection = option1Values.length > 1;
+  const hasOption2Selection = option2Values.length > 1;
 
   const selectedVariant = hasVariants
     ? variants.find(
         (v) =>
-          (!hasWeightSelection || v.weight_band === weight) &&
-          (!hasSupplySelection || v.supply_months === supplyMonths)
+          (!hasOption1Selection || v.option1 === selectedOption1) &&
+          (!hasOption2Selection || v.option2 === selectedOption2)
       ) || variants[0]
     : null;
 
-  let totalPrice, basePrice, autoshipSavings, perUnit;
-  if (hasVariants && selectedVariant) {
-    basePrice = selectedVariant.price;
-    perUnit = basePrice;
-    totalPrice = autoship ? basePrice * 0.95 : basePrice;
-    autoshipSavings = basePrice - basePrice * 0.95;
-  } else {
-    perUnit = product.price;
-    basePrice = product.price * supplyMonths;
-    totalPrice = autoship ? basePrice * 0.95 : basePrice;
-    autoshipSavings = product.price * supplyMonths * 0.05;
-  }
-
-  const WEIGHT_DOSED_CATEGORIES = [
-    "Flea, Tick & Heartworm",
-    "Flea & Tick",
-    "Pain & Inflammation",
-    "Joint & Pain",
-    "Heartworm",
-  ];
-  const showWeightSelector = hasWeightSelection || (!hasVariants && WEIGHT_DOSED_CATEGORIES.includes(product.category));
-
-  const fallbackSupplyOptions = [
-    { months: 1, label: "1-Month", desc: null },
-    { months: 3, label: "3-Month", desc: "Most Popular" },
-    { months: 6, label: "6-Month", desc: "Best Value" },
-  ];
+  const basePrice = hasVariants && selectedVariant ? selectedVariant.price : product.price;
+  const totalPrice = autoship ? basePrice * 0.95 : basePrice;
+  const autoshipSavings = basePrice - basePrice * 0.95;
 
   const handleAdd = () => {
     addItem(
       { ...product, selected_variant: selectedVariant },
-      hasVariants ? 1 : supplyMonths,
+      1,
       autoship
     );
     setAdded(true);
@@ -199,9 +189,9 @@ export default function ProductDetail() {
               )}
             </div>
             {autoship ? (
-              <p className="text-sage text-sm font-semibold mb-8">Save ${autoshipSavings.toFixed(2)} with AutoShip{hasVariants ? ` · $${(perUnit * 0.95).toFixed(2)}` : ` · $${perUnit.toFixed(2)}/month`}</p>
+              <p className="text-sage text-sm font-semibold mb-8">Save ${autoshipSavings.toFixed(2)} with AutoShip</p>
             ) : (
-              <p className="text-ink/40 text-sm mb-8">${perUnit.toFixed(2)}{hasVariants ? "" : "/month"}</p>
+              <p className="text-ink/40 text-sm mb-8">One-time purchase</p>
             )}
 
             {/* Subscription Engine */}
@@ -255,22 +245,29 @@ export default function ProductDetail() {
               </div>
             )}
 
-            {/* Weight / Dosage Selector — uses real variant weight bands from Shopify */}
-            {showWeightSelector && (
+            {/* Option 1 Selector — weight, strength, or size depending on product */}
+            {hasOption1Selection && (
               <div className="cellular-card p-5 mb-5">
-                <p className="text-xs text-ink/40 uppercase tracking-wider font-semibold mb-3">Select Your Pet's Weight</p>
+                <p className="text-xs text-ink/40 uppercase tracking-wider font-semibold mb-3">
+                  {getOption1Label(product.option1_name, option1Values)}
+                </p>
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
-                  {(hasVariants ? weightBands : []).map((wb) => {
-                    const active = weight === wb;
+                  {option1Values.map((val) => {
+                    const active = selectedOption1 === val;
+                    const valVariant = variants.find(
+                      (v) => v.option1 === val && (!hasOption2Selection || v.option2 === selectedOption2)
+                    );
+                    const valPrice = valVariant?.price || 0;
                     return (
                       <button
-                        key={wb}
-                        onClick={() => setWeight(wb)}
+                        key={val}
+                        onClick={() => setSelectedOption1(val)}
                         className={`flex flex-col items-center gap-1 py-4 px-2 rounded-2xl border-2 transition-all ${
                           active ? "border-sage bg-sage/5" : "border-border hover:border-sage/40"
                         }`}
                       >
-                        <span className={`text-sm font-semibold ${active ? "text-sage" : "text-ink"}`}>{wb}</span>
+                        <span className={`text-sm font-semibold ${active ? "text-sage" : "text-ink"}`}>{val}</span>
+                        <span className="text-xs text-ink/40">${valPrice.toFixed(2)}</span>
                       </button>
                     );
                   })}
@@ -281,30 +278,37 @@ export default function ProductDetail() {
               </div>
             )}
 
-            {/* Supply Size Selector — uses real variant supply counts or fallback */}
-            {(hasVariants ? hasSupplySelection : true) && (
+            {/* Option 2 Selector — supply size, quantity, or count */}
+            {hasOption2Selection && (
               <div className="mb-5">
-                <p className="text-xs text-ink/40 uppercase tracking-wider font-semibold mb-3">Supply Size</p>
-                <div className={`grid gap-2.5 ${hasVariants ? "grid-cols-" + Math.min(supplyCounts.length, 4) : "grid-cols-3"}`}>
-                  {(hasVariants ? supplyCounts.map((m) => ({ months: m, label: `${m}-Month`, desc: m === 6 ? "Best Value" : m === 3 ? "Most Popular" : null })) : fallbackSupplyOptions).map((opt) => {
-                    const active = supplyMonths === opt.months;
-                    const optVariant = hasVariants
-                      ? variants.find((v) => (!hasWeightSelection || v.weight_band === weight) && v.supply_months === opt.months)
-                      : null;
-                    const optPrice = optVariant ? optVariant.price : perUnit * opt.months;
+                <p className="text-xs text-ink/40 uppercase tracking-wider font-semibold mb-3">
+                  {getOption2Label(product.option2_name, option2Values)}
+                </p>
+                <div className={`grid gap-2.5 grid-cols-${Math.min(option2Values.length, 4)}`}>
+                  {option2Values.map((val) => {
+                    const active = selectedOption2 === val;
+                    const optVariant = variants.find(
+                      (v) => (!hasOption1Selection || v.option1 === selectedOption1) && v.option2 === val
+                    );
+                    const optPrice = optVariant?.price || 0;
                     const optAutoship = optPrice * 0.95;
+                    const isBestValue = /60|6\s*month/i.test(val);
+                    const isPopular = /30|3\s*month/i.test(val);
                     return (
                       <button
-                        key={opt.months}
-                        onClick={() => setSupplyMonths(opt.months)}
+                        key={val}
+                        onClick={() => setSelectedOption2(val)}
                         className={`flex flex-col items-center gap-1 py-4 rounded-2xl border-2 transition-all relative ${
                           active ? "border-sage bg-sage/5" : "border-border hover:border-sage/40"
                         }`}
                       >
-                        {opt.desc && active && (
-                          <span className="absolute -top-2 px-2 py-0.5 bg-sage text-white rounded-full text-[9px] font-bold uppercase tracking-wide">{opt.desc}</span>
+                        {active && isBestValue && (
+                          <span className="absolute -top-2 px-2 py-0.5 bg-sage text-white rounded-full text-[9px] font-bold uppercase tracking-wide">Best Value</span>
                         )}
-                        <span className={`text-sm font-semibold ${active ? "text-sage" : "text-ink"}`}>{opt.label}</span>
+                        {active && !isBestValue && isPopular && (
+                          <span className="absolute -top-2 px-2 py-0.5 bg-sage text-white rounded-full text-[9px] font-bold uppercase tracking-wide">Most Popular</span>
+                        )}
+                        <span className={`text-sm font-semibold ${active ? "text-sage" : "text-ink"}`}>{val}</span>
                         <span className="text-xs text-ink/40">${optPrice.toFixed(2)}</span>
                         {autoship && (
                           <span className="text-[10px] text-sage font-medium">${optAutoship.toFixed(2)} w/ AutoShip</span>

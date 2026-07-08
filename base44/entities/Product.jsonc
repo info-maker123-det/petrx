@@ -81,6 +81,32 @@
     "featured": {
       "type": "boolean",
       "default": false
+    },
+    "option1_name": {
+      "type": "string"
+    },
+    "option2_name": {
+      "type": "string"
+    },
+    "variants": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "option1": {
+            "type": "string"
+          },
+          "option2": {
+            "type": "string"
+          },
+          "price": {
+            "type": "number"
+          },
+          "label": {
+            "type": "string"
+          }
+        }
+      }
     }
   },
   "required": [

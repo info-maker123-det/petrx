@@ -14,14 +14,21 @@ Deno.serve(async (req) => {
 
     const allProducts = await base44.asServiceRole.entities.Product.list('-created_date', 1000);
 
+    const needsUpdate = (p) => {
+      if (!p.slug) return false;
+      if (force) return true;
+      if (!p.variants || p.variants.length === 0) return true;
+      // Re-process products not yet migrated to the new option-based format
+      return !p.option1_name;
+    };
+
     const toProcess = allProducts
-      .filter((p) => p.slug && (force || !p.variants || p.variants.length === 0))
+      .filter(needsUpdate)
       .slice(skip, skip + limit);
 
     let updated = 0;
     let skipped = 0;
     const errors = [];
-
     const updates = [];
 
     for (const product of toProcess) {
@@ -42,44 +49,37 @@ Deno.serve(async (req) => {
         }
 
         const data = await resp.json();
-        const shopifyVariants = data?.product?.variants || [];
+        const shopifyProduct = data?.product || {};
+        const shopifyVariants = shopifyProduct.variants || [];
+        const shopifyOptions = shopifyProduct.options || [];
 
         if (shopifyVariants.length === 0) {
           skipped++;
           continue;
         }
 
+        // Read option names directly from Shopify's options array
+        const option1Name = shopifyOptions[0]?.name || 'Size';
+        const option2Name = shopifyOptions.length > 1 ? shopifyOptions[1]?.name : null;
+
+        // Map variants using raw Shopify option values — no assumptions about weight vs strength
         const variants = shopifyVariants.map((v) => {
           const title = v.title || '';
-          const option1 = v.option1 || '';
-          const option2 = v.option2 || '';
+          const rawOpt1 = v.option1 || '';
+          const rawOpt2 = v.option2 || '';
 
-          let weight_band = 'All weights';
-          let supply_months = 0;
-
-          // Weight band: option1 usually contains the weight range
-          if (option1 && /lb|kg|weight/i.test(option1)) {
-            weight_band = option1;
-          } else if (option1 && option1.toLowerCase() !== 'default title') {
-            weight_band = option1;
-          }
-
-          // Supply months: parse from option2 or title
-          const supplyText = `${option2} ${title}`;
-          const monthMatch = supplyText.match(/(\d+)\s*month/i);
-          if (monthMatch) {
-            supply_months = parseInt(monthMatch[1]);
-          }
+          // Filter out Shopify's "Default Title" placeholder for single-option products
+          const option1 = rawOpt1 && rawOpt1.toLowerCase() !== 'default title' ? rawOpt1 : '';
+          const option2 = rawOpt2 && rawOpt2.toLowerCase() !== 'default title' ? rawOpt2 : '';
 
           return {
-            weight_band,
-            supply_months,
+            option1,
+            option2,
             price: parseFloat(v.price) || 0,
             label: title.replace(/\s*\/\s*/g, ', '),
           };
         });
 
-        // Set base price to the minimum variant price, and build price_range
         const prices = variants.map((v) => v.price).filter((p) => p > 0);
         const minPrice = prices.length > 0 ? Math.min(...prices) : null;
         const maxPrice = prices.length > 0 ? Math.max(...prices) : null;
@@ -90,6 +90,8 @@ Deno.serve(async (req) => {
         const updateObj = {
           id: product.id,
           variants,
+          option1_name: option1Name,
+          option2_name: option2Name,
         };
         if (minPrice) updateObj.price = minPrice;
         if (priceRange) updateObj.price_range = priceRange;
@@ -108,7 +110,7 @@ Deno.serve(async (req) => {
       await base44.asServiceRole.entities.Product.bulkUpdate(updates);
     }
 
-    const totalWithSlug = allProducts.filter((p) => p.slug && (force || !p.variants || p.variants.length === 0)).length;
+    const totalWithSlug = allProducts.filter(needsUpdate).length;
 
     return Response.json({
       status: 'success',
