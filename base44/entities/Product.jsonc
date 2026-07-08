@@ -107,6 +107,14 @@
           }
         }
       }
+    },
+    "data_source": {
+      "type": "string",
+      "enum": [
+        "shopify",
+        "ai_estimated"
+      ],
+      "default": "shopify"
     }
   },
   "required": [

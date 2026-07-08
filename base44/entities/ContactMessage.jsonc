@@ -22,7 +22,8 @@
       "enum": [
         "new",
         "read",
-        "responded"
+        "responded",
+        "resolved"
       ],
       "default": "new"
     }

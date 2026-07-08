@@ -27,6 +27,16 @@ import TermsOfService from './pages/TermsOfService';
 import Accessibility from './pages/Accessibility';
 import About from './pages/About';
 import ShippingReturns from './pages/ShippingReturns';
+import AdminRoute from '@/components/admin/AdminRoute';
+import AdminLayout from '@/components/admin/AdminLayout';
+import AdminHome from './pages/admin/AdminHome';
+import AdminPrescriptions from './pages/admin/AdminPrescriptions';
+import PrescriptionDetail from './pages/admin/PrescriptionDetail';
+import AdminOrders from './pages/admin/AdminOrders';
+import AdminMessages from './pages/admin/AdminMessages';
+import AdminProducts from './pages/admin/AdminProducts';
+import AdminVets from './pages/admin/AdminVets';
+import AdminFinance from './pages/admin/AdminFinance';
 // Add page imports here
 
 const AuthenticatedApp = () => {
@@ -76,6 +86,18 @@ const AuthenticatedApp = () => {
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/advisor" element={<PetAdvisor />} />
             <Route path="/autoship" element={<AutoShip />} />
+          </Route>
+        </Route>
+        <Route element={<AdminRoute unauthenticatedElement={<Navigate to="/login" replace />} unauthorizedElement={<Navigate to="/" replace />} />}>
+          <Route element={<AdminLayout />}>
+            <Route path="/admin" element={<AdminHome />} />
+            <Route path="/admin/prescriptions" element={<AdminPrescriptions />} />
+            <Route path="/admin/prescriptions/:id" element={<PrescriptionDetail />} />
+            <Route path="/admin/orders" element={<AdminOrders />} />
+            <Route path="/admin/messages" element={<AdminMessages />} />
+            <Route path="/admin/products" element={<AdminProducts />} />
+            <Route path="/admin/vets" element={<AdminVets />} />
+            <Route path="/admin/finance" element={<AdminFinance />} />
           </Route>
         </Route>
         <Route path="*" element={<PageNotFound />} />

@@ -39,6 +39,9 @@
     "vet_email": {
       "type": "string"
     },
+    "vet_fax": {
+      "type": "string"
+    },
     "vet_address": {
       "type": "string"
     },
@@ -58,6 +61,62 @@
     },
     "notes": {
       "type": "string"
+    },
+    "internal_status": {
+      "type": "string",
+      "enum": [
+        "submitted",
+        "vet_request_sent",
+        "vet_response_received",
+        "sent_to_sister_pharmacy",
+        "tracking_entered",
+        "delivered",
+        "rejected",
+        "needs_more_info"
+      ],
+      "default": "submitted"
+    },
+    "vet_request_method": {
+      "type": "string",
+      "enum": [
+        "fax",
+        "email",
+        "phone"
+      ]
+    },
+    "vet_request_sent_date": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "vet_response": {
+      "type": "string",
+      "enum": [
+        "approved",
+        "denied",
+        "needs_more_info"
+      ]
+    },
+    "vet_response_date": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "vet_response_notes": {
+      "type": "string"
+    },
+    "sister_pharmacy_sent_date": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "tracking_number": {
+      "type": "string"
+    },
+    "tracking_entered_date": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "delivered_date": {
+      "type": "string",
+      "format": "date-time"
     }
   },
   "required": [

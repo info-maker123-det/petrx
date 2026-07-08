@@ -63,6 +63,13 @@
     "has_prescription_items": {
       "type": "boolean",
       "default": false
+    },
+    "tracking_number": {
+      "type": "string"
+    },
+    "delivered_date": {
+      "type": "string",
+      "format": "date-time"
     }
   },
   "required": [
