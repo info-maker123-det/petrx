@@ -36,9 +36,11 @@ export default function SimilarProducts({ product }) {
           <div className="w-8 h-8 border-4 border-secondary border-t-sage rounded-full animate-spin" />
         </div>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="flex sm:grid sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 overflow-x-auto sm:overflow-visible no-scrollbar snap-x snap-mandatory sm:snap-none -mx-5 px-5 sm:mx-0 sm:px-0 pb-2 sm:pb-0">
           {related.map((p, i) => (
-            <ProductCard key={p.id} product={p} index={i} />
+            <div key={p.id} className="w-[75vw] max-w-[280px] sm:w-auto sm:max-w-none flex-shrink-0 sm:flex-shrink snap-start">
+              <ProductCard product={p} index={i} />
+            </div>
           ))}
         </div>
       )}
