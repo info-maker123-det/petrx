@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useCart } from "@/lib/cartContext";
 import Logo from "@/components/petrx/Logo";
 import MegaMenu from "@/components/petrx/MegaMenu";
+import ContactDropdown from "@/components/petrx/ContactDropdown";
 
 const NAV_LINKS = [
   { label: "Shop", type: "route", target: "/shop" },
@@ -101,7 +102,7 @@ export default function FluidHeader() {
           {/* Desktop Nav */}
           <nav className="hidden lg:flex items-center gap-7">
             <MegaMenu />
-            {NAV_LINKS.filter((l) => l.label !== "Shop").map((link) =>
+            {NAV_LINKS.filter((l) => l.label !== "Shop" && l.label !== "Contact").map((link) =>
               link.type === "route" ? (
                 <Link key={link.label} to={link.target} onClick={handleRouteClick} className="text-sm font-medium text-ink/70 hover:text-ink transition-colors">
                   {link.label}
@@ -112,6 +113,7 @@ export default function FluidHeader() {
                 </a>
               )
             )}
+            <ContactDropdown />
           </nav>
 
           {/* Account + Cart */}
@@ -162,6 +164,13 @@ export default function FluidHeader() {
                   className="block py-3 px-4 mt-2 bg-ink text-white rounded-xl text-sm font-semibold text-center"
                 >
                   My Account
+                </Link>
+                <Link
+                  to="/admin"
+                  onClick={() => setMobileOpen(false)}
+                  className="block py-3 px-4 text-ink/50 hover:text-ink rounded-xl text-sm font-medium text-center"
+                >
+                  Staff Portal
                 </Link>
               </div>
             </motion.div>
