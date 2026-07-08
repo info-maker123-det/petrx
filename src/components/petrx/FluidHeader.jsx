@@ -115,15 +115,17 @@ export default function FluidHeader() {
           </nav>
 
           {/* Account + Cart */}
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 sm:gap-3">
             <Link
               to="/dashboard"
-              className="hidden lg:inline-flex items-center gap-2 px-4 py-2 border border-border rounded-xl text-sm font-medium text-ink hover:border-sage hover:text-sage transition-colors"
+              aria-label="My account"
+              className="inline-flex items-center justify-center w-9 h-9 sm:w-auto sm:h-auto sm:gap-2 sm:px-4 sm:py-2 border border-border rounded-xl text-sm font-medium text-ink hover:border-sage hover:text-sage transition-colors"
             >
-              <User className="w-4 h-4" /> Account
+              <User className="w-5 h-5 sm:w-4 sm:h-4" />
+              <span className="hidden sm:inline">Account</span>
             </Link>
 
-            <button onClick={openCart} className="relative p-2 hover:bg-secondary rounded-xl transition-colors">
+            <button onClick={openCart} aria-label="Cart" className="relative p-2 hover:bg-secondary rounded-xl transition-colors">
               <ShoppingBag className="w-5 h-5 text-ink" />
               {count > 0 && (
                 <span className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-sage text-white text-[10px] font-bold rounded-full flex items-center justify-center">
