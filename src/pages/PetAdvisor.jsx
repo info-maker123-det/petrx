@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { base44 } from "@/api/base44Client";
 import AdvisorChat from "@/components/petrx/AdvisorChat";
+import PetHealthPanel from "@/components/petrx/PetHealthPanel";
 import { Stethoscope, PawPrint, Plus, ArrowRight, ShieldCheck } from "lucide-react";
 
 export default function PetAdvisor() {
@@ -23,7 +24,7 @@ export default function PetAdvisor() {
 
   return (
     <div className="py-10 md:py-16 bg-porcelain min-h-screen">
-      <div className="max-w-5xl mx-auto px-5 md:px-8">
+      <div className="max-w-7xl mx-auto px-5 md:px-8">
         <div className="mb-8 md:mb-12">
           <div className="flex items-center gap-2 text-sage text-xs font-semibold tracking-wider uppercase mb-3">
             <Stethoscope className="w-4 h-4" /> PetRx Advisor
@@ -123,7 +124,14 @@ export default function PetAdvisor() {
                   Recommendations are guidance only — always consult your veterinarian before starting
                   new medications.
                 </div>
-                <AdvisorChat pet={selectedPet} />
+                <div className="grid grid-cols-1 lg:grid-cols-[340px_1fr] gap-6 items-start">
+                  <div className="lg:sticky lg:top-28 order-2 lg:order-1">
+                    <PetHealthPanel pet={selectedPet} />
+                  </div>
+                  <div className="order-1 lg:order-2">
+                    <AdvisorChat pet={selectedPet} />
+                  </div>
+                </div>
               </motion.div>
             )}
           </div>
