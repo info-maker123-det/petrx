@@ -102,6 +102,7 @@ export default function Shop() {
               setPetType={setPetType}
               healthIssue={healthIssue}
               setHealthIssue={setHealthIssue}
+              excludeIssues={productType === "rx" ? ["supplements"] : []}
             />
             <TopSellersCarousel products={products} />
           </>

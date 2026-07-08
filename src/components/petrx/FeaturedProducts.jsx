@@ -93,7 +93,7 @@ export default function FeaturedProducts() {
           {activeTab === "pharma" && (
             <div className="bg-[#FBF7F0] pt-10 md:pt-14">
               <div className="max-w-7xl mx-auto px-5 md:px-8">
-                <GuidedShop petType={petType} setPetType={setPetType} healthIssue={healthIssue} setHealthIssue={setHealthIssue} />
+                <GuidedShop petType={petType} setPetType={setPetType} healthIssue={healthIssue} setHealthIssue={setHealthIssue} excludeIssues={["supplements"]} />
               </div>
               <PharmaCatalog products={filteredRx} loading={loading} linkParams={shopLinkParams()} />
             </div>

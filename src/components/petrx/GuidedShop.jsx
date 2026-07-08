@@ -21,7 +21,8 @@ export const HEALTH_ISSUES = [
   { id: "supplements", label: "Vitamins & Supplements", icon: Pill, categories: ["Supplements"] },
 ];
 
-export default function GuidedShop({ products = [], petType, setPetType, healthIssue, setHealthIssue }) {
+export default function GuidedShop({ products = [], petType, setPetType, healthIssue, setHealthIssue, excludeIssues = [] }) {
+  const issues = HEALTH_ISSUES.filter((issue) => !excludeIssues.includes(issue.id));
   const enhanceImage = (url) => {
     if (!url) return url;
     if (url.includes("cdn.shopify.com")) return url + (url.includes("?") ? "&width=200" : "?width=200");
@@ -104,7 +105,7 @@ export default function GuidedShop({ products = [], petType, setPetType, healthI
                   </div>
                   <span className={`text-xs font-medium text-center ${!issueSelected ? "text-ink" : "text-ink/60"}`}>All issues</span>
                 </button>
-                {HEALTH_ISSUES.map((issue) => {
+                {issues.map((issue) => {
                   const active = healthIssue === issue.id;
                   const Icon = issue.icon;
                   const thumb = getIssueThumb(issue);
