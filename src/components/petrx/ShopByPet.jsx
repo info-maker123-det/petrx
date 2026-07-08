@@ -1,4 +1,5 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { ArrowUpRight } from "lucide-react";
 
@@ -7,12 +8,13 @@ const CAT_IMG = "https://media.base44.com/images/public/6a4dc0dbd2a6ae29bc765da4
 const HORSE_IMG = "https://media.base44.com/images/public/6a4dc0dbd2a6ae29bc765da4/6c813bc05_generated_880758e4.png";
 
 const CATEGORIES = [
-  { name: "Dogs", tagline: "Medications, supplements & preventatives", image: DOG_IMG, count: "200+ Products" },
-  { name: "Cats", tagline: "Feline health & wellness essentials", image: CAT_IMG, count: "150+ Products" },
-  { name: "Horses", tagline: "Equine supplements & care", image: HORSE_IMG, count: "80+ Products" },
+  { name: "Dogs", petKey: "dog", tagline: "Medications, supplements & preventatives", image: DOG_IMG, count: "200+ Products" },
+  { name: "Cats", petKey: "cat", tagline: "Feline health & wellness essentials", image: CAT_IMG, count: "150+ Products" },
+  { name: "Horses", petKey: "horse", tagline: "Equine supplements & care", image: HORSE_IMG, count: "80+ Products" },
 ];
 
 export default function ShopByPet() {
+  const navigate = useNavigate();
   return (
     <section id="shop-by-pet" className="py-24 md:py-36 bg-porcelain">
       <div className="max-w-7xl mx-auto px-5 md:px-8">
@@ -34,7 +36,7 @@ export default function ShopByPet() {
           {CATEGORIES.map((cat, i) => (
             <motion.a
               key={cat.name}
-              href="#products"
+              onClick={() => navigate(`/shop?pet=${cat.petKey}`)}
               initial={{ opacity: 0, y: 40 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}

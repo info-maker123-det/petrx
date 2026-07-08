@@ -18,6 +18,9 @@ export default function Shop() {
   const [showFilters, setShowFilters] = useState(false);
 
   useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const pet = params.get("pet");
+    if (pet && ["dog", "cat", "horse"].includes(pet)) setPetType(pet);
     base44.entities.Product
       .list("-rating", 1000)
       .then((data) => setProducts(Array.isArray(data) ? data : []))
