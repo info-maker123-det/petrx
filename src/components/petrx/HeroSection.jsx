@@ -1,6 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { ShieldCheck, ArrowRight, FileText, Star, Stethoscope } from "lucide-react";
+import { ShieldCheck, ArrowRight, FileText, Stethoscope } from "lucide-react";
 import { motion } from "framer-motion";
 
 const HERO_IMAGE = "https://media.base44.com/images/public/6a4dc0dbd2a6ae29bc765da4/d1e54be26_generated_e50bc09d.png";
@@ -8,7 +8,7 @@ const HERO_IMAGE = "https://media.base44.com/images/public/6a4dc0dbd2a6ae29bc765
 const TRUST_BADGES = [
   { icon: ShieldCheck, label: "Licensed in 50 States" },
   { icon: FileText, label: "Pharmacist-Reviewed Rx" },
-  { icon: Star, label: "4.9/5 · 12,000+ Reviews" },
+  { icon: Stethoscope, label: "Talk to a Pharmacist" },
 ];
 
 export default function HeroSection() {
