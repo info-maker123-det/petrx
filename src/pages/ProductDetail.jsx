@@ -30,7 +30,7 @@ export default function ProductDetail() {
   const [loading, setLoading] = useState(true);
   const [autoship, setAutoship] = useState(true);
   const [supplyMonths, setSupplyMonths] = useState(1);
-  const [weight, setWeight] = useState(50);
+  const [weight, setWeight] = useState("24to50");
   const [added, setAdded] = useState(false);
 
   useEffect(() => {
@@ -62,11 +62,37 @@ export default function ProductDetail() {
   const perUnit = autoship ? product.price * 0.95 : product.price;
   const totalPrice = perUnit * supplyMonths;
   const autoshipSavings = (product.price - product.price * 0.95) * supplyMonths;
-  const weightOptions = [
-    { label: "Small", range: "Under 25 lbs", value: 20 },
-    { label: "Medium", range: "25–60 lbs", value: 45 },
-    { label: "Large", range: "60+ lbs", value: 80 },
+
+  // Real veterinary weight tiers — shown only for weight-dosed medications
+  const DOG_WEIGHTS = [
+    { label: "Up to 10 lbs", value: "upto10" },
+    { label: "10.1–24 lbs", value: "10to24" },
+    { label: "24.1–50 lbs", value: "24to50" },
+    { label: "50.1–100 lbs", value: "50to100" },
+    { label: "100+ lbs", value: "over100" },
   ];
+  const CAT_WEIGHTS = [
+    { label: "Up to 10 lbs", value: "upto10" },
+    { label: "10.1–20 lbs", value: "10to20" },
+  ];
+  const HORSE_WEIGHTS = [
+    { label: "Up to 600 lbs", value: "upto600" },
+    { label: "600–1,200 lbs", value: "600to1200" },
+  ];
+
+  const WEIGHT_DOSED_CATEGORIES = [
+    "Flea, Tick & Heartworm",
+    "Flea & Tick",
+    "Pain & Inflammation",
+    "Joint & Pain",
+    "Heartworm",
+  ];
+  const isWeightDosed =
+    WEIGHT_DOSED_CATEGORIES.includes(product.category) ||
+    (product.weight_class && product.weight_class !== "All weights" && product.weight_class !== "Dogs 8 weeks+");
+  const weightOptions =
+    product.pet_type === "cat" ? CAT_WEIGHTS : product.pet_type === "horse" ? HORSE_WEIGHTS : DOG_WEIGHTS;
+
   const supplyOptions = [
     { months: 1, label: "1-Month", desc: null },
     { months: 3, label: "3-Month", desc: "Most Popular" },
@@ -207,27 +233,31 @@ export default function ProductDetail() {
               </div>
             )}
 
-            {/* Weight / Dosage Selector */}
-            <div className="cellular-card p-5 mb-5">
-              <p className="text-xs text-ink/40 uppercase tracking-wider font-semibold mb-3">Select Your Pet's Weight</p>
-              <div className="grid grid-cols-3 gap-2.5">
-                {weightOptions.map((opt) => {
-                  const active = weight === opt.value;
-                  return (
-                    <button
-                      key={opt.label}
-                      onClick={() => setWeight(opt.value)}
-                      className={`flex flex-col items-center gap-1 py-4 rounded-2xl border-2 transition-all ${
-                        active ? "border-sage bg-sage/5" : "border-border hover:border-sage/40"
-                      }`}
-                    >
-                      <span className={`text-sm font-semibold ${active ? "text-sage" : "text-ink"}`}>{opt.label}</span>
-                      <span className="text-xs text-ink/40">{opt.range}</span>
-                    </button>
-                  );
-                })}
+            {/* Weight / Dosage Selector — only for weight-dosed medications */}
+            {isWeightDosed && (
+              <div className="cellular-card p-5 mb-5">
+                <p className="text-xs text-ink/40 uppercase tracking-wider font-semibold mb-3">Select Your Pet's Weight</p>
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
+                  {weightOptions.map((opt) => {
+                    const active = weight === opt.value;
+                    return (
+                      <button
+                        key={opt.value}
+                        onClick={() => setWeight(opt.value)}
+                        className={`flex flex-col items-center gap-1 py-4 px-2 rounded-2xl border-2 transition-all ${
+                          active ? "border-sage bg-sage/5" : "border-border hover:border-sage/40"
+                        }`}
+                      >
+                        <span className={`text-sm font-semibold ${active ? "text-sage" : "text-ink"}`}>{opt.label}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+                <p className="text-xs text-ink/40 mt-3">
+                  Not sure? Check your pet's weight or ask your vet — dosing is based on body weight.
+                </p>
               </div>
-            </div>
+            )}
 
             {/* Supply Size Selector */}
             <div className="mb-5">
@@ -247,7 +277,10 @@ export default function ProductDetail() {
                         <span className="absolute -top-2 px-2 py-0.5 bg-sage text-white rounded-full text-[9px] font-bold uppercase tracking-wide">{opt.desc}</span>
                       )}
                       <span className={`text-sm font-semibold ${active ? "text-sage" : "text-ink"}`}>{opt.label}</span>
-                      <span className="text-xs text-ink/40">${perUnit.toFixed(2)}/mo</span>
+                      <span className="text-xs text-ink/40">${(perUnit * opt.months).toFixed(2)} total</span>
+                      {opt.months > 1 && autoship && (
+                        <span className="text-[10px] text-sage font-medium">Save ${((product.price - product.price * 0.95) * opt.months).toFixed(2)} w/ AutoShip</span>
+                      )}
                     </button>
                   );
                 })}
