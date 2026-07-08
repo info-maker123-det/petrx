@@ -1,15 +1,17 @@
 import React from "react";
-import { Plus } from "lucide-react";
+import DogIcon from "./DogIcon";
 
+/**
+ * The advisor avatar — the dog mark from the PetRx logo, set in a clean circle.
+ */
 export default function LogoMark({ size = 32, className = "" }) {
-  const iconSize = Math.round(size * 0.55);
-  const radius = Math.round(size * 0.28);
+  const dogSize = Math.round(size * 0.64);
   return (
     <span
-      className={`inline-flex items-center justify-center bg-sage shadow-sm flex-shrink-0 ${className}`}
-      style={{ width: size, height: size, borderRadius: radius }}
+      className={`inline-flex items-center justify-center bg-white border border-border shadow-sm flex-shrink-0 ${className}`}
+      style={{ width: size, height: size, borderRadius: "50%" }}
     >
-      <Plus className="text-white" strokeWidth={2.5} style={{ width: iconSize, height: iconSize }} />
+      <DogIcon size={dogSize} color="#4a4a4a" strokeWidth={2.4} />
     </span>
   );
 }

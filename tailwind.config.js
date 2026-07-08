@@ -59,13 +59,18 @@ module.exports = {
   				'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
   				border: 'hsl(var(--sidebar-border))',
   				ring: 'hsl(var(--sidebar-ring))'
+  			},
+  			brand: {
+  				magenta: 'hsl(var(--brand-magenta))',
+  				charcoal: 'hsl(var(--brand-charcoal))'
   			}
   		},
   		fontFamily: {
   			heading: ['DM Serif Display', 'Georgia', 'serif'],
   			body: ['Inter', 'ui-sans-serif', 'system-ui', 'sans-serif'],
   			display: ['DM Serif Display', 'Georgia', 'serif'],
-  			mono: ['var(--font-mono)']
+  			mono: ['var(--font-mono)'],
+  			logo: ['Quicksand', 'ui-sans-serif', 'system-ui', 'sans-serif']
   		},
   		keyframes: {
   			'accordion-down': {
