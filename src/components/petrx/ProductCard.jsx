@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { useCart } from "@/lib/cartContext";
-import { Star, ShoppingBag, Check, PawPrint } from "lucide-react";
+import { Star, ShoppingBag, Check, PawPrint, Truck } from "lucide-react";
 import FilterLink from "./FilterLink";
 
 const enhanceImage = (url) => {
@@ -27,6 +27,11 @@ export default function ProductCard({ product, index = 0 }) {
     setAdded(true);
     setTimeout(() => setAdded(false), 1800);
   };
+
+  const unitCount = product.price_range ? parseInt(product.price_range.match(/\d+/)?.[0] || "0") : 0;
+  const perUnit = unitCount > 0 ? (Number(product.price) / unitCount).toFixed(2) : null;
+  const autoshipPrice = (Number(product.price) * 0.95).toFixed(2);
+  const autoshipSavings = (Number(product.price) * 0.05).toFixed(2);
 
   return (
     <motion.div
@@ -111,11 +116,42 @@ export default function ProductCard({ product, index = 0 }) {
             <span className="text-xs text-ink/40">{product.rating} ({product.review_count})</span>
           </div>
 
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-lg font-semibold text-ink">From ${Number(product.price).toFixed(2)}</p>
-              <p className="text-xs text-ink/40">{product.price_range}</p>
+          {/* Price + per-unit */}
+          <div className="mb-3">
+            <div className="flex items-baseline gap-2 flex-wrap">
+              <p className="text-lg font-semibold text-ink">${Number(product.price).toFixed(2)}</p>
+              {product.autoship_eligible && (
+                <p className="text-sm text-sage font-semibold">
+                  ${autoshipPrice} <span className="font-normal text-sage/70">w/ AutoShip</span>
+                </p>
+              )}
             </div>
+            {product.price_range && (
+              <p className="text-xs text-ink/40">
+                {product.price_range}
+                {perUnit && ` · $${perUnit}/unit`}
+              </p>
+            )}
+          </div>
+
+          {/* Trust badges */}
+          <div className="flex flex-wrap gap-1.5 mb-4">
+            {product.requires_prescription && (
+              <span className="px-2 py-0.5 bg-ochre/10 text-ochre rounded-full text-[10px] font-semibold">
+                Prescription Item
+              </span>
+            )}
+            {product.autoship_eligible && (
+              <span className="px-2 py-0.5 bg-sage/10 text-sage rounded-full text-[10px] font-medium">
+                Save ${autoshipSavings} w/ AutoShip
+              </span>
+            )}
+            <span className="px-2 py-0.5 bg-secondary text-ink/50 rounded-full text-[10px] font-medium flex items-center gap-1">
+              <Truck className="w-2.5 h-2.5" /> Free delivery $49+
+            </span>
+          </div>
+
+          <div className="flex justify-end">
             <button
               onClick={handleAdd}
               className={`w-10 h-10 rounded-full flex items-center justify-center transition-colors ${

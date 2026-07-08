@@ -4,6 +4,7 @@ import { Search, ShoppingBag, Menu, X, Phone, ShieldCheck } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useCart } from "@/lib/cartContext";
 import Logo from "@/components/petrx/Logo";
+import MegaMenu from "@/components/petrx/MegaMenu";
 
 const NAV_LINKS = [
   { label: "Shop", type: "route", target: "/shop" },
@@ -96,7 +97,18 @@ export default function FluidHeader() {
 
           {/* Desktop Nav */}
           <nav className="hidden lg:flex items-center gap-7">
-            {renderNavLinks()}
+            <MegaMenu />
+            {NAV_LINKS.filter((l) => l.label !== "Shop").map((link) =>
+              link.type === "route" ? (
+                <Link key={link.label} to={link.target} onClick={handleRouteClick} className="text-sm font-medium text-ink/70 hover:text-ink transition-colors">
+                  {link.label}
+                </Link>
+              ) : (
+                <a key={link.label} href={link.target} onClick={(e) => handleSectionClick(e, link.target)} className="text-sm font-medium text-ink/70 hover:text-ink transition-colors">
+                  {link.label}
+                </a>
+              )
+            )}
           </nav>
 
           {/* Search + Account + Cart */}
