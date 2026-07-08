@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { base44 } from "@/api/base44Client";
-import { Search, Stethoscope, Trash2, Loader2 } from "lucide-react";
+import { Search, Stethoscope, Trash2, Loader2, Mail } from "lucide-react";
 import EditModal from "@/components/admin/EditModal";
+import VetEmailGenerator from "@/components/admin/VetEmailGenerator";
 
 export default function AdminVets() {
   const [vets, setVets] = useState([]);
@@ -11,6 +12,7 @@ export default function AdminVets() {
   const [form, setForm] = useState({});
   const [saving, setSaving] = useState(false);
   const [deleting, setDeleting] = useState(null);
+  const [emailing, setEmailing] = useState(null);
 
   useEffect(() => {
     base44.entities.Vet
@@ -136,6 +138,9 @@ export default function AdminVets() {
                     </td>
                     <td className="px-4 py-3 text-right">
                       <div className="flex justify-end gap-2">
+                        <button onClick={() => setEmailing(v)} className="text-xs font-medium text-slate-700 bg-slate-100 hover:bg-slate-200 px-3 py-1.5 rounded-lg transition-colors inline-flex items-center gap-1">
+                          <Mail className="w-3 h-3" /> Email
+                        </button>
                         <button onClick={() => startEdit(v)} className="text-xs font-medium text-slate-700 bg-slate-100 hover:bg-slate-200 px-3 py-1.5 rounded-lg transition-colors">
                           Edit
                         </button>
@@ -200,6 +205,8 @@ export default function AdminVets() {
           </div>
         </div>
       </EditModal>
+
+      {emailing && <VetEmailGenerator vet={emailing} onClose={() => setEmailing(null)} />}
     </div>
   );
 }

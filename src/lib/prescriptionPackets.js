@@ -61,6 +61,46 @@ export function generateVetVerificationPacket(rx) {
   `;
 }
 
+export function generateVetVerificationText(rx, vet) {
+  const ref = rx.id ? rx.id.slice(-8).toUpperCase() : "N/A";
+  const date = new Date().toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" });
+  const val = (v) => v || "—";
+  const clinic = vet ? vet.clinic_name : rx.vet_clinic_name;
+
+  return `PETRX PHARMACY — PRESCRIPTION VERIFICATION REQUEST
+${date}
+Reference: ${ref}
+
+TO: ${clinic || "—"}
+${vet && vet.vet_name ? `ATTN: Dr. ${vet.vet_name}\n` : ""}${vet && vet.email ? `Email: ${vet.email}\n` : ""}${vet && vet.fax ? `Fax: ${vet.fax}\n` : ""}${vet && vet.phone ? `Phone: ${vet.phone}\n` : ""}
+PET INFORMATION
+Pet Name: ${val(rx.pet_name)}
+Species: ${val(rx.pet_species)}
+
+MEDICATION REQUESTED
+${val(rx.medication_name)}
+Approval Method: ${val(rx.approval_method ? rx.approval_method.replace(/_/g, " ") : null)}
+
+PRESCRIBING VETERINARIAN (ON FILE)
+Clinic: ${val(rx.vet_clinic_name)}
+Veterinarian: ${val(rx.vet_name)}
+Phone: ${val(rx.vet_phone)}
+Fax: ${val(rx.vet_fax)}
+Email: ${val(rx.vet_email)}
+Address: ${val(rx.vet_address)}
+
+VERIFICATION REQUEST
+We are requesting verification of the above prescription for ${val(rx.medication_name)} prescribed for ${val(rx.pet_name)}. Please confirm or deny by responding via phone, fax, or email.
+
+[ ] Approved
+[ ] Denied
+[ ] Need More Information
+
+${rx.notes ? `ADDITIONAL NOTES\n${rx.notes}\n\n` : ""}—
+PetRx Pharmacy
+pharmacy@petrx.com`;
+}
+
 export function generateSisterPharmacyPacket(rx) {
   const ref = rx.id ? rx.id.slice(-8).toUpperCase() : "N/A";
   const date = new Date().toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" });
