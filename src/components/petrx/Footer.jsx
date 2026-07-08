@@ -33,10 +33,10 @@ export default function Footer() {
         <div className="max-w-7xl mx-auto px-5 md:px-8 py-16 md:py-20 flex flex-col md:flex-row items-center justify-between gap-8">
           <div>
             <h3 className="font-display text-2xl md:text-3xl text-white mb-2">
-              Ready to simplify your pet's pharmacy?
+              Your pet's pharmacy, simplified.
             </h3>
             <p className="text-white/40 text-base">
-              Join thousands of pet parents who trust PetRx for their medications.
+              Create a free account to manage prescriptions, pets, and deliveries in one secure place.
             </p>
           </div>
           <a
@@ -117,6 +117,15 @@ export default function Footer() {
               </button>
             </div>
           </div>
+        </div>
+      </div>
+
+      {/* Credentials Strip */}
+      <div className="border-t border-white/10">
+        <div className="max-w-7xl mx-auto px-5 md:px-8 py-8 flex flex-wrap items-center justify-center gap-6 md:gap-10">
+          {["NABP Accredited", "VIPPS Certified", "HIPAA Compliant", "CA Board of Pharmacy Licensed", "FDA-Approved Sources"].map((cred) => (
+            <span key={cred} className="text-white/30 text-xs font-medium tracking-wide uppercase">{cred}</span>
+          ))}
         </div>
       </div>
 

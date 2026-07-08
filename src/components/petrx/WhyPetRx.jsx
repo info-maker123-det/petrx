@@ -1,14 +1,14 @@
 import React from "react";
 import { motion } from "framer-motion";
-import { Heart, ShieldCheck, Users, Truck, Award, Stethoscope } from "lucide-react";
+import { ShieldCheck, Stethoscope, Lock, Truck, BadgeCheck, Heart } from "lucide-react";
 
 const REASONS = [
-  { icon: Users, title: "Family-Owned", desc: "We're a family-owned pharmacy, not a faceless corporation. Every order is handled with personal care." },
-  { icon: ShieldCheck, title: "Licensed & Accredited", desc: "Fully licensed pharmacy meeting all state and federal regulations for pet medication dispensing." },
-  { icon: Stethoscope, title: "Pharmacist On Staff", desc: "Our licensed pharmacists review every prescription to ensure your pet's safety." },
-  { icon: Truck, title: "Free Shipping $49+", desc: "Fast, temperature-controlled shipping on all orders over $49 — delivered right to your door." },
-  { icon: Award, title: "FDA-Approved Only", desc: "We carry only FDA-approved medications and EPA-registered products. No compromises on quality." },
-  { icon: Heart, title: "Compassionate Service", desc: "We understand the stress of a sick pet. Our team provides guidance and support every step of the way." },
+  { icon: ShieldCheck, title: "Licensed & Accredited", desc: "Nationwide licensed pharmacy, NABP-accredited and compliant with all state and federal regulations for pet medication dispensing." },
+  { icon: Stethoscope, title: "Board-Certified Pharmacists", desc: "Every prescription is reviewed by a licensed pharmacist before it ships — ensuring safety, accuracy, and the right dosage for your pet." },
+  { icon: Lock, title: "Secure & Compliant", desc: "Our platform is HIPAA-compliant and encrypted end to end. Your pet's health data and your information stay private." },
+  { icon: Truck, title: "Fast, Free Shipping", desc: "Temperature-controlled delivery on all orders over $49, shipped directly from our California pharmacy to your door." },
+  { icon: BadgeCheck, title: "FDA-Approved Medications", desc: "We carry only FDA-approved medications and EPA-registered products. No compromises on quality or sourcing." },
+  { icon: Heart, title: "Real People, Real Care", desc: "Talk to a pharmacist anytime. We understand the stress of a sick pet, and our team is here with guidance and support every step of the way." },
 ];
 
 export default function WhyPetRx() {
@@ -25,10 +25,10 @@ export default function WhyPetRx() {
         <div className="text-center mb-20">
           <p className="text-sage text-sm font-semibold tracking-widest uppercase mb-3">Our Promise</p>
           <h2 className="font-display text-3xl md:text-4xl lg:text-5xl text-white mb-4">
-            Why Pet Parents Choose PetRx
+            A pharmacy built on trust
           </h2>
           <p className="text-white/40 max-w-md mx-auto text-base">
-            Trusted by thousands of families for pharmaceutical-grade pet care.
+            Clinical-grade infrastructure with the personal care your pet deserves.
           </p>
         </div>
 
@@ -41,7 +41,7 @@ export default function WhyPetRx() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.5, delay: i * 0.08 }}
-              className="p-8 rounded-[32px] border-[0.5px] border-white/10 bg-white/[0.03] backdrop-blur-sm hover:bg-white/[0.06] transition-colors"
+              className="p-8 rounded-[32px] border border-white/10 bg-white/[0.03] backdrop-blur-sm hover:bg-white/[0.06] transition-colors"
             >
               <div className="w-12 h-12 rounded-2xl bg-sage/15 flex items-center justify-center mb-5">
                 <Icon className="w-5 h-5 text-sage" />
