@@ -10,12 +10,12 @@ const LOGO_URL =
  * logo blends seamlessly. On dark surfaces (footer) the logo sits on a white
  * rounded "plate" so it reads cleanly.
  */
-export default function Logo({ className = "", onDark = false, to = "/" }) {
+export default function Logo({ className = "", onDark = false, heightClass = "h-8 md:h-9", to = "/" }) {
   const img = (
     <img
       src={LOGO_URL}
       alt="PetRx"
-      className={`h-8 md:h-9 w-auto ${onDark ? "" : "mix-blend-multiply"}`}
+      className={`${heightClass} w-auto ${onDark ? "" : "mix-blend-multiply"}`}
     />
   );
 

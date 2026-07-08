@@ -96,7 +96,7 @@ export default function FluidHeader() {
       >
         <div className="max-w-7xl mx-auto px-5 md:px-8 flex items-center justify-between gap-6">
           {/* Logo */}
-          <Logo />
+          <Logo heightClass="h-12 md:h-14" />
 
           {/* Desktop Nav */}
           <nav className="hidden lg:flex items-center gap-7">
