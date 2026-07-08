@@ -361,6 +361,7 @@ For EACH clinic you find, return:
 - zip: The 5-digit zip code
 - phone: The phone number in format (XXX) XXX-XXXX
 - email: The clinic's email if publicly available, otherwise ""
+- fax: The clinic's fax number in format (XXX) XXX-XXXX if publicly available, otherwise ""
 - website: The clinic's website URL if available, otherwise ""
 
 Rules:
@@ -391,6 +392,7 @@ Rules:
                     zip: { type: 'string' },
                     phone: { type: 'string' },
                     email: { type: 'string' },
+                    fax: { type: 'string' },
                     website: { type: 'string' },
                   },
                   required: ['clinic_name', 'address', 'city', 'state', 'phone'],
@@ -420,6 +422,7 @@ Rules:
             zip: c.zip ? String(c.zip).slice(0, 10) : '',
             phone: c.phone ? String(c.phone).slice(0, 30) : '',
             email: c.email ? String(c.email).slice(0, 200) : '',
+            fax: c.fax ? String(c.fax).slice(0, 30) : '',
             website: c.website ? String(c.website).slice(0, 300) : '',
           });
         }

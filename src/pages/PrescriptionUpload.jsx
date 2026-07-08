@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { base44 } from "@/api/base44Client";
-import { Upload, FileText, Check, ArrowRight, Stethoscope, PawPrint, MapPin, Phone, Mail, X } from "lucide-react";
+import { Upload, FileText, Check, ArrowRight, Stethoscope, PawPrint, MapPin, Phone, Mail, Printer, X } from "lucide-react";
 import MedicationSearch from "@/components/petrx/MedicationSearch";
 import VetSearch from "@/components/petrx/VetSearch";
 
@@ -216,6 +216,9 @@ export default function PrescriptionUpload() {
                         )}
                         {selectedVet.email && (
                           <p className="flex items-center gap-1.5"><Mail className="w-3.5 h-3.5 text-sage" />{selectedVet.email}</p>
+                        )}
+                        {selectedVet.fax && (
+                          <p className="flex items-center gap-1.5"><Printer className="w-3.5 h-3.5 text-sage" />{selectedVet.fax}</p>
                         )}
                       </div>
                     </div>

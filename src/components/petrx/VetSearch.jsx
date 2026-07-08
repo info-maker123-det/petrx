@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { base44 } from "@/api/base44Client";
-import { Search, Stethoscope, MapPin, Phone, Mail, Check, X, ChevronDown } from "lucide-react";
+import { Search, Stethoscope, MapPin, Phone, Mail, Check, X, ChevronDown, Printer } from "lucide-react";
 
 export default function VetSearch({ onSelect, selectedClinic }) {
   const [vets, setVets] = useState([]);
@@ -110,6 +110,20 @@ export default function VetSearch({ onSelect, selectedClinic }) {
                     <span className="mx-1">·</span>
                     <Phone className="w-3 h-3" />
                     <span>{vet.phone}</span>
+                  </>
+                )}
+                {vet.email && (
+                  <>
+                    <span className="mx-1">·</span>
+                    <Mail className="w-3 h-3" />
+                    <span className="truncate max-w-[140px]">{vet.email}</span>
+                  </>
+                )}
+                {vet.fax && (
+                  <>
+                    <span className="mx-1">·</span>
+                    <Printer className="w-3 h-3" />
+                    <span>{vet.fax}</span>
                   </>
                 )}
               </div>
