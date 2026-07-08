@@ -1,16 +1,14 @@
 import React from "react";
-import { Link } from "react-router-dom";
+import Logo from "@/components/petrx/Logo";
 
 export default function AuthLayout({ icon: Icon, title, subtitle, footer, children }) {
   return (
     <div className="min-h-screen flex items-center justify-center bg-porcelain px-4 py-12">
       <div className="w-full max-w-md">
         {/* Logo */}
-        <Link to="/" className="flex justify-center mb-8">
-          <h2 className="font-display text-3xl text-ink tracking-tight">
-            Pet<span className="text-sage">Rx</span>
-          </h2>
-        </Link>
+        <div className="flex justify-center mb-8">
+          <Logo className="h-10" />
+        </div>
 
         <div className="text-center mb-10">
           <div className="inline-flex items-center justify-center w-14 h-14 rounded-[20px] bg-sage/10 border-[0.5px] border-sage/20 mb-4">

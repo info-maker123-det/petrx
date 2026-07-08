@@ -1,5 +1,6 @@
 import React from "react";
 import { Phone, Mail, MapPin } from "lucide-react";
+import Logo from "@/components/petrx/Logo";
 
 const PHARMACY_LINKS = [
   { label: "Dog Medications", href: "#products" },
@@ -52,9 +53,9 @@ export default function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 lg:gap-8">
           {/* Brand */}
           <div className="lg:col-span-1">
-            <h2 className="font-display text-2xl text-white mb-4">
-              Pet<span className="text-sage">Rx</span>
-            </h2>
+            <div className="mb-4">
+              <Logo onDark />
+            </div>
             <p className="text-white/40 text-sm leading-relaxed mb-6">
               Your trusted family-owned pet pharmacy. Licensed, accredited, and committed to your pet's health.
             </p>

@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { Search, ShoppingBag, Menu, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useCart } from "@/lib/cartContext";
+import Logo from "@/components/petrx/Logo";
 
 const NAV_LINKS = [
   { label: "Shop", type: "section", target: "#shop-by-pet" },
@@ -82,15 +83,7 @@ export default function FluidHeader() {
       >
         <div className="max-w-7xl mx-auto px-5 md:px-8 flex items-center justify-between gap-6">
           {/* Logo */}
-          <Link to="/" className="flex-shrink-0 transition-all duration-500">
-            <h1
-              className={`font-display text-ink tracking-tight transition-all duration-500 ${
-                scrolled ? "text-xl" : "text-3xl"
-              }`}
-            >
-              Pet<span className="text-sage">Rx</span>
-            </h1>
-          </Link>
+          <Logo className={`transition-all duration-500 ${scrolled ? "scale-90" : "scale-100"}`} />
 
           {/* Desktop Nav */}
           <nav className="hidden lg:flex items-center gap-8">
