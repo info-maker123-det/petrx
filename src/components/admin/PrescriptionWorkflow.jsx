@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { base44 } from "@/api/base44Client";
-import { Printer, Send, CheckCircle, XCircle, Truck, Package, RefreshCw, AlertCircle, Loader2 } from "lucide-react";
+import { Printer, Send, CheckCircle, XCircle, Truck, Package, RefreshCw, AlertCircle, Loader2, Stethoscope, Phone, Mail, MapPin } from "lucide-react";
 import { effectiveRxStatus, CUSTOMER_STATUS_MAP, printHtml } from "@/lib/adminUtils";
 import { generateVetVerificationPacket, generateSisterPharmacyPacket } from "@/lib/prescriptionPackets";
 
@@ -47,6 +47,42 @@ export default function PrescriptionWorkflow({ rx, onUpdate }) {
           <Package className="w-3.5 h-3.5" />
         </div>
         <h3 className="font-display text-lg text-slate-900">Workflow Actions</h3>
+      </div>
+
+      <div className="bg-slate-50 border border-slate-200 rounded-xl p-3 mb-4">
+        <div className="flex items-center gap-1.5 mb-2">
+          <Stethoscope className="w-3.5 h-3.5 text-slate-400" />
+          <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Vet Contact</p>
+        </div>
+        <div className="space-y-1.5">
+          <p className="text-sm font-semibold text-slate-900">{rx.vet_clinic_name || "—"}</p>
+          {rx.vet_name && <p className="text-xs text-slate-600">Dr. {rx.vet_name}</p>}
+          <div className="grid grid-cols-1 gap-1 pt-1">
+            {rx.vet_phone && (
+              <a href={`tel:${rx.vet_phone}`} className="flex items-center gap-2 text-xs text-slate-700 hover:text-slate-900">
+                <Phone className="w-3 h-3 text-slate-400" /> {rx.vet_phone}
+              </a>
+            )}
+            {rx.vet_fax && (
+              <div className="flex items-center gap-2 text-xs text-slate-700">
+                <Printer className="w-3 h-3 text-slate-400" /> {rx.vet_fax}
+              </div>
+            )}
+            {rx.vet_email && (
+              <a href={`mailto:${rx.vet_email}`} className="flex items-center gap-2 text-xs text-blue-600 hover:underline break-all">
+                <Mail className="w-3 h-3 text-slate-400 flex-shrink-0" /> {rx.vet_email}
+              </a>
+            )}
+            {rx.vet_address && (
+              <div className="flex items-start gap-2 text-xs text-slate-600 pt-0.5">
+                <MapPin className="w-3 h-3 text-slate-400 flex-shrink-0 mt-0.5" /> <span>{rx.vet_address}</span>
+              </div>
+            )}
+            {!rx.vet_phone && !rx.vet_fax && !rx.vet_email && !rx.vet_address && (
+              <p className="text-xs text-slate-400 italic">No contact details on file</p>
+            )}
+          </div>
+        </div>
       </div>
 
       {error && (
