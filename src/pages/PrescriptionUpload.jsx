@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { base44 } from "@/api/base44Client";
 import { Upload, FileText, Check, ArrowRight, Stethoscope, PawPrint } from "lucide-react";
+import MedicationSearch from "@/components/petrx/MedicationSearch";
 
 export default function PrescriptionUpload() {
   const [submitting, setSubmitting] = useState(false);
@@ -25,17 +26,23 @@ export default function PrescriptionUpload() {
   });
 
   useEffect(() => {
-    base44.entities.Pet.list()
-      .then((data) => {
-        const list = Array.isArray(data) ? data : [];
-        setPets(list);
-        if (list.length > 0) {
-          setSelectedPetId(list[0].id);
-          setForm((f) => ({ ...f, pet_name: list[0].name, pet_species: list[0].species }));
-        }
-      })
-      .catch(() => setPets([]))
-      .finally(() => setCheckingPets(false));
+    base44.auth.isAuthenticated().then((authed) => {
+      if (!authed) {
+        base44.auth.redirectToLogin("/prescription");
+        return;
+      }
+      base44.entities.Pet.list()
+        .then((data) => {
+          const list = Array.isArray(data) ? data : [];
+          setPets(list);
+          if (list.length > 0) {
+            setSelectedPetId(list[0].id);
+            setForm((f) => ({ ...f, pet_name: list[0].name, pet_species: list[0].species }));
+          }
+        })
+        .catch(() => setPets([]))
+        .finally(() => setCheckingPets(false));
+    });
   }, []);
 
   const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
@@ -171,7 +178,9 @@ export default function PrescriptionUpload() {
               </div>
               <div className="md:col-span-2">
                 <label className="text-xs text-ink/50 font-medium uppercase tracking-wider">Medication Name *</label>
-                <input name="medication_name" value={form.medication_name} onChange={handleChange} placeholder="e.g. Vetmedin 5mg" className="mt-1 w-full px-4 py-3 bg-secondary rounded-2xl border-[0.5px] border-transparent focus:border-sage focus:outline-none transition-all" />
+                <div className="mt-1">
+                  <MedicationSearch value={form.medication_name} onChange={(val) => setForm({ ...form, medication_name: val })} />
+                </div>
               </div>
             </div>
           </div>
