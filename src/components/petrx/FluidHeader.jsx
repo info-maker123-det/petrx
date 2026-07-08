@@ -91,7 +91,7 @@ export default function FluidHeader() {
 
       {/* Main Header */}
       <header
-        className={`sticky top-0 z-[60] transition-all duration-300 bg-porcelain/95 backdrop-blur-md border-b ${
+        className={`sticky top-0 z-50 transition-all duration-300 bg-porcelain/95 backdrop-blur-md border-b ${
           scrolled ? "border-border shadow-sm py-2.5" : "border-transparent py-4"
         }`}
       >
