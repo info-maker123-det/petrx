@@ -1,6 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { ShieldCheck, ArrowRight, FileText, Star } from "lucide-react";
+import { ShieldCheck, ArrowRight, FileText, Star, Stethoscope } from "lucide-react";
 import { motion } from "framer-motion";
 
 const HERO_IMAGE = "https://media.base44.com/images/public/6a4dc0dbd2a6ae29bc765da4/d1e54be26_generated_e50bc09d.png";
@@ -72,6 +72,9 @@ export default function HeroSection() {
             </Link>
             <Link to="/prescription" className="inline-flex items-center gap-2 px-8 py-4 bg-white text-ink rounded-2xl text-base font-semibold border border-border hover:border-sage hover:text-sage transition-colors">
               Submit a prescription
+            </Link>
+            <Link to="/advisor" className="inline-flex items-center gap-2 px-8 py-4 bg-white text-ink rounded-2xl text-base font-semibold border border-border hover:border-sage hover:text-sage transition-colors">
+              <Stethoscope className="w-4 h-4" /> Talk to the Advisor
             </Link>
           </motion.div>
 
