@@ -50,6 +50,9 @@
     "usage": {
       "type": "string"
     },
+    "side_effects": {
+      "type": "string"
+    },
     "image_url": {
       "type": "string"
     },

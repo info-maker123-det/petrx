@@ -20,7 +20,7 @@ import {
   AccordionTrigger,
   AccordionContent,
 } from "@/components/ui/accordion";
-import { ShieldAlert, Info, FileText } from "lucide-react";
+import { ShieldAlert, Info, FileText, AlertTriangle } from "lucide-react";
 
 export default function ProductDetail() {
   const { id } = useParams();
@@ -287,6 +287,42 @@ export default function ProductDetail() {
                       discontinue use and consult your veterinarian. Always inform your veterinarian of any other
                       medications your pet is taking before starting a new treatment.
                     </p>
+                  </AccordionContent>
+                </AccordionItem>
+
+                <AccordionItem value="side-effects" className="border-border">
+                  <AccordionTrigger className="text-ink font-display text-lg hover:no-underline">
+                    <span className="flex items-center gap-2">
+                      <AlertTriangle className="w-4 h-4 text-ochre" /> Side Effects
+                    </span>
+                  </AccordionTrigger>
+                  <AccordionContent className="text-ink/60 text-sm leading-relaxed space-y-3">
+                    {product.side_effects ? (
+                      <p>{product.side_effects}</p>
+                    ) : product.requires_prescription ? (
+                      <>
+                        <p>
+                          <strong className="text-ink">Possible side effects may include:</strong> gastrointestinal
+                          upset (vomiting, diarrhea, decreased appetite), lethargy, or changes in behavior. These are
+                          not all possible side effects.
+                        </p>
+                        <p>
+                          <strong className="text-ink">Serious reactions:</strong> Stop use and contact your
+                          veterinarian immediately if you observe signs of allergic reaction (hives, facial swelling,
+                          difficulty breathing), persistent vomiting or diarrhea, or any other unusual symptoms.
+                        </p>
+                        <p>
+                          For a complete list of side effects, refer to the product label or consult your veterinarian.
+                          Report any adverse reactions to your vet and to the manufacturer.
+                        </p>
+                      </>
+                    ) : (
+                      <p>
+                        Side effects are rare with this supplement. Mild digestive upset may occur when first
+                        introduced. If you notice any unusual symptoms or allergic reactions, discontinue use and
+                        consult your veterinarian.
+                      </p>
+                    )}
                   </AccordionContent>
                 </AccordionItem>
 
