@@ -85,10 +85,12 @@ export default function Shop() {
   return (
     <div className="min-h-screen bg-porcelain">
       <div className="max-w-7xl mx-auto px-5 md:px-8 py-12 md:py-16">
-        <div className="mb-8">
-          <p className="text-sage text-sm font-semibold tracking-widest uppercase mb-2">{heading.eyebrow}</p>
-          <h1 className="font-display text-3xl md:text-4xl lg:text-5xl text-ink">{heading.title}</h1>
-          <p className="text-ink/50 mt-3 max-w-xl">{loading ? "Loading catalog…" : heading.subtitle}</p>
+        <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4 mb-12">
+          <div>
+            <p className="text-sage text-sm font-semibold tracking-widest uppercase mb-3">{heading.eyebrow}</p>
+            <h1 className="font-display text-3xl md:text-4xl lg:text-5xl text-ink leading-tight">{heading.title}</h1>
+          </div>
+          <p className="text-ink/50 max-w-sm text-base">{loading ? "Loading catalog…" : heading.subtitle}</p>
         </div>
 
         {brand === "all" && category === "All" && (

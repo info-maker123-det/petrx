@@ -31,18 +31,18 @@ export default function GuidedShop({ petType, setPetType, healthIssue, setHealth
   };
 
   return (
-    <div className="bg-white rounded-3xl border-[0.5px] border-border p-6 md:p-8 mb-8">
+    <div className="cellular-card p-8 md:p-10 mb-10">
       {/* Step 1: Pet type */}
       <div>
-        <div className="flex items-center justify-between mb-1">
-          <p className="text-xs font-semibold uppercase tracking-widest text-sage">Step 1</p>
+        <div className="flex items-center justify-between mb-2">
+          <p className="text-sage text-sm font-semibold tracking-widest uppercase">Step 1</p>
           {(petSelected || issueSelected) && (
             <button onClick={reset} className="flex items-center gap-1.5 text-xs text-ink/40 hover:text-ink transition-colors">
               <RotateCcw className="w-3 h-3" /> Start over
             </button>
           )}
         </div>
-        <h2 className="font-display text-xl md:text-2xl text-ink mb-4">What kind of pet do you have?</h2>
+        <h2 className="font-display text-2xl md:text-3xl text-ink mb-6">What kind of pet do you have?</h2>
         <div className="grid grid-cols-3 gap-3">
           {PETS.map((pet) => {
             const active = petType === pet.key;
@@ -76,9 +76,9 @@ export default function GuidedShop({ petType, setPetType, healthIssue, setHealth
             transition={{ duration: 0.3 }}
             className="overflow-hidden"
           >
-            <div className="pt-6 mt-6 border-t border-border">
-              <p className="text-xs font-semibold uppercase tracking-widest text-sage mb-1">Step 2</p>
-              <h2 className="font-display text-xl md:text-2xl text-ink mb-4">What can we help with?</h2>
+            <div className="pt-8 mt-8 border-t border-border">
+              <p className="text-sage text-sm font-semibold tracking-widest uppercase mb-2">Step 2</p>
+              <h2 className="font-display text-2xl md:text-3xl text-ink mb-6">What can we help with?</h2>
               <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
                 <button
                   onClick={() => setHealthIssue(null)}
@@ -129,11 +129,11 @@ export default function GuidedShop({ petType, setPetType, healthIssue, setHealth
             className="mt-5 pt-5 border-t border-border flex items-center gap-2 text-sm"
           >
             <span className="text-ink/40">Showing</span>
-            <span className="px-2.5 py-1 bg-sage/10 text-sage rounded-full text-xs font-medium capitalize">{petType} products</span>
+            <span className="px-3 py-1 bg-sage/10 text-sage rounded-full text-xs font-medium capitalize">{petType} products</span>
             {issueSelected && (
               <>
                 <ArrowRight className="w-3 h-3 text-ink/30" />
-                <span className="px-2.5 py-1 bg-sage/10 text-sage rounded-full text-xs font-medium">
+                <span className="px-3 py-1 bg-sage/10 text-sage rounded-full text-xs font-medium">
                   {HEALTH_ISSUES.find((i) => i.id === healthIssue)?.label}
                 </span>
               </>
