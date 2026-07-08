@@ -16,18 +16,6 @@
     },
     "category": {
       "type": "string",
-      "enum": [
-        "Heart Health",
-        "Allergy Relief",
-        "Flea & Tick",
-        "Flea, Tick & Heartworm",
-        "Joint & Pain",
-        "Pain & Inflammation",
-        "Supplements",
-        "Dental",
-        "Eye & Ear",
-        "Behavioral"
-      ],
       "default": "Supplements"
     },
     "pet_type": {
