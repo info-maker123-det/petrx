@@ -1,20 +1,23 @@
 import React, { useState, useEffect } from "react";
-import { Search, ShoppingBag, Menu, X, ChevronDown } from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
+import { Search, ShoppingBag, Menu, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useCart } from "@/lib/cartContext";
 
 const NAV_LINKS = [
-  { label: "Dogs", href: "#shop-by-pet" },
-  { label: "Cats", href: "#shop-by-pet" },
-  { label: "Horses", href: "#shop-by-pet" },
-  { label: "Pharmacy", href: "#products" },
-  { label: "AutoShip", href: "#autoship" },
-  { label: "About", href: "#why-petrx" },
+  { label: "Shop", type: "section", target: "#shop-by-pet" },
+  { label: "Pharmacy", type: "section", target: "#products" },
+  { label: "AutoShip", type: "section", target: "#autoship" },
+  { label: "About", type: "section", target: "#why-petrx" },
+  { label: "Prescriptions", type: "route", target: "/prescription" },
+  { label: "Contact", type: "route", target: "/contact" },
 ];
 
 export default function FluidHeader() {
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [searchFocused, setSearchFocused] = useState(false);
+  const { count, openCart } = useCart();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 60);
@@ -22,12 +25,45 @@ export default function FluidHeader() {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  const handleNavClick = (e, href) => {
+  const handleSectionClick = (e, target) => {
     e.preventDefault();
     setMobileOpen(false);
-    const el = document.querySelector(href);
-    if (el) el.scrollIntoView({ behavior: "smooth" });
+    if (window.location.pathname === "/") {
+      const el = document.querySelector(target);
+      if (el) el.scrollIntoView({ behavior: "smooth" });
+    } else {
+      navigate("/" + target);
+    }
   };
+
+  const handleRouteClick = () => setMobileOpen(false);
+
+  const renderNavLinks = (mobile = false) =>
+    NAV_LINKS.map((link) =>
+      link.type === "route" ? (
+        <Link
+          key={link.label}
+          to={link.target}
+          onClick={handleRouteClick}
+          className={`text-sm font-medium text-ink/70 hover:text-ink transition-colors tracking-wide uppercase ${
+            mobile ? "block py-3 px-4 hover:bg-secondary rounded-2xl" : ""
+          }`}
+        >
+          {link.label}
+        </Link>
+      ) : (
+        <a
+          key={link.label}
+          href={link.target}
+          onClick={(e) => handleSectionClick(e, link.target)}
+          className={`text-sm font-medium text-ink/70 hover:text-ink transition-colors tracking-wide uppercase ${
+            mobile ? "block py-3 px-4 hover:bg-secondary rounded-2xl" : ""
+          }`}
+        >
+          {link.label}
+        </a>
+      )
+    );
 
   return (
     <>
@@ -46,7 +82,7 @@ export default function FluidHeader() {
       >
         <div className="max-w-7xl mx-auto px-5 md:px-8 flex items-center justify-between gap-6">
           {/* Logo */}
-          <a href="#" className="flex-shrink-0 transition-all duration-500">
+          <Link to="/" className="flex-shrink-0 transition-all duration-500">
             <h1
               className={`font-display text-ink tracking-tight transition-all duration-500 ${
                 scrolled ? "text-xl" : "text-3xl"
@@ -54,20 +90,11 @@ export default function FluidHeader() {
             >
               Pet<span className="text-sage">Rx</span>
             </h1>
-          </a>
+          </Link>
 
           {/* Desktop Nav */}
           <nav className="hidden lg:flex items-center gap-8">
-            {NAV_LINKS.map((link) => (
-              <a
-                key={link.label}
-                href={link.href}
-                onClick={(e) => handleNavClick(e, link.href)}
-                className="text-sm font-medium text-ink/70 hover:text-ink transition-colors tracking-wide uppercase"
-              >
-                {link.label}
-              </a>
-            ))}
+            {renderNavLinks()}
           </nav>
 
           {/* Search + Cart */}
@@ -83,18 +110,18 @@ export default function FluidHeader() {
                 <input
                   type="text"
                   placeholder={scrolled ? "Search medications..." : "Search"}
-                  onFocus={() => setSearchFocused(true)}
-                  onBlur={() => setSearchFocused(false)}
                   className="w-full pl-9 pr-4 py-2 bg-secondary rounded-full text-sm border-[0.5px] border-transparent focus:border-sage focus:outline-none transition-all placeholder:text-muted-foreground"
                 />
               </div>
             </motion.div>
 
-            <button className="relative p-2 hover:bg-secondary rounded-full transition-colors">
+            <button onClick={openCart} className="relative p-2 hover:bg-secondary rounded-full transition-colors">
               <ShoppingBag className="w-5 h-5 text-ink" />
-              <span className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-sage text-white text-[10px] font-bold rounded-full flex items-center justify-center">
-                0
-              </span>
+              {count > 0 && (
+                <span className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-sage text-white text-[10px] font-bold rounded-full flex items-center justify-center">
+                  {count}
+                </span>
+              )}
             </button>
 
             {/* Mobile Menu Toggle */}
@@ -126,16 +153,7 @@ export default function FluidHeader() {
                     className="w-full pl-9 pr-4 py-3 bg-secondary rounded-full text-sm border-[0.5px] border-transparent focus:border-sage focus:outline-none"
                   />
                 </div>
-                {NAV_LINKS.map((link) => (
-                  <a
-                    key={link.label}
-                    href={link.href}
-                    onClick={(e) => handleNavClick(e, link.href)}
-                    className="block py-3 px-4 text-ink/80 hover:text-ink hover:bg-secondary rounded-2xl transition-colors font-medium"
-                  >
-                    {link.label}
-                  </a>
-                ))}
+                {renderNavLinks(true)}
               </div>
             </motion.div>
           )}
