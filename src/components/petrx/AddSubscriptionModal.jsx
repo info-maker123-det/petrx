@@ -1,6 +1,8 @@
 import React, { useState, useMemo } from "react";
+import { useNavigate } from "react-router-dom";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { base44 } from "@/api/base44Client";
+import { useCart } from "@/lib/cartContext";
 import { Search, Loader2, Plus, Check, Pill, Leaf, ShieldCheck } from "lucide-react";
 
 export const FREQUENCIES = [
@@ -13,6 +15,8 @@ export const FREQUENCIES = [
 ];
 
 export default function AddSubscriptionModal({ open, onClose, pet, products = [], onAdded }) {
+  const navigate = useNavigate();
+  const { addItem, closeCart } = useCart();
   const [query, setQuery] = useState("");
   const [selected, setSelected] = useState(null);
   const [quantity, setQuantity] = useState(1);
@@ -61,6 +65,13 @@ export default function AddSubscriptionModal({ open, onClose, pet, products = []
       reset();
       onAdded();
       onClose();
+      closeCart();
+      addItem(selected, quantity, true);
+      if (selected.requires_prescription) {
+        navigate("/prescription");
+      } else {
+        navigate("/checkout");
+      }
     } catch (err) {
       setError(err.message || "Could not create this subscription.");
     }
