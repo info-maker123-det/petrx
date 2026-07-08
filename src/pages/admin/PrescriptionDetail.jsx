@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
-import { ArrowLeft, PawPrint, Pill, Stethoscope, FileText, Paperclip } from "lucide-react";
+import { ArrowLeft, PawPrint, Pill, Stethoscope, FileText, Paperclip, User } from "lucide-react";
 import { effectiveRxStatus, getRxStatusConfig, formatDateTime } from "@/lib/adminUtils";
 import PrescriptionWorkflow from "@/components/admin/PrescriptionWorkflow";
 import PrescriptionTimeline from "@/components/admin/PrescriptionTimeline";
@@ -83,6 +83,19 @@ export default function PrescriptionDetail() {
             <div className="grid grid-cols-2 gap-4">
               <Field label="Pet Name" value={rx.pet_name} />
               <Field label="Species" value={rx.pet_species} />
+              <Field label="Breed" value={rx.pet_breed} />
+              <Field label="Sex" value={rx.pet_sex ? (rx.pet_spayed_neutered ? `${rx.pet_sex} (spayed/neutered)` : rx.pet_sex) : null} />
+              <Field label="Weight" value={rx.pet_weight ? `${rx.pet_weight} ${rx.pet_weight_unit || "lbs"}` : null} />
+              <Field label="Date of Birth" value={rx.pet_dob} />
+            </div>
+          </InfoSection>
+
+          <InfoSection icon={User} title="Pet Owner">
+            <div className="grid grid-cols-2 gap-4">
+              <Field label="Name" value={rx.owner_name} />
+              <Field label="Phone" value={rx.owner_phone} />
+              <Field label="Email" value={rx.owner_email} />
+              <Field label="Address" value={[rx.owner_address, rx.owner_city, rx.owner_state, rx.owner_zip].filter(Boolean).join(", ") || null} />
             </div>
           </InfoSection>
 
