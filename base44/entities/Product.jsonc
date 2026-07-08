@@ -53,6 +53,12 @@
     "side_effects": {
       "type": "string"
     },
+    "serving_info": {
+      "type": "string"
+    },
+    "directions": {
+      "type": "string"
+    },
     "image_url": {
       "type": "string"
     },

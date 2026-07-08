@@ -290,41 +290,22 @@ export default function ProductDetail() {
                   </AccordionContent>
                 </AccordionItem>
 
-                <AccordionItem value="side-effects" className="border-border">
-                  <AccordionTrigger className="text-ink font-display text-lg hover:no-underline">
-                    <span className="flex items-center gap-2">
-                      <AlertTriangle className="w-4 h-4 text-ochre" /> Side Effects
-                    </span>
-                  </AccordionTrigger>
-                  <AccordionContent className="text-ink/60 text-sm leading-relaxed space-y-3">
-                    {product.side_effects ? (
+                {product.side_effects && (
+                  <AccordionItem value="side-effects" className="border-border">
+                    <AccordionTrigger className="text-ink font-display text-lg hover:no-underline">
+                      <span className="flex items-center gap-2">
+                        <AlertTriangle className="w-4 h-4 text-ochre" /> Side Effects
+                      </span>
+                    </AccordionTrigger>
+                    <AccordionContent className="text-ink/60 text-sm leading-relaxed">
                       <p>{product.side_effects}</p>
-                    ) : product.requires_prescription ? (
-                      <>
-                        <p>
-                          <strong className="text-ink">Possible side effects may include:</strong> gastrointestinal
-                          upset (vomiting, diarrhea, decreased appetite), lethargy, or changes in behavior. These are
-                          not all possible side effects.
-                        </p>
-                        <p>
-                          <strong className="text-ink">Serious reactions:</strong> Stop use and contact your
-                          veterinarian immediately if you observe signs of allergic reaction (hives, facial swelling,
-                          difficulty breathing), persistent vomiting or diarrhea, or any other unusual symptoms.
-                        </p>
-                        <p>
-                          For a complete list of side effects, refer to the product label or consult your veterinarian.
-                          Report any adverse reactions to your vet and to the manufacturer.
-                        </p>
-                      </>
-                    ) : (
-                      <p>
-                        Side effects are rare with this supplement. Mild digestive upset may occur when first
-                        introduced. If you notice any unusual symptoms or allergic reactions, discontinue use and
-                        consult your veterinarian.
+                      <p className="mt-3 text-xs text-ink/40">
+                        If your pet experiences an adverse reaction, discontinue use and contact your veterinarian
+                        immediately. Report side effects to the manufacturer.
                       </p>
-                    )}
-                  </AccordionContent>
-                </AccordionItem>
+                    </AccordionContent>
+                  </AccordionItem>
+                )}
 
                 <AccordionItem value="additional" className="border-border">
                   <AccordionTrigger className="text-ink font-display text-lg hover:no-underline">
@@ -333,6 +314,18 @@ export default function ProductDetail() {
                     </span>
                   </AccordionTrigger>
                   <AccordionContent className="text-sm">
+                    {product.serving_info && (
+                      <div className="mb-5 p-4 bg-sage/5 rounded-2xl">
+                        <p className="text-ink/40 text-xs uppercase tracking-wider mb-1">Serving Info</p>
+                        <p className="text-ink text-sm font-medium leading-relaxed">{product.serving_info}</p>
+                      </div>
+                    )}
+                    {product.directions && (
+                      <div className="mb-5 p-4 bg-sage/5 rounded-2xl">
+                        <p className="text-ink/40 text-xs uppercase tracking-wider mb-1">Directions</p>
+                        <p className="text-ink text-sm font-medium leading-relaxed">{product.directions}</p>
+                      </div>
+                    )}
                     <div className="grid grid-cols-2 gap-4">
                       <div>
                         <p className="text-ink/40 text-xs uppercase tracking-wider mb-1">Active Ingredient</p>
