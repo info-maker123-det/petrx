@@ -73,8 +73,8 @@ export default function HeroSection() {
             <Link to="/prescription" className="inline-flex items-center gap-2 px-8 py-4 bg-white text-ink rounded-2xl text-base font-semibold border border-border hover:border-sage hover:text-sage transition-colors">
               Submit a prescription
             </Link>
-            <Link to="/advisor" className="inline-flex items-center gap-2 px-8 py-4 bg-white text-ink rounded-2xl text-base font-semibold border border-border hover:border-sage hover:text-sage transition-colors">
-              <Stethoscope className="w-4 h-4" /> Talk to the Advisor
+            <Link to="/advisor" className="inline-flex items-center gap-2 px-6 py-4 bg-white text-sage rounded-2xl text-sm font-semibold border border-sage/30 hover:border-sage hover:bg-sage/5 transition-colors">
+              <Stethoscope className="w-4 h-4" /> Chat with Advisor
             </Link>
           </motion.div>
 
