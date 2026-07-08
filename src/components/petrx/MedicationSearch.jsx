@@ -33,7 +33,7 @@ export default function MedicationSearch({ value, onChange }) {
     : products.slice(0, 30);
 
   const select = (product) => {
-    onChange(product.name);
+    onChange(product.name, product);
     setQuery(product.name);
     setOpen(false);
   };
@@ -46,7 +46,7 @@ export default function MedicationSearch({ value, onChange }) {
           value={query}
           onChange={(e) => {
             setQuery(e.target.value);
-            onChange(e.target.value);
+            onChange(e.target.value, null);
             setOpen(true);
           }}
           onFocus={() => setOpen(true)}

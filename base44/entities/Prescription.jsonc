@@ -15,6 +15,56 @@
       ],
       "default": "dog"
     },
+    "pet_breed": {
+      "type": "string"
+    },
+    "pet_sex": {
+      "type": "string",
+      "enum": [
+        "male",
+        "female"
+      ]
+    },
+    "pet_weight": {
+      "type": "number"
+    },
+    "pet_weight_unit": {
+      "type": "string",
+      "enum": [
+        "lbs",
+        "kg"
+      ],
+      "default": "lbs"
+    },
+    "pet_dob": {
+      "type": "string",
+      "format": "date"
+    },
+    "pet_spayed_neutered": {
+      "type": "boolean",
+      "default": false
+    },
+    "owner_name": {
+      "type": "string"
+    },
+    "owner_email": {
+      "type": "string"
+    },
+    "owner_phone": {
+      "type": "string"
+    },
+    "owner_address": {
+      "type": "string"
+    },
+    "owner_city": {
+      "type": "string"
+    },
+    "owner_state": {
+      "type": "string"
+    },
+    "owner_zip": {
+      "type": "string"
+    },
     "medication_name": {
       "type": "string"
     },
@@ -48,6 +98,9 @@
     "prescription_file_url": {
       "type": "string"
     },
+    "verified_prescription_file_url": {
+      "type": "string"
+    },
     "status": {
       "type": "string",
       "enum": [
@@ -75,6 +128,22 @@
         "needs_more_info"
       ],
       "default": "submitted"
+    },
+    "payment_status": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "paid",
+        "refunded",
+        "failed"
+      ],
+      "default": "pending"
+    },
+    "payment_id": {
+      "type": "string"
+    },
+    "amount_paid": {
+      "type": "number"
     },
     "vet_request_method": {
       "type": "string",

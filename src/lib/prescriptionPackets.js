@@ -4,6 +4,31 @@ function val(v) {
   return v || "—";
 }
 
+function petInfoBlock(rx) {
+  return `
+    <div class="section">
+      <h2>Pet Information</h2>
+      <div class="field"><span class="label">Pet Name</span><br/><span class="value">${val(rx.pet_name)}</span></div>
+      <div class="field"><span class="label">Species</span><br/><span class="value">${val(rx.pet_species)}</span></div>
+      <div class="field"><span class="label">Breed</span><br/><span class="value">${val(rx.pet_breed)}</span></div>
+      <div class="field"><span class="label">Sex</span><br/><span class="value">${val(rx.pet_sex ? (rx.pet_spayed_neutered ? rx.pet_sex + " (spayed/neutered)" : rx.pet_sex) : null)}</span></div>
+      <div class="field"><span class="label">Weight</span><br/><span class="value">${rx.pet_weight ? rx.pet_weight + " " + val(rx.pet_weight_unit) : "—"}</span></div>
+      <div class="field"><span class="label">Date of Birth</span><br/><span class="value">${val(rx.pet_dob)}</span></div>
+    </div>`;
+}
+
+function ownerInfoBlock(rx) {
+  const fullAddress = [rx.owner_address, rx.owner_city, rx.owner_state, rx.owner_zip].filter(Boolean).join(", ");
+  return `
+    <div class="section">
+      <h2>Pet Owner Information</h2>
+      <div class="field"><span class="label">Name</span><br/><span class="value">${val(rx.owner_name)}</span></div>
+      <div class="field"><span class="label">Phone</span><br/><span class="value">${val(rx.owner_phone)}</span></div>
+      <div class="field"><span class="label">Email</span><br/><span class="value">${val(rx.owner_email)}</span></div>
+      <div class="field"><span class="label">Address</span><br/><span class="value">${val(fullAddress)}</span></div>
+    </div>`;
+}
+
 export function generateVetVerificationPacket(rx) {
   const ref = rx.id ? rx.id.slice(-8).toUpperCase() : "N/A";
   const date = new Date().toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" });
@@ -15,16 +40,14 @@ export function generateVetVerificationPacket(rx) {
     </div>
     <h1>Prescription Verification Request</h1>
 
-    <div class="section">
-      <h2>Pet Information</h2>
-      <div class="field"><span class="label">Pet Name</span><br/><span class="value">${val(rx.pet_name)}</span></div>
-      <div class="field"><span class="label">Species</span><br/><span class="value">${val(rx.pet_species)}</span></div>
-    </div>
+    ${petInfoBlock(rx)}
 
     <div class="section">
       <h2>Medication Requested</h2>
       <div class="field"><span class="value" style="font-size:18px;">${val(rx.medication_name)}</span></div>
     </div>
+
+    ${ownerInfoBlock(rx)}
 
     <div class="section">
       <h2>Prescribing Veterinarian</h2>
@@ -66,6 +89,7 @@ export function generateVetVerificationText(rx, vet) {
   const date = new Date().toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" });
   const val = (v) => v || "—";
   const clinic = vet ? vet.clinic_name : rx.vet_clinic_name;
+  const ownerAddress = [rx.owner_address, rx.owner_city, rx.owner_state, rx.owner_zip].filter(Boolean).join(", ");
 
   return `PETRX PHARMACY — PRESCRIPTION VERIFICATION REQUEST
 ${date}
@@ -76,6 +100,16 @@ ${vet && vet.vet_name ? `ATTN: Dr. ${vet.vet_name}\n` : ""}${vet && vet.email ? 
 PET INFORMATION
 Pet Name: ${val(rx.pet_name)}
 Species: ${val(rx.pet_species)}
+Breed: ${val(rx.pet_breed)}
+Sex: ${val(rx.pet_sex)}${rx.pet_spayed_neutered ? " (spayed/neutered)" : ""}
+Weight: ${rx.pet_weight ? rx.pet_weight + " " + val(rx.pet_weight_unit) : "—"}
+Date of Birth: ${val(rx.pet_dob)}
+
+PET OWNER
+Name: ${val(rx.owner_name)}
+Phone: ${val(rx.owner_phone)}
+Email: ${val(rx.owner_email)}
+Address: ${val(ownerAddress)}
 
 MEDICATION REQUESTED
 ${val(rx.medication_name)}
@@ -105,6 +139,7 @@ export function generateSisterPharmacyPacket(rx) {
   const ref = rx.id ? rx.id.slice(-8).toUpperCase() : "N/A";
   const date = new Date().toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" });
   const verifiedDate = rx.vet_response_date ? formatDateTime(rx.vet_response_date) : "—";
+  const shipAddress = [rx.owner_address, rx.owner_city, rx.owner_state, rx.owner_zip].filter(Boolean).join(", ");
 
   return `
     <div class="letterhead">
@@ -114,15 +149,18 @@ export function generateSisterPharmacyPacket(rx) {
     <h1>Dispensing &amp; Shipping Request</h1>
     <div class="badge">Prescription Verified</div>
 
-    <div class="section">
-      <h2>Pet Information</h2>
-      <div class="field"><span class="label">Pet Name</span><br/><span class="value">${val(rx.pet_name)}</span></div>
-      <div class="field"><span class="label">Species</span><br/><span class="value">${val(rx.pet_species)}</span></div>
-    </div>
+    ${petInfoBlock(rx)}
 
     <div class="section">
       <h2>Medication to Dispense</h2>
       <div class="field"><span class="value" style="font-size:18px;">${val(rx.medication_name)}</span></div>
+    </div>
+
+    <div class="section">
+      <h2>Ship To (Customer)</h2>
+      <div class="field"><span class="label">Name</span><br/><span class="value">${val(rx.owner_name)}</span></div>
+      <div class="field"><span class="label">Phone</span><br/><span class="value">${val(rx.owner_phone)}</span></div>
+      <div class="field"><span class="label">Address</span><br/><span class="value">${val(shipAddress)}</span></div>
     </div>
 
     <div class="section">
