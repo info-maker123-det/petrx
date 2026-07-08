@@ -1,0 +1,56 @@
+{
+  "name": "SiteVisit",
+  "type": "object",
+  "properties": {
+    "visitor_id": {
+      "type": "string"
+    },
+    "session_id": {
+      "type": "string"
+    },
+    "page": {
+      "type": "string"
+    },
+    "ip_address": {
+      "type": "string"
+    },
+    "city": {
+      "type": "string"
+    },
+    "state": {
+      "type": "string"
+    },
+    "country": {
+      "type": "string"
+    },
+    "device_type": {
+      "type": "string",
+      "enum": [
+        "mobile",
+        "tablet",
+        "desktop"
+      ],
+      "default": "desktop"
+    },
+    "browser": {
+      "type": "string"
+    },
+    "os": {
+      "type": "string"
+    },
+    "referrer": {
+      "type": "string"
+    },
+    "user_email": {
+      "type": "string"
+    },
+    "is_logged_in": {
+      "type": "boolean",
+      "default": false
+    }
+  },
+  "required": [
+    "visitor_id",
+    "page"
+  ]
+}

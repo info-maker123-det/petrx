@@ -3,6 +3,8 @@ import { Link } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
 import { FileText, Package, Mail, AlertCircle, ArrowRight, Truck } from "lucide-react";
 import { effectiveRxStatus, formatDateTime, formatCurrency, getRxStatusConfig } from "@/lib/adminUtils";
+import OrderStats from "@/components/admin/OrderStats";
+import VisitorAnalytics from "@/components/admin/VisitorAnalytics";
 
 export default function AdminHome() {
   const [data, setData] = useState(null);
@@ -54,6 +56,11 @@ export default function AdminHome() {
         </p>
       </div>
 
+      <div className="mb-8">
+        <h2 className="font-display text-lg text-slate-900 mb-3">Order Metrics</h2>
+        <OrderStats />
+      </div>
+
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
         {cards.map((card, i) => (
           <Link key={i} to={card.link} className="bg-white rounded-2xl border border-slate-200 p-6 hover:border-slate-300 hover:shadow-sm transition-all group">
@@ -78,6 +85,10 @@ export default function AdminHome() {
           </p>
         </div>
       )}
+
+      <div className="mb-8">
+        <VisitorAnalytics />
+      </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div className="bg-white rounded-2xl border border-slate-200 p-6">
