@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
 import PetCard from "@/components/petrx/PetCard";
 import AddPetModal from "@/components/petrx/AddPetModal";
-import { Plus, PawPrint, Package, FileText, ChevronRight } from "lucide-react";
+import { Plus, PawPrint, Package, FileText, ChevronRight, Stethoscope } from "lucide-react";
 
 const TABS = [
   { key: "pets", label: "My Pets", icon: PawPrint },
@@ -75,12 +75,20 @@ export default function Dashboard() {
                 Manage your pets, track their medications, and review your orders — all in one secure place.
               </p>
             </div>
-            <Link
-              to="/prescription"
-              className="inline-flex items-center gap-2 px-6 py-3 bg-sage text-white rounded-full text-sm font-semibold hover:bg-[#3d5a66] transition-colors flex-shrink-0 self-start md:self-auto"
-            >
-              <FileText className="w-4 h-4" /> Submit Prescription
-            </Link>
+            <div className="flex flex-col sm:flex-row gap-3 flex-shrink-0">
+              <Link
+                to="/advisor"
+                className="inline-flex items-center gap-2 px-6 py-3 border border-white/20 text-white rounded-full text-sm font-semibold hover:bg-white/10 transition-colors"
+              >
+                <Stethoscope className="w-4 h-4" /> Ask the Advisor
+              </Link>
+              <Link
+                to="/prescription"
+                className="inline-flex items-center gap-2 px-6 py-3 bg-sage text-white rounded-full text-sm font-semibold hover:bg-[#3d5a66] transition-colors"
+              >
+                <FileText className="w-4 h-4" /> Submit Prescription
+              </Link>
+            </div>
           </div>
         </div>
 
