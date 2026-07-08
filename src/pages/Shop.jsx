@@ -15,7 +15,7 @@ export default function Shop() {
   const [brand, setBrand] = useState("all");
   const [search, setSearch] = useState("");
   const [healthIssue, setHealthIssue] = useState(null);
-  const [visible, setVisible] = useState(24);
+  const [visible, setVisible] = useState(18);
   const [showFilters, setShowFilters] = useState(false);
 
   useEffect(() => {
@@ -37,7 +37,7 @@ export default function Shop() {
       .finally(() => setLoading(false));
   }, []);
 
-  useEffect(() => { setVisible(24); }, [category, petType, productType, brand, search, healthIssue]);
+  useEffect(() => { setVisible(18); }, [category, petType, productType, brand, search, healthIssue]);
 
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase();
@@ -192,7 +192,7 @@ export default function Shop() {
                 {visible < filtered.length && (
                   <div className="flex justify-center mt-12">
                     <button
-                      onClick={() => setVisible((v) => v + 24)}
+                      onClick={() => setVisible((v) => v + 18)}
                       className="px-8 py-3.5 bg-white border-[0.5px] border-border rounded-full text-sm font-semibold text-ink hover:border-sage hover:text-sage transition-colors"
                     >
                       Load More
