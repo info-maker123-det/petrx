@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import { base44 } from "@/api/base44Client";
 import AdvisorMessageBubble from "./AdvisorMessageBubble";
 import { Send, Loader2, Sparkles } from "lucide-react";
@@ -40,6 +40,10 @@ const STARTER_QUESTIONS = [
   "Any interactions with their current medications?",
 ];
 
+// Generate a stable unique ID for each local message
+let msgCounter = 0;
+const localId = () => `local_${Date.now()}_${msgCounter++}`;
+
 export default function AdvisorChat({ pet }) {
   const [conversation, setConversation] = useState(null);
   const [messages, setMessages] = useState([]);
@@ -47,38 +51,57 @@ export default function AdvisorChat({ pet }) {
   const [initializing, setInitializing] = useState(true);
   const [sending, setSending] = useState(false);
   const [error, setError] = useState(null);
+
   const contextSentRef = useRef(false);
   const productContextRef = useRef("");
   const containerRef = useRef(null);
-  // Tracks the current message list outside React state so the subscription
-  // handler can reliably compare against the latest — never losing messages.
   const messagesRef = useRef([]);
-  // Holds user message contents that were sent but not yet confirmed by the server.
-  const pendingRef = useRef([]);
+  const conversationRef = useRef(null);
+  // Set of local message IDs that haven't been confirmed by the server yet
+  const pendingIdsRef = useRef(new Set());
 
-  const applyServerMessages = (serverMsgs) => {
-    const server = serverMsgs || [];
-    const current = messagesRef.current;
-
-    // Only accept the server snapshot if it includes ALL user messages we're
-    // showing. If it's missing any (race with addMessage), keep current —
-    // this prevents the user's just-sent bubble from disappearing.
-    const currentUsers = current
-      .filter((m) => m.role === "user")
-      .map((m) => (m.content || "").trim());
-    const serverUsers = server
-      .filter((m) => m.role === "user")
-      .map((m) => (m.content || "").trim());
-    const allPresent = currentUsers.every((c) => serverUsers.includes(c));
-
-    const next = allPresent ? server : current;
+  const syncMessages = useCallback((next) => {
     messagesRef.current = next;
     setMessages(next);
-    pendingRef.current = pendingRef.current.filter((c) => serverUsers.includes(c.trim()));
+  }, []);
 
-    const last = next[next.length - 1];
+  const applyServerMessages = useCallback((serverMsgs) => {
+    const server = serverMsgs || [];
+
+    // Build merged list: start with server messages, then insert any local
+    // pending user messages that the server hasn't echoed back yet.
+    // This NEVER deletes a user message — pending ones are always preserved.
+    const merged = [...server];
+    const pendingToAdd = [];
+
+    for (const m of messagesRef.current) {
+      if (!m._localId || !pendingIdsRef.current.has(m._localId)) continue;
+      // Check if this pending message is now in the server snapshot
+      const confirmed = server.some(
+        (s) => s.role === "user" && (s.content || "") === (m.content || "")
+      );
+      if (!confirmed) {
+        pendingToAdd.push(m);
+      } else {
+        pendingIdsRef.current.delete(m._localId);
+      }
+    }
+
+    if (pendingToAdd.length) {
+      // Insert pending user messages before any trailing assistant message
+      const lastIdx = merged.length - 1;
+      if (lastIdx >= 0 && merged[lastIdx].role === "assistant" && !merged[lastIdx]._localId) {
+        merged.splice(lastIdx, 0, ...pendingToAdd);
+      } else {
+        merged.push(...pendingToAdd);
+      }
+    }
+
+    syncMessages(merged);
+
+    const last = merged[merged.length - 1];
     if (last?.role === "assistant" && last.content?.trim()) setSending(false);
-  };
+  }, [syncMessages]);
 
   useEffect(() => {
     if (!pet?.id) return;
@@ -87,13 +110,13 @@ export default function AdvisorChat({ pet }) {
 
     (async () => {
       setInitializing(true);
-      setMessages([]);
-      messagesRef.current = [];
+      syncMessages([]);
       setError(null);
       setConversation(null);
+      conversationRef.current = null;
       contextSentRef.current = false;
       productContextRef.current = "";
-      pendingRef.current = [];
+      pendingIdsRef.current = new Set();
       try {
         const productCtx = await buildProductContext(pet).catch(() => "");
         if (cancelled) return;
@@ -121,6 +144,7 @@ export default function AdvisorChat({ pet }) {
         }
 
         if (cancelled) return;
+        conversationRef.current = conv;
         setConversation(conv);
         if (conv.messages?.length) {
           applyServerMessages(conv.messages);
@@ -146,7 +170,7 @@ export default function AdvisorChat({ pet }) {
 
   const send = async (text) => {
     const content = (text ?? input).trim();
-    if (!content || !conversation || sending) return;
+    if (!content || !conversationRef.current || sending) return;
     setInput("");
     setSending(true);
 
@@ -158,25 +182,26 @@ export default function AdvisorChat({ pet }) {
       contextSentRef.current = true;
     }
 
-    // Track this message so it stays visible until the server confirms it.
-    pendingRef.current = [...pendingRef.current, messageContent];
-    const next = [...messagesRef.current, { role: "user", content: messageContent }];
-    messagesRef.current = next;
-    setMessages(next);
+    // Add user message locally with a tracking ID
+    const id = localId();
+    pendingIdsRef.current.add(id);
+    const userMsg = { _localId: id, role: "user", content: messageContent };
+    syncMessages([...messagesRef.current, userMsg]);
 
     try {
-      await base44.agents.addMessage(conversation, { role: "user", content: messageContent });
+      await base44.agents.addMessage(conversationRef.current, { role: "user", content: messageContent });
       // Safety net: if the realtime subscription misses the reply, poll once after a delay.
       setTimeout(async () => {
         try {
-          const fresh = await base44.agents.getConversation(conversation.id);
+          const fresh = await base44.agents.getConversation(conversationRef.current.id);
           applyServerMessages(fresh.messages || []);
         } catch (_) { /* subscription will handle it */ }
       }, 12000);
     } catch (e) {
       setError(e.message || "Failed to send message");
       setSending(false);
-      pendingRef.current = pendingRef.current.filter((c) => c !== messageContent);
+      pendingIdsRef.current.delete(id);
+      syncMessages(messagesRef.current.filter((m) => m._localId !== id));
     }
   };
 
@@ -223,7 +248,7 @@ export default function AdvisorChat({ pet }) {
         ) : (
           <>
             {messages.map((m, idx) => (
-              <AdvisorMessageBubble key={idx} message={m} />
+              <AdvisorMessageBubble key={m._localId || `srv_${idx}`} message={m} />
             ))}
             {showTyping && (
               <div className="flex gap-2 md:gap-3 justify-start">
