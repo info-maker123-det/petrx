@@ -119,7 +119,7 @@ export default function FeaturedProducts() {
                     Open the shop <ArrowRight className="w-4 h-4" />
                   </Link>
                 </div>
-                <CatalogGrid products={allProducts.slice(0, visibleAll)} loading={loading} columns={3} emptyText="Products are loading." mobileScroll />
+                <CatalogGrid products={allProducts.slice(0, visibleAll)} loading={loading} columns={3} emptyText="Products are loading." />
                 {visibleAll < allProducts.length && (
                   <div className="flex justify-center mt-10">
                     <button onClick={() => setVisibleAll((v) => v + 18)} className="px-8 py-3.5 bg-white border-[0.5px] border-border rounded-full text-sm font-semibold text-ink hover:border-sage hover:text-sage transition-colors">
