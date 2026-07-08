@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { base44 } from "@/api/base44Client";
-import { Printer, Send, CheckCircle, XCircle, Truck, Package, RefreshCw, AlertCircle, Loader2, Stethoscope, Phone, Mail, MapPin } from "lucide-react";
+import { Printer, Send, CheckCircle, XCircle, Truck, Package, RefreshCw, AlertCircle, Loader2, Stethoscope, Phone, Mail, MapPin, Upload, FileCheck } from "lucide-react";
 import { effectiveRxStatus, CUSTOMER_STATUS_MAP, printHtml } from "@/lib/adminUtils";
 import { generateVetVerificationPacket, generateSisterPharmacyPacket } from "@/lib/prescriptionPackets";
 
@@ -22,6 +22,8 @@ export default function PrescriptionWorkflow({ rx, onUpdate }) {
   const [response, setResponse] = useState("approved");
   const [responseNotes, setResponseNotes] = useState("");
   const [tracking, setTracking] = useState("");
+  const [verifiedFileName, setVerifiedFileName] = useState("");
+  const [uploadingVerified, setUploadingVerified] = useState(false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState(null);
 
@@ -185,15 +187,59 @@ export default function PrescriptionWorkflow({ rx, onUpdate }) {
         </div>
       )}
 
-      {/* Step 3: Send to sister pharmacy */}
+      {/* Step 3: Upload verified Rx + Send to sister pharmacy */}
       {status === "vet_response_received" && (
         <div className="space-y-4">
           <div>
-            <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Step 3: Sister Pharmacy Handoff</p>
+            <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Step 3: Upload Verified Rx &amp; Send to Sister Pharmacy</p>
             <div className="bg-green-50 border border-green-200 rounded-xl p-3 mb-3 flex items-center gap-2">
               <CheckCircle className="w-4 h-4 text-green-600 flex-shrink-0" />
               <p className="text-xs text-green-700">Vet approved on {new Date(rx.vet_response_date).toLocaleDateString()}</p>
             </div>
+
+            {/* Verified Rx upload */}
+            <div className="mb-3">
+              <p className="text-xs text-slate-500 mb-1.5">Upload the verified prescription received from the vet (sent to sister pharmacy):</p>
+              {rx.verified_prescription_file_url ? (
+                <div className="flex items-center gap-2 p-3 bg-green-50 border border-green-200 rounded-xl">
+                  <FileCheck className="w-4 h-4 text-green-600 flex-shrink-0" />
+                  <a href={rx.verified_prescription_file_url} target="_blank" rel="noopener noreferrer" className="text-xs text-blue-600 hover:underline truncate flex-1">
+                    Verified Rx on file — click to view
+                  </a>
+                  <span className="text-xs text-green-600 font-medium">✓ Uploaded</span>
+                </div>
+              ) : (
+                <label className="flex flex-col items-center justify-center gap-1.5 p-4 border-2 border-dashed border-slate-300 rounded-xl cursor-pointer hover:border-slate-400 hover:bg-slate-50 transition-all">
+                  {uploadingVerified ? (
+                    <Loader2 className="w-5 h-5 text-slate-400 animate-spin" />
+                  ) : (
+                    <Upload className="w-5 h-5 text-slate-400" />
+                  )}
+                  <span className="text-xs font-medium text-slate-600">{verifiedFileName || "Upload verified Rx (PDF/JPG/PNG)"}</span>
+                  <input
+                    type="file"
+                    accept=".pdf,.jpg,.jpeg,.png"
+                    className="hidden"
+                    onChange={async (e) => {
+                      const file = e.target.files?.[0];
+                      if (!file) return;
+                      setVerifiedFileName(file.name);
+                      setUploadingVerified(true);
+                      try {
+                        const { file_url } = await base44.integrations.Core.UploadFile({ file });
+                        await base44.entities.Prescription.update(rx.id, { verified_prescription_file_url: file_url });
+                        onUpdate();
+                      } catch (err) {
+                        setError("Failed to upload verified Rx file");
+                      } finally {
+                        setUploadingVerified(false);
+                      }
+                    }}
+                  />
+                </label>
+              )}
+            </div>
+
             <p className="text-sm text-slate-600 mb-3">Generate a dispensing packet to send to our sister pharmacy.</p>
             <button
               onClick={() => printHtml("Dispensing & Shipping Request", generateSisterPharmacyPacket(rx))}
@@ -206,10 +252,10 @@ export default function PrescriptionWorkflow({ rx, onUpdate }) {
                 internal_status: "sent_to_sister_pharmacy",
                 sister_pharmacy_sent_date: now(),
               })}
-              disabled={saving}
+              disabled={saving || !rx.verified_prescription_file_url}
               className="w-full flex items-center justify-center gap-2 py-2.5 bg-slate-900 text-white rounded-xl text-sm font-medium hover:bg-slate-800 transition-colors disabled:opacity-50"
             >
-              <Package className="w-4 h-4" /> Mark as Sent to Sister Pharmacy
+              <Package className="w-4 h-4" /> {rx.verified_prescription_file_url ? "Mark as Sent to Sister Pharmacy" : "Upload verified Rx first"}
             </button>
           </div>
         </div>

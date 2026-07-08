@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { base44 } from "@/api/base44Client";
-import { Upload, FileText, Check, ArrowRight, Stethoscope, PawPrint, MapPin, Phone, Mail, Printer, X, HeartPulse, AlertCircle, Package } from "lucide-react";
+import { Upload, FileText, Check, ArrowRight, Stethoscope, PawPrint, MapPin, Phone, Mail, Printer, X, HeartPulse, AlertCircle, Package, User, CreditCard, Lock } from "lucide-react";
 import MedicationSearch from "@/components/petrx/MedicationSearch";
 import VetSearch from "@/components/petrx/VetSearch";
 import PrescriptionSteps from "@/components/petrx/PrescriptionSteps";
@@ -19,9 +19,23 @@ export default function PrescriptionUpload() {
   const [selectedVet, setSelectedVet] = useState(null);
   const [manualVet, setManualVet] = useState(false);
   const [approvalMethod, setApprovalMethod] = useState("contact_vet");
+  const [selectedProduct, setSelectedProduct] = useState(null);
   const [form, setForm] = useState({
     pet_name: "",
     pet_species: "dog",
+    pet_breed: "",
+    pet_sex: "",
+    pet_weight: "",
+    pet_weight_unit: "lbs",
+    pet_dob: "",
+    pet_spayed_neutered: false,
+    owner_name: "",
+    owner_email: "",
+    owner_phone: "",
+    owner_address: "",
+    owner_city: "",
+    owner_state: "",
+    owner_zip: "",
     medication_name: "",
     vet_clinic_name: "",
     vet_name: "",
@@ -37,41 +51,80 @@ export default function PrescriptionUpload() {
         base44.auth.redirectToLogin("/prescription");
         return;
       }
-      base44.entities.Pet.list()
-        .then((data) => {
-          const list = Array.isArray(data) ? data : [];
-          setPets(list);
-          if (list.length > 0) {
-            setSelectedPetId(list[0].id);
-            setForm((f) => ({ ...f, pet_name: list[0].name, pet_species: list[0].species }));
-          }
-        })
-        .catch(() => setPets([]))
-        .finally(() => setCheckingPets(false));
+      Promise.all([
+        base44.entities.Pet.list().catch(() => []),
+        base44.auth.me().catch(() => null),
+      ]).then(([data, user]) => {
+        const list = Array.isArray(data) ? data : [];
+        setPets(list);
+        const ownerDefaults = {
+          owner_name: user?.full_name || "",
+          owner_email: user?.email || "",
+        };
+        if (list.length > 0) {
+          const pet = list[0];
+          setSelectedPetId(pet.id);
+          setForm((f) => ({
+            ...f,
+            ...ownerDefaults,
+            pet_name: pet.name,
+            pet_species: pet.species,
+            pet_breed: pet.breed || "",
+            pet_sex: pet.sex || "",
+            pet_weight: pet.weight || "",
+            pet_weight_unit: pet.weight_unit || "lbs",
+            pet_dob: pet.date_of_birth || "",
+            pet_spayed_neutered: pet.spayed_neutered || false,
+          }));
+        } else {
+          setForm((f) => ({ ...f, ...ownerDefaults }));
+        }
+        setCheckingPets(false);
+      });
     });
   }, []);
 
-  const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
+  const handleChange = (e) => {
+    const { name, value, type, checked } = e.target;
+    setForm({ ...form, [name]: type === "checkbox" ? checked : value });
+  };
 
   const handleFile = (e) => {
     const file = e.target.files?.[0];
     if (file) setFileName(file.name);
   };
 
+  const selectPet = (petId) => {
+    const pet = pets.find((p) => p.id === petId);
+    setSelectedPetId(petId);
+    if (pet) {
+      setForm((f) => ({
+        ...f,
+        pet_name: pet.name,
+        pet_species: pet.species,
+        pet_breed: pet.breed || "",
+        pet_sex: pet.sex || "",
+        pet_weight: pet.weight || "",
+        pet_weight_unit: pet.weight_unit || "lbs",
+        pet_dob: pet.date_of_birth || "",
+        pet_spayed_neutered: pet.spayed_neutered || false,
+      }));
+    }
+  };
+
   const valid =
     form.pet_name &&
     form.medication_name &&
+    form.owner_name &&
+    form.owner_email &&
+    form.owner_phone &&
     (approvalMethod === "upload" || form.vet_clinic_name);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
     if (!valid) {
-      setError(
-        approvalMethod === "upload"
-          ? "Please fill in your pet's name and medication, and attach your prescription file."
-          : "Please fill in your pet's name, medication, and vet clinic."
-      );
+      setError("Please complete all required fields — pet info, owner contact, medication, and vet clinic.");
       return;
     }
     setSubmitting(true);
@@ -90,9 +143,11 @@ export default function PrescriptionUpload() {
       }
       const record = await base44.entities.Prescription.create({
         ...form,
+        pet_weight: form.pet_weight ? Number(form.pet_weight) : undefined,
         approval_method: approvalMethod,
         prescription_file_url,
         status: "pending",
+        payment_status: "pending",
       });
       setSubmitted(record);
     } catch (err) {
@@ -122,15 +177,18 @@ export default function PrescriptionUpload() {
               ? "We'll begin processing once your original prescription arrives by mail. You'll receive an email update at each step."
               : `Our pharmacists will verify your prescription with ${submitted.vet_clinic_name}. You'll receive an email update once it's approved — usually within 24–48 hours.`}
           </p>
+          <p className="text-xs text-ink/40 mb-8 max-w-md mx-auto">
+            A payment link will be sent to <strong>{submitted.owner_email}</strong> once your prescription is verified. Your medication will ship after payment is received.
+          </p>
           <div className="mb-8">
             <PrescriptionSteps active={1} />
           </div>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
-            <Link to="/" className="px-6 py-3 bg-sage text-white rounded-full text-sm font-semibold hover:bg-[#3d5a66] transition-colors">
-              Continue Shopping
+            <Link to="/dashboard" className="px-6 py-3 bg-sage text-white rounded-full text-sm font-semibold hover:bg-[#3d5a66] transition-colors">
+              Track in My Account
             </Link>
-            <Link to="/contact" className="px-6 py-3 border-[0.5px] border-border rounded-full text-sm font-semibold text-ink hover:bg-secondary transition-colors">
-              Contact Us
+            <Link to="/" className="px-6 py-3 border-[0.5px] border-border rounded-full text-sm font-semibold text-ink hover:bg-secondary transition-colors">
+              Continue Shopping
             </Link>
           </div>
         </div>
@@ -163,6 +221,8 @@ export default function PrescriptionUpload() {
       </div>
     );
 
+  const selectedPet = pets.find((p) => p.id === selectedPetId);
+
   return (
     <div className="py-12 md:py-16 bg-porcelain">
       <div className="max-w-3xl mx-auto px-5 md:px-8">
@@ -173,7 +233,7 @@ export default function PrescriptionUpload() {
           <p className="text-sage text-sm font-semibold tracking-widest uppercase mb-2">Prescription</p>
           <h1 className="font-display text-3xl md:text-4xl text-ink mb-3">Submit Your Prescription</h1>
           <p className="text-ink/50 max-w-md mx-auto">
-            Choose how you'd like to verify your pet's prescription — upload it, have us contact your vet, or mail it in.
+            Provide your pet's details, your contact information, and choose how you'd like to verify the prescription.
           </p>
         </div>
 
@@ -191,11 +251,7 @@ export default function PrescriptionUpload() {
                 <label className="text-xs text-ink/50 font-medium uppercase tracking-wider">Select Your Pet *</label>
                 <select
                   value={selectedPetId}
-                  onChange={(e) => {
-                    const pet = pets.find((p) => p.id === e.target.value);
-                    setSelectedPetId(e.target.value);
-                    setForm({ ...form, pet_name: pet?.name || "", pet_species: pet?.species || "dog" });
-                  }}
+                  onChange={(e) => selectPet(e.target.value)}
                   className="mt-1 w-full px-4 py-3 bg-secondary rounded-2xl border-[0.5px] border-transparent focus:border-sage focus:outline-none transition-all"
                 >
                   {pets.map((p) => (
@@ -204,7 +260,7 @@ export default function PrescriptionUpload() {
                 </select>
               </div>
               {(() => {
-                const pet = pets.find((p) => p.id === selectedPetId);
+                const pet = selectedPet;
                 const conds = pet?.medical_conditions || [];
                 if (!conds.length && !pet?.allergies) return null;
                 return (
@@ -233,10 +289,97 @@ export default function PrescriptionUpload() {
                   </div>
                 );
               })()}
+              <div>
+                <label className="text-xs text-ink/50 font-medium uppercase tracking-wider">Pet Name *</label>
+                <input name="pet_name" value={form.pet_name} onChange={handleChange} className="mt-1 w-full px-4 py-3 bg-secondary rounded-2xl border-[0.5px] border-transparent focus:border-sage focus:outline-none transition-all" />
+              </div>
+              <div>
+                <label className="text-xs text-ink/50 font-medium uppercase tracking-wider">Species *</label>
+                <select name="pet_species" value={form.pet_species} onChange={handleChange} className="mt-1 w-full px-4 py-3 bg-secondary rounded-2xl border-[0.5px] border-transparent focus:border-sage focus:outline-none transition-all">
+                  <option value="dog">Dog</option>
+                  <option value="cat">Cat</option>
+                  <option value="horse">Horse</option>
+                  <option value="other">Other</option>
+                </select>
+              </div>
+              <div>
+                <label className="text-xs text-ink/50 font-medium uppercase tracking-wider">Breed</label>
+                <input name="pet_breed" value={form.pet_breed} onChange={handleChange} placeholder="e.g. Golden Retriever" className="mt-1 w-full px-4 py-3 bg-secondary rounded-2xl border-[0.5px] border-transparent focus:border-sage focus:outline-none transition-all" />
+              </div>
+              <div>
+                <label className="text-xs text-ink/50 font-medium uppercase tracking-wider">Sex</label>
+                <select name="pet_sex" value={form.pet_sex} onChange={handleChange} className="mt-1 w-full px-4 py-3 bg-secondary rounded-2xl border-[0.5px] border-transparent focus:border-sage focus:outline-none transition-all">
+                  <option value="">Not specified</option>
+                  <option value="male">Male</option>
+                  <option value="female">Female</option>
+                </select>
+              </div>
+              <div className="flex gap-2">
+                <div className="flex-1">
+                  <label className="text-xs text-ink/50 font-medium uppercase tracking-wider">Weight</label>
+                  <input name="pet_weight" type="number" step="0.1" value={form.pet_weight} onChange={handleChange} placeholder="0" className="mt-1 w-full px-4 py-3 bg-secondary rounded-2xl border-[0.5px] border-transparent focus:border-sage focus:outline-none transition-all" />
+                </div>
+                <div className="w-20">
+                  <label className="text-xs text-ink/50 font-medium uppercase tracking-wider">Unit</label>
+                  <select name="pet_weight_unit" value={form.pet_weight_unit} onChange={handleChange} className="mt-1 w-full px-4 py-3 bg-secondary rounded-2xl border-[0.5px] border-transparent focus:border-sage focus:outline-none transition-all">
+                    <option value="lbs">lbs</option>
+                    <option value="kg">kg</option>
+                  </select>
+                </div>
+              </div>
+              <div>
+                <label className="text-xs text-ink/50 font-medium uppercase tracking-wider">Date of Birth</label>
+                <input name="pet_dob" type="date" value={form.pet_dob} onChange={handleChange} className="mt-1 w-full px-4 py-3 bg-secondary rounded-2xl border-[0.5px] border-transparent focus:border-sage focus:outline-none transition-all" />
+              </div>
+              <div className="md:col-span-2 flex items-center gap-2">
+                <input id="spayed" name="pet_spayed_neutered" type="checkbox" checked={form.pet_spayed_neutered} onChange={handleChange} className="w-4 h-4 rounded accent-sage" />
+                <label htmlFor="spayed" className="text-sm text-ink/60 cursor-pointer">Spayed / Neutered</label>
+              </div>
               <div className="md:col-span-2">
                 <label className="text-xs text-ink/50 font-medium uppercase tracking-wider">Medication Name *</label>
                 <div className="mt-1">
-                  <MedicationSearch value={form.medication_name} onChange={(val) => setForm({ ...form, medication_name: val })} />
+                  <MedicationSearch value={form.medication_name} onChange={(val, product) => { setForm({ ...form, medication_name: val }); setSelectedProduct(product); }} />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Owner Info */}
+          <div>
+            <div className="flex items-center gap-2 mb-4">
+              <User className="w-5 h-5 text-sage" />
+              <h2 className="font-display text-xl text-ink">Your Information</h2>
+            </div>
+            <p className="text-xs text-ink/40 mb-4">We use this to contact you, process payment, and ship your medication.</p>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="text-xs text-ink/50 font-medium uppercase tracking-wider">Full Name *</label>
+                <input name="owner_name" value={form.owner_name} onChange={handleChange} className="mt-1 w-full px-4 py-3 bg-secondary rounded-2xl border-[0.5px] border-transparent focus:border-sage focus:outline-none transition-all" />
+              </div>
+              <div>
+                <label className="text-xs text-ink/50 font-medium uppercase tracking-wider">Phone *</label>
+                <input name="owner_phone" type="tel" value={form.owner_phone} onChange={handleChange} className="mt-1 w-full px-4 py-3 bg-secondary rounded-2xl border-[0.5px] border-transparent focus:border-sage focus:outline-none transition-all" />
+              </div>
+              <div className="md:col-span-2">
+                <label className="text-xs text-ink/50 font-medium uppercase tracking-wider">Email *</label>
+                <input name="owner_email" type="email" value={form.owner_email} onChange={handleChange} className="mt-1 w-full px-4 py-3 bg-secondary rounded-2xl border-[0.5px] border-transparent focus:border-sage focus:outline-none transition-all" />
+              </div>
+              <div className="md:col-span-2">
+                <label className="text-xs text-ink/50 font-medium uppercase tracking-wider">Shipping Address *</label>
+                <input name="owner_address" value={form.owner_address} onChange={handleChange} placeholder="Street address" className="mt-1 w-full px-4 py-3 bg-secondary rounded-2xl border-[0.5px] border-transparent focus:border-sage focus:outline-none transition-all" />
+              </div>
+              <div>
+                <label className="text-xs text-ink/50 font-medium uppercase tracking-wider">City</label>
+                <input name="owner_city" value={form.owner_city} onChange={handleChange} className="mt-1 w-full px-4 py-3 bg-secondary rounded-2xl border-[0.5px] border-transparent focus:border-sage focus:outline-none transition-all" />
+              </div>
+              <div className="grid grid-cols-2 gap-2">
+                <div>
+                  <label className="text-xs text-ink/50 font-medium uppercase tracking-wider">State</label>
+                  <input name="owner_state" value={form.owner_state} onChange={handleChange} placeholder="CA" className="mt-1 w-full px-4 py-3 bg-secondary rounded-2xl border-[0.5px] border-transparent focus:border-sage focus:outline-none transition-all" />
+                </div>
+                <div>
+                  <label className="text-xs text-ink/50 font-medium uppercase tracking-wider">Zip</label>
+                  <input name="owner_zip" value={form.owner_zip} onChange={handleChange} placeholder="90001" className="mt-1 w-full px-4 py-3 bg-secondary rounded-2xl border-[0.5px] border-transparent focus:border-sage focus:outline-none transition-all" />
                 </div>
               </div>
             </div>
@@ -397,6 +540,17 @@ export default function PrescriptionUpload() {
           <div>
             <label className="text-xs text-ink/50 font-medium uppercase tracking-wider">Additional Notes</label>
             <textarea name="notes" value={form.notes} onChange={handleChange} rows={3} placeholder="Any details about your pet's condition or prescription..." className="mt-1 w-full px-4 py-3 bg-secondary rounded-2xl border-[0.5px] border-transparent focus:border-sage focus:outline-none transition-all resize-none" />
+          </div>
+
+          {/* Payment notice */}
+          <div className="flex items-start gap-3 p-4 bg-sage/5 rounded-2xl border-[0.5px] border-sage/20">
+            <CreditCard className="w-5 h-5 text-sage flex-shrink-0 mt-0.5" />
+            <div>
+              <p className="text-sm font-medium text-ink">Payment required to process</p>
+              <p className="text-xs text-ink/50 mt-0.5">
+                Once your prescription is verified by our pharmacy team, you'll receive a secure payment link by email. Your medication ships after payment is received.
+              </p>
+            </div>
           </div>
 
           {error && <p className="text-sm text-destructive">{error}</p>}

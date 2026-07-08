@@ -4,7 +4,8 @@ import { base44 } from "@/api/base44Client";
 import PetCard from "@/components/petrx/PetCard";
 import AddPetModal from "@/components/petrx/AddPetModal";
 import PetHealthOverview from "@/components/petrx/PetHealthOverview";
-import { Plus, PawPrint, Package, FileText, ChevronRight, Stethoscope, HeartPulse } from "lucide-react";
+import PrescriptionTracker from "@/components/petrx/PrescriptionTracker";
+import { Plus, PawPrint, Package, FileText, ChevronRight, Stethoscope, HeartPulse, ChevronDown } from "lucide-react";
 
 const TABS = [
   { key: "pets", label: "My Pets", icon: PawPrint },
@@ -33,6 +34,7 @@ export default function Dashboard() {
   const [tab, setTab] = useState("pets");
   const [showAdd, setShowAdd] = useState(false);
   const [userName, setUserName] = useState("");
+  const [expandedRx, setExpandedRx] = useState(null);
 
   const load = async () => {
     setLoading(true);
@@ -203,23 +205,35 @@ export default function Dashboard() {
               />
             ) : (
               <div className="space-y-3">
-                {prescriptions.map((rx) => (
-                  <div key={rx.id} className="cellular-card p-5 flex items-center justify-between">
-                    <div>
-                      <p className="font-medium text-ink">{rx.medication_name}</p>
-                      <p className="text-xs text-ink/50 mt-0.5">
-                        {rx.pet_name} · {rx.vet_clinic_name}
-                      </p>
+                {prescriptions.map((rx) => {
+                  const isOpen = expandedRx === rx.id;
+                  return (
+                    <div key={rx.id} className="cellular-card overflow-hidden">
+                      <button
+                        onClick={() => setExpandedRx(isOpen ? null : rx.id)}
+                        className="w-full p-5 flex items-center justify-between text-left"
+                      >
+                        <div>
+                          <p className="font-medium text-ink">{rx.medication_name}</p>
+                          <p className="text-xs text-ink/50 mt-0.5">
+                            {rx.pet_name} · {rx.vet_clinic_name} · Submitted {new Date(rx.created_date).toLocaleDateString()}
+                          </p>
+                        </div>
+                        <div className="flex items-center gap-3">
+                          <span className={`px-3 py-1 rounded-full text-xs font-medium capitalize ${STATUS_STYLES[rx.status] || "bg-secondary text-ink/60"}`}>
+                            {rx.status.replace(/_/g, " ")}
+                          </span>
+                          <ChevronDown className={`w-4 h-4 text-ink/30 transition-transform ${isOpen ? "rotate-180" : ""}`} />
+                        </div>
+                      </button>
+                      {isOpen && (
+                        <div className="px-5 pb-5 pt-1 border-t border-border">
+                          <PrescriptionTracker rx={rx} />
+                        </div>
+                      )}
                     </div>
-                    <span
-                      className={`px-3 py-1 rounded-full text-xs font-medium capitalize ${
-                        STATUS_STYLES[rx.status] || "bg-secondary text-ink/60"
-                      }`}
-                    >
-                      {rx.status.replace("_", " ")}
-                    </span>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             )}
           </div>
