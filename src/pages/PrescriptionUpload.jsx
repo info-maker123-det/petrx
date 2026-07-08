@@ -2,10 +2,11 @@ import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { base44 } from "@/api/base44Client";
-import { Upload, FileText, Check, ArrowRight, Stethoscope, PawPrint, MapPin, Phone, Mail, Printer, X, HeartPulse, AlertCircle } from "lucide-react";
+import { Upload, FileText, Check, ArrowRight, Stethoscope, PawPrint, MapPin, Phone, Mail, Printer, X, HeartPulse, AlertCircle, Package } from "lucide-react";
 import MedicationSearch from "@/components/petrx/MedicationSearch";
 import VetSearch from "@/components/petrx/VetSearch";
 import PrescriptionSteps from "@/components/petrx/PrescriptionSteps";
+import ApprovalMethodSelector from "@/components/petrx/ApprovalMethodSelector";
 
 export default function PrescriptionUpload() {
   const [submitting, setSubmitting] = useState(false);
@@ -17,6 +18,7 @@ export default function PrescriptionUpload() {
   const [checkingPets, setCheckingPets] = useState(true);
   const [selectedVet, setSelectedVet] = useState(null);
   const [manualVet, setManualVet] = useState(false);
+  const [approvalMethod, setApprovalMethod] = useState("contact_vet");
   const [form, setForm] = useState({
     pet_name: "",
     pet_species: "dog",
@@ -56,26 +58,39 @@ export default function PrescriptionUpload() {
     if (file) setFileName(file.name);
   };
 
-  const valid = form.pet_name && form.medication_name && form.vet_clinic_name;
+  const valid =
+    form.pet_name &&
+    form.medication_name &&
+    (approvalMethod === "upload" || form.vet_clinic_name);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
     if (!valid) {
-      setError("Please fill in your pet's name, medication, and vet clinic.");
+      setError(
+        approvalMethod === "upload"
+          ? "Please fill in your pet's name and medication, and attach your prescription file."
+          : "Please fill in your pet's name, medication, and vet clinic."
+      );
       return;
     }
     setSubmitting(true);
     try {
       let prescription_file_url = "";
-      const fileInput = document.getElementById("prescription-file");
-      const file = fileInput?.files?.[0];
-      if (file) {
+      if (approvalMethod === "upload") {
+        const fileInput = document.getElementById("prescription-file");
+        const file = fileInput?.files?.[0];
+        if (!file) {
+          setError("Please attach your prescription file.");
+          setSubmitting(false);
+          return;
+        }
         const { file_url } = await base44.integrations.Core.UploadFile({ file });
         prescription_file_url = file_url;
       }
       const record = await base44.entities.Prescription.create({
         ...form,
+        approval_method: approvalMethod,
         prescription_file_url,
         status: "pending",
       });
@@ -101,8 +116,11 @@ export default function PrescriptionUpload() {
           <p className="text-sage text-sm font-semibold tracking-widest uppercase mb-2">Prescription Received</p>
           <h1 className="font-display text-3xl md:text-4xl text-ink mb-3">We're on it</h1>
           <p className="text-ink/50 mb-8 max-w-md mx-auto">
-            Our pharmacists will verify your prescription with {submitted.vet_clinic_name}. You'll receive an email
-            update once it's approved — usually within 24–48 hours.
+            {submitted.approval_method === "upload"
+              ? "Our pharmacists are reviewing your uploaded prescription now. You'll receive an email update once it's approved — usually within 24–48 hours."
+              : submitted.approval_method === "mail"
+              ? "We'll begin processing once your original prescription arrives by mail. You'll receive an email update at each step."
+              : `Our pharmacists will verify your prescription with ${submitted.vet_clinic_name}. You'll receive an email update once it's approved — usually within 24–48 hours.`}
           </p>
           <div className="mb-8">
             <PrescriptionSteps active={1} />
@@ -155,7 +173,7 @@ export default function PrescriptionUpload() {
           <p className="text-sage text-sm font-semibold tracking-widest uppercase mb-2">Prescription</p>
           <h1 className="font-display text-3xl md:text-4xl text-ink mb-3">Submit Your Prescription</h1>
           <p className="text-ink/50 max-w-md mx-auto">
-            Upload your vet's prescription or provide your clinic's details and we'll contact them directly.
+            Choose how you'd like to verify your pet's prescription — upload it, have us contact your vet, or mail it in.
           </p>
         </div>
 
@@ -224,7 +242,11 @@ export default function PrescriptionUpload() {
             </div>
           </div>
 
-          {/* Vet Info */}
+          {/* Approval Method */}
+          <ApprovalMethodSelector value={approvalMethod} onChange={setApprovalMethod} />
+
+          {/* Vet Info — shown for contact_vet and mail methods */}
+          {approvalMethod !== "upload" && (
           <div>
             <div className="flex items-center gap-2 mb-4">
               <Stethoscope className="w-5 h-5 text-sage" />
@@ -324,12 +346,14 @@ export default function PrescriptionUpload() {
               </>
             )}
           </div>
+          )}
 
-          {/* File Upload */}
+          {/* File Upload — shown for upload method */}
+          {approvalMethod === "upload" && (
           <div>
-            <h2 className="font-display text-xl text-ink mb-2">Upload Prescription</h2>
+            <h2 className="font-display text-xl text-ink mb-2">Upload Your Prescription *</h2>
             <p className="text-sm text-ink/40 mb-4">
-              Optional — if you have a copy, upload it now. Otherwise we'll contact your vet directly.
+              Upload a clear photo or PDF of your vet's written prescription.
             </p>
             <label
               htmlFor="prescription-file"
@@ -341,6 +365,33 @@ export default function PrescriptionUpload() {
               <input id="prescription-file" type="file" accept=".pdf,.jpg,.jpeg,.png" onChange={handleFile} className="hidden" />
             </label>
           </div>
+          )}
+
+          {/* Mail-in instructions */}
+          {approvalMethod === "mail" && (
+          <div className="p-5 bg-sage/5 rounded-2xl border-[0.5px] border-sage/20">
+            <div className="flex items-start gap-3">
+              <div className="w-10 h-10 rounded-full bg-sage/10 flex items-center justify-center flex-shrink-0">
+                <Package className="w-5 h-5 text-sage" />
+              </div>
+              <div>
+                <p className="font-semibold text-ink mb-1">Mailing Instructions</p>
+                <p className="text-sm text-ink/60 mb-3">
+                  After submitting, mail the <strong>original</strong> paper prescription from your vet to:
+                </p>
+                <div className="text-sm text-ink/70 bg-white/60 rounded-2xl p-4 leading-relaxed">
+                  PetRx Pharmacy<br />
+                  Attn: Prescription Dept.<br />
+                  1234 Pharmacy Lane<br />
+                  Los Angeles, CA 90001
+                </div>
+                <p className="text-xs text-ink/40 mt-3">
+                  Be sure to include your pet's name on the envelope. We'll begin processing once it arrives — typically within 1–2 business days.
+                </p>
+              </div>
+            </div>
+          </div>
+          )}
 
           {/* Notes */}
           <div>
