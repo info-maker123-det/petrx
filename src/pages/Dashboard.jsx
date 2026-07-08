@@ -150,7 +150,7 @@ export default function Dashboard() {
         ) : tab === "health" ? (
           <div>
             <div className="flex items-center justify-between mb-6">
-              <h2 className="font-display text-2xl text-ink">Patient Overview</h2>
+              <h2 className="font-display text-2xl text-ink">Pet Overview</h2>
               <Link
                 to="/advisor"
                 className="inline-flex items-center gap-2 px-5 py-2.5 border border-border rounded-full text-sm font-semibold text-ink hover:border-sage hover:text-sage transition-colors"
