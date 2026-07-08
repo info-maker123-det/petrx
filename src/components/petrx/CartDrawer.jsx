@@ -1,11 +1,20 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Link } from "react-router-dom";
-import { X, Plus, Minus, Trash2, ArrowRight, ShieldAlert, ShoppingBag } from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
+import { X, Plus, Minus, Trash2, ArrowRight, ShieldAlert, ShoppingBag, UserPlus, LogIn } from "lucide-react";
 import { useCart } from "@/lib/cartContext";
+import { base44 } from "@/api/base44Client";
 
 export default function CartDrawer() {
   const { items, isOpen, closeCart, removeItem, updateQty, subtotal, hasPrescriptionItems, count } = useCart();
+  const navigate = useNavigate();
+  const [authed, setAuthed] = useState(null);
+
+  useEffect(() => {
+    if (isOpen && items.length > 0) {
+      base44.auth.isAuthenticated().then(setAuthed).catch(() => setAuthed(false));
+    }
+  }, [isOpen, items.length]);
 
   return (
     <AnimatePresence>
@@ -117,13 +126,33 @@ export default function CartDrawer() {
                     <span className="text-ink/60 text-sm">Subtotal</span>
                     <span className="font-display text-xl text-ink">${subtotal.toFixed(2)}</span>
                   </div>
-                  <Link
-                    to="/checkout"
-                    onClick={closeCart}
-                    className="w-full flex items-center justify-center gap-2 py-4 bg-sage text-white rounded-full font-semibold text-sm hover:bg-[#3d5a66] transition-colors"
-                  >
-                    Checkout <ArrowRight className="w-4 h-4" />
-                  </Link>
+                  {authed === false ? (
+                    <div className="rounded-2xl bg-sage/8 border-[0.5px] border-sage/20 p-4 text-center">
+                      <p className="text-sm text-ink/70 mb-3 leading-relaxed">
+                        Create an account to securely check out, track orders, and manage your pet's medications.
+                      </p>
+                      <button
+                        onClick={() => { closeCart(); navigate("/register"); }}
+                        className="w-full flex items-center justify-center gap-2 py-3.5 bg-sage text-white rounded-full font-semibold text-sm hover:bg-[#3d5a66] transition-colors mb-2"
+                      >
+                        <UserPlus className="w-4 h-4" /> Create Account
+                      </button>
+                      <button
+                        onClick={() => { closeCart(); navigate("/login"); }}
+                        className="w-full flex items-center justify-center gap-2 py-2 text-sm text-ink/60 hover:text-ink transition-colors"
+                      >
+                        <LogIn className="w-4 h-4" /> Already have an account? Sign in
+                      </button>
+                    </div>
+                  ) : (
+                    <Link
+                      to="/checkout"
+                      onClick={closeCart}
+                      className="w-full flex items-center justify-center gap-2 py-4 bg-sage text-white rounded-full font-semibold text-sm hover:bg-[#3d5a66] transition-colors"
+                    >
+                      Checkout <ArrowRight className="w-4 h-4" />
+                    </Link>
+                  )}
                   <button onClick={closeCart} className="w-full text-center text-sm text-ink/50 hover:text-ink transition-colors">
                     Continue Shopping
                   </button>
