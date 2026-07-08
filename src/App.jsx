@@ -21,6 +21,7 @@ import Layout from '@/components/petrx/Layout';
 import Shop from './pages/Shop';
 import Dashboard from './pages/Dashboard';
 import PetAdvisor from './pages/PetAdvisor';
+import AutoShip from './pages/AutoShip';
 // Add page imports here
 
 const AuthenticatedApp = () => {
@@ -64,6 +65,7 @@ const AuthenticatedApp = () => {
             <Route path="/checkout" element={<Checkout />} />
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/advisor" element={<PetAdvisor />} />
+            <Route path="/autoship" element={<AutoShip />} />
           </Route>
         </Route>
         <Route path="*" element={<PageNotFound />} />

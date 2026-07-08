@@ -1,0 +1,57 @@
+{
+  "name": "Subscription",
+  "type": "object",
+  "properties": {
+    "pet_id": {
+      "type": "string"
+    },
+    "pet_name": {
+      "type": "string"
+    },
+    "product_id": {
+      "type": "string"
+    },
+    "product_name": {
+      "type": "string"
+    },
+    "product_image": {
+      "type": "string"
+    },
+    "product_price": {
+      "type": "number"
+    },
+    "brand": {
+      "type": "string"
+    },
+    "requires_prescription": {
+      "type": "boolean",
+      "default": false
+    },
+    "quantity": {
+      "type": "number",
+      "default": 1
+    },
+    "frequency_days": {
+      "type": "number",
+      "default": 30
+    },
+    "next_refill_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "active",
+        "paused",
+        "cancelled"
+      ],
+      "default": "active"
+    }
+  },
+  "required": [
+    "pet_id",
+    "product_id",
+    "product_name"
+  ]
+}

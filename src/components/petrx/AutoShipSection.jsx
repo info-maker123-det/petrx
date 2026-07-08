@@ -1,6 +1,7 @@
 import React from "react";
 import { motion } from "framer-motion";
 import { Calendar, RefreshCw, DollarSign, ArrowRight } from "lucide-react";
+import { Link } from "react-router-dom";
 
 const AUTOSHIP_IMG = "https://media.base44.com/images/public/6a4dc0dbd2a6ae29bc765da4/a058ef8a1_generated_3950012b.png";
 
@@ -66,10 +67,10 @@ export default function AutoShipSection() {
             </div>
 
             {/* CTA */}
-            <button className="autoship-pulse inline-flex items-center gap-3 px-8 py-4 bg-sage text-white rounded-full font-semibold text-base hover:bg-[#3d5a66] transition-colors">
+            <Link to="/autoship" className="autoship-pulse inline-flex items-center gap-3 px-8 py-4 bg-sage text-white rounded-full font-semibold text-base hover:bg-[#3d5a66] transition-colors">
               Start AutoShip
               <ArrowRight className="w-4 h-4" />
-            </button>
+            </Link>
           </motion.div>
         </div>
       </div>
