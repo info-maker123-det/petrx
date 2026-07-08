@@ -71,19 +71,24 @@ export default function Shop() {
     productType, setProductType, brand, setBrand,
   };
 
+  const issueLabel = healthIssue ? HEALTH_ISSUES.find((i) => i.id === healthIssue)?.label : null;
+
+  const heading = (() => {
+    if (brand !== "all") return { eyebrow: "Brand", title: `Shop ${brand}`, subtitle: `All medications and supplements from ${brand}.` };
+    if (category !== "All") return { eyebrow: "Category", title: `Shop ${category}`, subtitle: `Products in the ${category} category.` };
+    if (productType === "rx") return { eyebrow: "Prescription", title: "Shop the Pharmacy", subtitle: "Vet-verified prescription medications, reviewed by our pharmacists." };
+    if (productType === "otc") return { eyebrow: "Over-the-Counter", title: "Shop Supplements", subtitle: "Vet-recommended wellness supplements — no prescription required." };
+    if (petType !== "all") return { eyebrow: "Shop by Pet", title: `Shop for ${petType === "all" ? "All Pets" : petType.charAt(0).toUpperCase() + petType.slice(1) + "s"}`, subtitle: `Showing products for your ${petType}${issueLabel ? ` — ${issueLabel}` : ""}.` };
+    return { eyebrow: "Pharmacy Catalog", title: "Shop All Products", subtitle: `${products.length} prescription medications and supplements for every pet.` };
+  })();
+
   return (
     <div className="min-h-screen bg-porcelain">
       <div className="max-w-7xl mx-auto px-5 md:px-8 py-12 md:py-16">
         <div className="mb-8">
-          <p className="text-sage text-sm font-semibold tracking-widest uppercase mb-2">Pharmacy Catalog</p>
-          <h1 className="font-display text-3xl md:text-4xl lg:text-5xl text-ink">Shop All Products</h1>
-          <p className="text-ink/50 mt-3 max-w-xl">
-            {loading
-              ? "Loading catalog…"
-              : petType !== "all"
-                ? `Showing products for your ${petType}${healthIssue ? ` — ${HEALTH_ISSUES.find((i) => i.id === healthIssue)?.label}` : ""}.`
-                : `${products.length} prescription medications and supplements for every pet.`}
-          </p>
+          <p className="text-sage text-sm font-semibold tracking-widest uppercase mb-2">{heading.eyebrow}</p>
+          <h1 className="font-display text-3xl md:text-4xl lg:text-5xl text-ink">{heading.title}</h1>
+          <p className="text-ink/50 mt-3 max-w-xl">{loading ? "Loading catalog…" : heading.subtitle}</p>
         </div>
 
         <GuidedShop

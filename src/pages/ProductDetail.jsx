@@ -13,6 +13,7 @@ import {
   Check,
   Truck,
 } from "lucide-react";
+import SimilarProducts from "@/components/petrx/SimilarProducts";
 
 export default function ProductDetail() {
   const { id } = useParams();
@@ -266,6 +267,8 @@ export default function ProductDetail() {
             </div>
           </div>
         </div>
+
+        <SimilarProducts product={product} />
       </div>
     </div>
   );
