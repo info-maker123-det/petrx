@@ -4,10 +4,20 @@ import { motion } from "framer-motion";
 import { useCart } from "@/lib/cartContext";
 import { Star, ShoppingBag, Check, PawPrint } from "lucide-react";
 
+const enhanceImage = (url) => {
+  if (!url) return url;
+  // Pull the highest-quality version available from Shopify's CDN
+  if (url.includes("cdn.shopify.com")) {
+    return url + (url.includes("?") ? "&width=1200" : "?width=1200");
+  }
+  return url;
+};
+
 export default function ProductCard({ product, index = 0 }) {
   const { addItem } = useCart();
   const [hovered, setHovered] = useState(false);
   const [added, setAdded] = useState(false);
+  const [imgError, setImgError] = useState(false);
 
   const handleAdd = (e) => {
     e.preventDefault();
@@ -30,12 +40,20 @@ export default function ProductCard({ product, index = 0 }) {
         onMouseEnter={() => setHovered(true)}
         onMouseLeave={() => setHovered(false)}
       >
-        <div className="relative aspect-square bg-[#FBFBF9] flex items-center justify-center overflow-hidden p-8">
-          {product.image_url ? (
-            <img src={product.image_url} alt={product.name} className="max-w-full max-h-full object-contain transition-transform duration-700 group-hover:scale-105" />
+        <div className="relative aspect-square bg-secondary overflow-hidden">
+          {product.image_url && !imgError ? (
+            <img
+              src={enhanceImage(product.image_url)}
+              alt={product.name}
+              loading="lazy"
+              onError={() => setImgError(true)}
+              className="w-full h-full object-contain p-8 transition-transform duration-700 group-hover:scale-105"
+            />
           ) : (
-            <div className="w-24 h-24 rounded-[24px] bg-sage/10 flex items-center justify-center">
-              <PawPrint className="w-10 h-10 text-sage/30" />
+            <div className="absolute inset-0 flex items-center justify-center">
+              <div className="w-24 h-24 rounded-[24px] bg-sage/10 flex items-center justify-center">
+                <PawPrint className="w-10 h-10 text-sage/30" />
+              </div>
             </div>
           )}
 
