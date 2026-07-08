@@ -9,7 +9,7 @@ import CatalogGrid from "./CatalogGrid";
 
 const TABS = [
   { key: "all", label: "All Products", icon: LayoutGrid },
-  { key: "pharma", label: "Pharmaceuticals", icon: Pill },
+  { key: "pharma", label: "Pharmacy", icon: Pill },
   { key: "supplements", label: "Supplements", icon: Leaf },
 ];
 

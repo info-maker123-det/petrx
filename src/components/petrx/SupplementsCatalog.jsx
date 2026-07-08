@@ -27,7 +27,7 @@ export default function SupplementsCatalog({ products, loading }) {
               <p className="text-xs text-ink/50">Schedule recurring deliveries — skip or cancel anytime.</p>
             </div>
           </div>
-          <Link to="/shop" className="flex items-center gap-2 text-sm font-semibold text-sage hover:gap-3 transition-all">
+          <Link to="/shop?type=otc" className="flex items-center gap-2 text-sm font-semibold text-sage hover:gap-3 transition-all">
             Browse supplements <ArrowRight className="w-4 h-4" />
           </Link>
         </div>

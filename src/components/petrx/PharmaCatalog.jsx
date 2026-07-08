@@ -47,7 +47,7 @@ export default function PharmaCatalog({ products, loading }) {
               <p className="text-xs text-ink/40 flex items-center gap-1.5">
                 <ShieldCheck className="w-3.5 h-3.5" /> Pharmacist-reviewed
               </p>
-              <Link to="/shop" className="text-sm text-ink/50 hover:text-ink transition-colors">View all Rx</Link>
+              <Link to="/shop?type=rx" className="text-sm text-ink/50 hover:text-ink transition-colors">View all Rx</Link>
             </div>
             <CatalogGrid products={products} loading={loading} columns={2} emptyText="No prescription medications available right now." />
           </div>

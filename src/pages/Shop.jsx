@@ -21,6 +21,8 @@ export default function Shop() {
     const params = new URLSearchParams(window.location.search);
     const pet = params.get("pet");
     if (pet && ["dog", "cat", "horse"].includes(pet)) setPetType(pet);
+    const type = params.get("type");
+    if (type === "rx" || type === "otc") setProductType(type);
     base44.entities.Product
       .list("-rating", 1000)
       .then((data) => setProducts(Array.isArray(data) ? data : []))

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { base44 } from "@/api/base44Client";
@@ -9,6 +9,9 @@ export default function PrescriptionUpload() {
   const [submitted, setSubmitted] = useState(null);
   const [error, setError] = useState("");
   const [fileName, setFileName] = useState("");
+  const [pets, setPets] = useState([]);
+  const [selectedPetId, setSelectedPetId] = useState("");
+  const [checkingPets, setCheckingPets] = useState(true);
   const [form, setForm] = useState({
     pet_name: "",
     pet_species: "dog",
@@ -20,6 +23,20 @@ export default function PrescriptionUpload() {
     vet_address: "",
     notes: "",
   });
+
+  useEffect(() => {
+    base44.entities.Pet.list()
+      .then((data) => {
+        const list = Array.isArray(data) ? data : [];
+        setPets(list);
+        if (list.length > 0) {
+          setSelectedPetId(list[0].id);
+          setForm((f) => ({ ...f, pet_name: list[0].name, pet_species: list[0].species }));
+        }
+      })
+      .catch(() => setPets([]))
+      .finally(() => setCheckingPets(false));
+  }, []);
 
   const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
 
@@ -88,6 +105,32 @@ export default function PrescriptionUpload() {
       </div>
     );
 
+  if (checkingPets)
+    return (
+      <div className="py-20 md:py-32 bg-porcelain flex items-center justify-center">
+        <div className="w-8 h-8 border-4 border-secondary border-t-sage rounded-full animate-spin" />
+      </div>
+    );
+
+  if (pets.length === 0)
+    return (
+      <div className="py-20 md:py-32 bg-porcelain">
+        <div className="max-w-xl mx-auto px-5 md:px-8 text-center">
+          <div className="w-16 h-16 rounded-2xl bg-sage/10 flex items-center justify-center mx-auto mb-6">
+            <PawPrint className="w-8 h-8 text-sage" />
+          </div>
+          <p className="text-sage text-sm font-semibold tracking-widest uppercase mb-2">Pet Profile Required</p>
+          <h1 className="font-display text-3xl md:text-4xl text-ink mb-3">Add your pet first</h1>
+          <p className="text-ink/50 mb-8 max-w-md mx-auto">
+            Before submitting a prescription, please create a profile for your pet so we can match the medication to the right patient.
+          </p>
+          <Link to="/dashboard" className="inline-flex items-center gap-2 px-6 py-3 bg-sage text-white rounded-full text-sm font-semibold hover:bg-[#3d5a66] transition-colors">
+            Create Pet Profile <ArrowRight className="w-4 h-4" />
+          </Link>
+        </div>
+      </div>
+    );
+
   return (
     <div className="py-12 md:py-16 bg-porcelain">
       <div className="max-w-3xl mx-auto px-5 md:px-8">
@@ -110,17 +153,20 @@ export default function PrescriptionUpload() {
               <h2 className="font-display text-xl text-ink">Pet Information</h2>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className="text-xs text-ink/50 font-medium uppercase tracking-wider">Pet's Name *</label>
-                <input name="pet_name" value={form.pet_name} onChange={handleChange} className="mt-1 w-full px-4 py-3 bg-secondary rounded-2xl border-[0.5px] border-transparent focus:border-sage focus:outline-none transition-all" />
-              </div>
-              <div>
-                <label className="text-xs text-ink/50 font-medium uppercase tracking-wider">Species</label>
-                <select name="pet_species" value={form.pet_species} onChange={handleChange} className="mt-1 w-full px-4 py-3 bg-secondary rounded-2xl border-[0.5px] border-transparent focus:border-sage focus:outline-none transition-all">
-                  <option value="dog">Dog</option>
-                  <option value="cat">Cat</option>
-                  <option value="horse">Horse</option>
-                  <option value="other">Other</option>
+              <div className="md:col-span-2">
+                <label className="text-xs text-ink/50 font-medium uppercase tracking-wider">Select Your Pet *</label>
+                <select
+                  value={selectedPetId}
+                  onChange={(e) => {
+                    const pet = pets.find((p) => p.id === e.target.value);
+                    setSelectedPetId(e.target.value);
+                    setForm({ ...form, pet_name: pet?.name || "", pet_species: pet?.species || "dog" });
+                  }}
+                  className="mt-1 w-full px-4 py-3 bg-secondary rounded-2xl border-[0.5px] border-transparent focus:border-sage focus:outline-none transition-all"
+                >
+                  {pets.map((p) => (
+                    <option key={p.id} value={p.id}>{p.name} ({p.species})</option>
+                  ))}
                 </select>
               </div>
               <div className="md:col-span-2">
