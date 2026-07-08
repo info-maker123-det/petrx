@@ -23,7 +23,7 @@ export default function ContactDropdown() {
         Contact <ChevronDown className={`w-3.5 h-3.5 transition-transform ${open ? "rotate-180" : ""}`} />
       </button>
       {open && (
-        <div className="absolute top-full right-0 mt-2 w-44 bg-white border border-border rounded-xl shadow-lg py-1.5 z-50">
+        <div className="absolute top-full right-0 mt-2 w-44 bg-white border border-border rounded-xl shadow-lg py-1.5 z-[100]">
           <Link
             to="/contact"
             onClick={() => setOpen(false)}

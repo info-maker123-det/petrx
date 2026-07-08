@@ -91,7 +91,7 @@ export default function FluidHeader() {
 
       {/* Main Header */}
       <header
-        className={`sticky top-0 z-50 transition-all duration-300 bg-porcelain/95 backdrop-blur-md border-b ${
+        className={`sticky top-0 z-[60] transition-all duration-300 bg-porcelain/95 backdrop-blur-md border-b ${
           scrolled ? "border-border shadow-sm py-2.5" : "border-transparent py-4"
         }`}
       >
@@ -175,13 +175,13 @@ export default function FluidHeader() {
                 >
                   My Account
                 </Link>
-                <Link
-                  to="/admin"
+                <a
+                  href="/admin"
                   onClick={() => setMobileOpen(false)}
                   className="block py-3 px-4 text-ink/50 hover:text-ink rounded-xl text-sm font-medium text-center"
                 >
                   Staff Portal
-                </Link>
+                </a>
               </div>
             </motion.div>
           )}
