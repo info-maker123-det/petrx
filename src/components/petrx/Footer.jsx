@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from "react-router-dom";
 import { Phone, Mail, MapPin } from "lucide-react";
 import Logo from "@/components/petrx/Logo";
 
@@ -20,9 +21,9 @@ const COMPANY_LINKS = [
 ];
 
 const LEGAL_LINKS = [
-  { label: "Privacy Policy", href: "#" },
-  { label: "Terms of Service", href: "#" },
-  { label: "Accessibility", href: "#" },
+  { label: "Privacy Policy", to: "/privacy" },
+  { label: "Terms of Service", to: "/terms" },
+  { label: "Accessibility", to: "/accessibility" },
 ];
 
 export default function Footer() {
@@ -137,9 +138,9 @@ export default function Footer() {
           </p>
           <div className="flex items-center gap-6">
             {LEGAL_LINKS.map((link) => (
-              <a key={link.label} href={link.href} className="text-white/30 hover:text-white/60 transition-colors text-xs">
+              <Link key={link.label} to={link.to} className="text-white/30 hover:text-white/60 transition-colors text-xs">
                 {link.label}
-              </a>
+              </Link>
             ))}
           </div>
         </div>

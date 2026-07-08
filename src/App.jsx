@@ -22,6 +22,9 @@ import Shop from './pages/Shop';
 import Dashboard from './pages/Dashboard';
 import PetAdvisor from './pages/PetAdvisor';
 import AutoShip from './pages/AutoShip';
+import PrivacyPolicy from './pages/PrivacyPolicy';
+import TermsOfService from './pages/TermsOfService';
+import Accessibility from './pages/Accessibility';
 // Add page imports here
 
 const AuthenticatedApp = () => {
@@ -58,6 +61,9 @@ const AuthenticatedApp = () => {
         <Route element={<Layout />}>
           <Route path="/" element={<Home />} />
           <Route path="/shop" element={<Shop />} />
+          <Route path="/privacy" element={<PrivacyPolicy />} />
+          <Route path="/terms" element={<TermsOfService />} />
+          <Route path="/accessibility" element={<Accessibility />} />
           <Route path="/product/:id" element={<ProductDetail />} />
           <Route element={<ProtectedRoute unauthenticatedElement={<Navigate to="/login" replace />} />}>
             <Route path="/contact" element={<Contact />} />
