@@ -1,6 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { Search, ShieldCheck, ArrowRight, FileText, Star } from "lucide-react";
+import { ShieldCheck, ArrowRight, FileText, Star } from "lucide-react";
 import { motion } from "framer-motion";
 
 const HERO_IMAGE = "https://media.base44.com/images/public/6a4dc0dbd2a6ae29bc765da4/d1e54be26_generated_e50bc09d.png";
@@ -59,40 +59,19 @@ export default function HeroSection() {
             all on one secure platform built for your pet's health.
           </motion.p>
 
-          {/* Search Bar */}
+          {/* Primary CTAs */}
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, delay: 0.3 }}
-            className="relative max-w-xl mb-8"
-          >
-            <div className="relative">
-              <Search className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-sage" />
-              <input
-                type="text"
-                placeholder="Search medications, supplements, or brands..."
-                className="w-full pl-14 pr-36 py-4 md:py-5 bg-white rounded-2xl border border-border shadow-xl shadow-black/[0.03] text-base focus:outline-none focus:border-sage focus:shadow-sage/5 transition-all placeholder:text-muted-foreground"
-              />
-              <button className="absolute right-2 top-1/2 -translate-y-1/2 px-6 py-2.5 md:py-3 bg-sage text-white rounded-xl text-sm font-semibold hover:bg-[#3d5a66] transition-colors">
-                Search
-              </button>
-            </div>
-          </motion.div>
-
-          {/* Secondary CTAs */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, delay: 0.4 }}
             className="flex flex-wrap items-center gap-4 mb-12"
           >
-            <Link to="/prescription" className="inline-flex items-center gap-2 text-sm font-semibold text-ink hover:text-sage transition-colors group">
-              Submit a prescription
-              <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
-            </Link>
-            <span className="text-ink/20">|</span>
-            <Link to="/shop" className="inline-flex items-center gap-2 text-sm font-semibold text-ink hover:text-sage transition-colors">
+            <Link to="/shop" className="inline-flex items-center gap-2 px-8 py-4 bg-sage text-white rounded-2xl text-base font-semibold hover:bg-[#3d5a66] transition-colors shadow-lg shadow-sage/10">
               Browse the catalog
+              <ArrowRight className="w-4 h-4" />
+            </Link>
+            <Link to="/prescription" className="inline-flex items-center gap-2 px-8 py-4 bg-white text-ink rounded-2xl text-base font-semibold border border-border hover:border-sage hover:text-sage transition-colors">
+              Submit a prescription
             </Link>
           </motion.div>
 
