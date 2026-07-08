@@ -227,22 +227,38 @@ export default function ProductDetail() {
             <div className="diagnostic-line pt-8">
               <h3 className="font-display text-lg text-ink mb-3">Product Details</h3>
               <p className="text-ink/60 text-sm leading-relaxed mb-6">{product.description}</p>
+
+              {product.usage && (
+                <div className="mb-6 p-4 bg-sage/5 rounded-2xl">
+                  <p className="text-ink/40 text-xs uppercase tracking-wider mb-1">Indications / Usage</p>
+                  <p className="text-ink text-sm font-medium leading-relaxed">{product.usage}</p>
+                </div>
+              )}
+
               <div className="grid grid-cols-2 gap-4 text-sm">
                 <div>
                   <p className="text-ink/40 text-xs uppercase tracking-wider mb-1">Active Ingredient</p>
-                  <p className="text-ink font-medium">{product.active_ingredient}</p>
+                  <p className="text-ink font-medium">{product.active_ingredient || "—"}</p>
                 </div>
                 <div>
                   <p className="text-ink/40 text-xs uppercase tracking-wider mb-1">Dosage Type</p>
-                  <p className="text-ink font-medium">{product.dosage_type}</p>
+                  <p className="text-ink font-medium">{product.dosage_type || "—"}</p>
                 </div>
                 <div>
                   <p className="text-ink/40 text-xs uppercase tracking-wider mb-1">Weight Class</p>
-                  <p className="text-ink font-medium">{product.weight_class}</p>
+                  <p className="text-ink font-medium">{product.weight_class || "—"}</p>
+                </div>
+                <div>
+                  <p className="text-ink/40 text-xs uppercase tracking-wider mb-1">Brand</p>
+                  <p className="text-ink font-medium">{product.brand || "—"}</p>
                 </div>
                 <div>
                   <p className="text-ink/40 text-xs uppercase tracking-wider mb-1">Category</p>
-                  <p className="text-ink font-medium">{product.category}</p>
+                  <p className="text-ink font-medium">{product.category || "—"}</p>
+                </div>
+                <div>
+                  <p className="text-ink/40 text-xs uppercase tracking-wider mb-1">For</p>
+                  <p className="text-ink font-medium capitalize">{product.pet_type || "—"}</p>
                 </div>
               </div>
             </div>
