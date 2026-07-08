@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { base44 } from "@/api/base44Client";
 import { useCart } from "@/lib/cartContext";
@@ -17,6 +17,7 @@ import SimilarProducts from "@/components/petrx/SimilarProducts";
 
 export default function ProductDetail() {
   const { id } = useParams();
+  const navigate = useNavigate();
   const { addItem } = useCart();
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -65,9 +66,12 @@ export default function ProductDetail() {
   return (
     <div className="py-10 md:py-16 bg-porcelain">
       <div className="max-w-7xl mx-auto px-5 md:px-8">
-        <Link to="/" className="inline-flex items-center gap-2 text-ink/50 hover:text-ink text-sm mb-8 transition-colors">
-          <ArrowLeft className="w-4 h-4" /> Back to products
-        </Link>
+        <button
+          onClick={() => navigate(-1)}
+          className="inline-flex items-center gap-2 text-ink/50 hover:text-ink text-sm mb-8 transition-colors"
+        >
+          <ArrowLeft className="w-4 h-4" /> Back
+        </button>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16">
           {/* Sticky Gallery */}

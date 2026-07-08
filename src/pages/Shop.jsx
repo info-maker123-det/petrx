@@ -91,12 +91,14 @@ export default function Shop() {
           <p className="text-ink/50 mt-3 max-w-xl">{loading ? "Loading catalog…" : heading.subtitle}</p>
         </div>
 
-        <GuidedShop
-          petType={petType}
-          setPetType={setPetType}
-          healthIssue={healthIssue}
-          setHealthIssue={setHealthIssue}
-        />
+        {brand === "all" && category === "All" && (
+          <GuidedShop
+            petType={petType}
+            setPetType={setPetType}
+            healthIssue={healthIssue}
+            setHealthIssue={setHealthIssue}
+          />
+        )}
 
         <div className="flex gap-3 mb-8">
           <div className="relative flex-1 max-w-md">
