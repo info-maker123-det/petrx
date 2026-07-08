@@ -3,10 +3,11 @@ import { Link } from "react-router-dom";
 import { ArrowRight, Repeat } from "lucide-react";
 import CatalogGrid from "./CatalogGrid";
 
-export default function SupplementsCatalog({ products, loading }) {
+export default function SupplementsCatalog({ products, loading, linkParams = "" }) {
+  const viewAllHref = `/shop?type=otc${linkParams ? `&${linkParams}` : ""}`;
   return (
-    <div className="bg-[#F4F8F6]">
-      <div className="max-w-7xl mx-auto px-5 md:px-8 py-20 md:py-28">
+    <div>
+      <div className="max-w-7xl mx-auto px-5 md:px-8 py-14 md:py-20">
         {/* Header */}
         <div className="text-center max-w-2xl mx-auto mb-12">
           <p className="text-sage text-sm font-semibold tracking-widest uppercase mb-3">Over-the-Counter</p>
@@ -27,7 +28,7 @@ export default function SupplementsCatalog({ products, loading }) {
               <p className="text-xs text-ink/50">Schedule recurring deliveries — skip or cancel anytime.</p>
             </div>
           </div>
-          <Link to="/shop?type=otc" className="flex items-center gap-2 text-sm font-semibold text-sage hover:gap-3 transition-all">
+          <Link to={viewAllHref} className="flex items-center gap-2 text-sm font-semibold text-sage hover:gap-3 transition-all">
             Browse supplements <ArrowRight className="w-4 h-4" />
           </Link>
         </div>

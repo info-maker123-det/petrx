@@ -9,10 +9,11 @@ const STEPS = [
   { icon: Package, title: "Shipped to you", desc: "Approved orders ship within one business day." },
 ];
 
-export default function PharmaCatalog({ products, loading }) {
+export default function PharmaCatalog({ products, loading, linkParams = "" }) {
+  const viewAllHref = `/shop?type=rx${linkParams ? `&${linkParams}` : ""}`;
   return (
-    <div className="bg-[#FBF7F0]">
-      <div className="max-w-7xl mx-auto px-5 md:px-8 py-20 md:py-28">
+    <div>
+      <div className="max-w-7xl mx-auto px-5 md:px-8 py-14 md:py-20">
         <div className="grid lg:grid-cols-3 gap-10 lg:gap-14">
           {/* Clinical intro panel */}
           <aside className="lg:col-span-1">
@@ -47,7 +48,7 @@ export default function PharmaCatalog({ products, loading }) {
               <p className="text-xs text-ink/40 flex items-center gap-1.5">
                 <ShieldCheck className="w-3.5 h-3.5" /> Pharmacist-reviewed
               </p>
-              <Link to="/shop?type=rx" className="text-sm text-ink/50 hover:text-ink transition-colors">View all Rx</Link>
+              <Link to={viewAllHref} className="text-sm text-ink/50 hover:text-ink transition-colors">View all Rx</Link>
             </div>
             <CatalogGrid products={products} loading={loading} columns={2} emptyText="No prescription medications available right now." />
           </div>

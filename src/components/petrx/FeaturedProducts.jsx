@@ -6,6 +6,7 @@ import { Pill, Leaf, LayoutGrid, ArrowRight } from "lucide-react";
 import PharmaCatalog from "./PharmaCatalog";
 import SupplementsCatalog from "./SupplementsCatalog";
 import CatalogGrid from "./CatalogGrid";
+import GuidedShop, { HEALTH_ISSUES } from "./GuidedShop";
 
 const TABS = [
   { key: "all", label: "All Products", icon: LayoutGrid },
@@ -18,6 +19,8 @@ export default function FeaturedProducts() {
   const [otc, setOtc] = useState([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("all");
+  const [petType, setPetType] = useState("all");
+  const [healthIssue, setHealthIssue] = useState(null);
 
   useEffect(() => {
     Promise.all([
@@ -31,6 +34,22 @@ export default function FeaturedProducts() {
   }, []);
 
   const allProducts = [...rx.slice(0, 9), ...otc.slice(0, 9)];
+
+  const issueCats = healthIssue ? HEALTH_ISSUES.find((i) => i.id === healthIssue)?.categories : null;
+  const matchesGuide = (p) => {
+    if (petType !== "all" && p.pet_type !== petType && p.pet_type !== "all") return false;
+    if (issueCats && !issueCats.includes(p.category)) return false;
+    return true;
+  };
+  const filteredRx = rx.filter(matchesGuide);
+  const filteredOtc = otc.filter(matchesGuide);
+
+  const shopLinkParams = () => {
+    const params = new URLSearchParams();
+    if (petType !== "all") params.set("pet", petType);
+    if (healthIssue) params.set("issue", healthIssue);
+    return params.toString();
+  };
 
   return (
     <section id="products">
@@ -71,8 +90,22 @@ export default function FeaturedProducts() {
           exit={{ opacity: 0, y: -8 }}
           transition={{ duration: 0.25 }}
         >
-          {activeTab === "pharma" && <PharmaCatalog products={rx} loading={loading} />}
-          {activeTab === "supplements" && <SupplementsCatalog products={otc} loading={loading} />}
+          {activeTab === "pharma" && (
+            <div className="bg-[#FBF7F0] pt-10 md:pt-14">
+              <div className="max-w-7xl mx-auto px-5 md:px-8">
+                <GuidedShop petType={petType} setPetType={setPetType} healthIssue={healthIssue} setHealthIssue={setHealthIssue} />
+              </div>
+              <PharmaCatalog products={filteredRx} loading={loading} linkParams={shopLinkParams()} />
+            </div>
+          )}
+          {activeTab === "supplements" && (
+            <div className="bg-[#F4F8F6] pt-10 md:pt-14">
+              <div className="max-w-7xl mx-auto px-5 md:px-8">
+                <GuidedShop petType={petType} setPetType={setPetType} healthIssue={healthIssue} setHealthIssue={setHealthIssue} />
+              </div>
+              <SupplementsCatalog products={filteredOtc} loading={loading} linkParams={shopLinkParams()} />
+            </div>
+          )}
           {activeTab === "all" && (
             <div className="bg-white">
               <div className="max-w-7xl mx-auto px-5 md:px-8 py-20 md:py-28">
