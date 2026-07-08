@@ -13,6 +13,7 @@ import {
   Truck,
 } from "lucide-react";
 import SimilarProducts from "@/components/petrx/SimilarProducts";
+import ShareBar from "@/components/petrx/ShareBar";
 import {
   Accordion,
   AccordionItem,
@@ -146,6 +147,10 @@ export default function ProductDetail() {
               {product.brand}
             </Link>
             <h1 className="font-display text-3xl md:text-4xl text-ink mb-4 leading-tight">{product.name}</h1>
+
+            <div className="mb-6">
+              <ShareBar product={product} />
+            </div>
 
             {/* Transparency Tier */}
             <div className="flex flex-wrap gap-3 mb-6">
