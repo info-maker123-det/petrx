@@ -5,13 +5,14 @@ import PetCard from "@/components/petrx/PetCard";
 import AddPetModal from "@/components/petrx/AddPetModal";
 import PetHealthOverview from "@/components/petrx/PetHealthOverview";
 import PrescriptionTracker from "@/components/petrx/PrescriptionTracker";
-import { Plus, PawPrint, Package, FileText, ChevronRight, Stethoscope, HeartPulse, ChevronDown } from "lucide-react";
+import { Plus, PawPrint, Package, FileText, ChevronRight, Stethoscope, HeartPulse, ChevronDown, RefreshCw } from "lucide-react";
 
 const TABS = [
   { key: "pets", label: "My Pets", icon: PawPrint },
   { key: "health", label: "Pet Health", icon: HeartPulse },
   { key: "orders", label: "Orders", icon: Package },
   { key: "prescriptions", label: "Prescriptions", icon: FileText },
+  { key: "autoship", label: "AutoShip", icon: RefreshCw },
 ];
 
 const STATUS_STYLES = {
@@ -30,6 +31,7 @@ export default function Dashboard() {
   const [pets, setPets] = useState([]);
   const [orders, setOrders] = useState([]);
   const [prescriptions, setPrescriptions] = useState([]);
+  const [subscriptions, setSubscriptions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [tab, setTab] = useState("pets");
   const [showAdd, setShowAdd] = useState(false);
@@ -44,14 +46,16 @@ export default function Dashboard() {
     } catch {
       /* user will be redirected to login by route guard */
     }
-    const [p, o, rx] = await Promise.all([
+    const [p, o, rx, subs] = await Promise.all([
       base44.entities.Pet.list().catch(() => []),
       base44.entities.Order.list("-created_date", 50).catch(() => []),
       base44.entities.Prescription.list("-created_date", 50).catch(() => []),
+      base44.entities.Subscription.list().catch(() => []),
     ]);
     setPets(Array.isArray(p) ? p : []);
     setOrders(Array.isArray(o) ? o : []);
     setPrescriptions(Array.isArray(rx) ? rx : []);
+    setSubscriptions(Array.isArray(subs) ? subs : []);
     setLoading(false);
   };
 
@@ -97,10 +101,11 @@ export default function Dashboard() {
         </div>
 
         {/* Stat Cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-10">
+        <div className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-4 gap-4 mb-10">
           <StatCard label="Pets" value={pets.length} icon={PawPrint} />
           <StatCard label="Medications" value={totalMeds} icon={FileText} />
           <StatCard label="Orders" value={orders.length} icon={Package} />
+          <StatCard label="AutoShips" value={subscriptions.length} icon={RefreshCw} />
         </div>
 
         <div className="flex items-center gap-2 mb-8 border-b border-border overflow-x-auto">
@@ -195,7 +200,7 @@ export default function Dashboard() {
               </div>
             )}
           </div>
-        ) : (
+        ) : tab === "prescriptions" ? (
           <div>
             {prescriptions.length === 0 ? (
               <EmptyState
@@ -233,14 +238,66 @@ export default function Dashboard() {
                       )}
                     </div>
                   );
-                })}
-              </div>
-            )}
-          </div>
-        )}
-      </div>
+                  })}
+                  </div>
+                  )}
+                  </div>
+                  ) : (
+                  <div>
+                  <div className="flex items-center justify-between mb-6">
+                  <h2 className="font-display text-2xl text-ink">AutoShip Subscriptions</h2>
+                  <Link
+                  to="/autoship"
+                  className="inline-flex items-center gap-2 px-5 py-2.5 bg-sage text-white rounded-full text-sm font-semibold hover:bg-[#3d5a66] transition-colors"
+                  >
+                  <Plus className="w-4 h-4" /> New AutoShip
+                  </Link>
+                  </div>
+                  {subscriptions.length === 0 ? (
+                  <EmptyState
+                  icon={RefreshCw}
+                  title="No active AutoShips"
+                  desc="Set up AutoShip to have your pet's medications delivered automatically on your schedule."
+                  cta={{ label: "Browse AutoShip", onClick: () => (window.location.href = "/autoship") }}
+                  />
+                  ) : (
+                  <div className="space-y-3">
+                  {subscriptions.map((s) => (
+                  <div key={s.id} className="cellular-card p-5 flex items-center justify-between">
+                   <div className="flex items-center gap-4">
+                     {s.product_image ? (
+                       <img src={s.product_image} alt={s.product_name} className="w-12 h-12 rounded-xl object-cover" />
+                     ) : (
+                       <div className="w-12 h-12 rounded-xl bg-sage/10 flex items-center justify-center">
+                         <Package className="w-5 h-5 text-sage" />
+                       </div>
+                     )}
+                     <div>
+                       <p className="font-medium text-ink">{s.product_name}</p>
+                       <p className="text-xs text-ink/50 mt-0.5">
+                         {s.pet_name} · Qty {s.quantity} · Every {s.frequency_days} days
+                       </p>
+                     </div>
+                   </div>
+                   <div className="flex items-center gap-3">
+                     <span className={`px-3 py-1 rounded-full text-xs font-medium capitalize ${
+                       s.status === "active" ? "bg-green-100 text-green-700"
+                       : s.status === "paused" ? "bg-ochre/10 text-ochre"
+                       : "bg-red-100 text-red-700"
+                     }`}>
+                       {s.status}
+                     </span>
+                     <Link to="/autoship" className="text-xs font-semibold text-sage hover:underline">Manage</Link>
+                   </div>
+                  </div>
+                  ))}
+                  </div>
+                  )}
+                  </div>
+                  )}
+                  </div>
 
-      <AddPetModal open={showAdd} onClose={() => setShowAdd(false)} onAdded={load} />
+                  <AddPetModal open={showAdd} onClose={() => setShowAdd(false)} onAdded={load} />
     </div>
   );
 }
