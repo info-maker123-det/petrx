@@ -79,7 +79,7 @@ export default function Shop() {
     if (productType === "rx") return { eyebrow: "Prescription", title: "Shop the Pharmacy", subtitle: "Vet-verified prescription medications, reviewed by our pharmacists." };
     if (productType === "otc") return { eyebrow: "Over-the-Counter", title: "Shop Supplements", subtitle: "Vet-recommended wellness supplements — no prescription required." };
     if (petType !== "all") return { eyebrow: "Shop by Pet", title: `Shop for ${petType === "all" ? "All Pets" : petType.charAt(0).toUpperCase() + petType.slice(1) + "s"}`, subtitle: `Showing products for your ${petType}${issueLabel ? ` — ${issueLabel}` : ""}.` };
-    return { eyebrow: "Pharmacy Catalog", title: "Shop All Products", subtitle: `${products.length} prescription medications and supplements for every pet.` };
+    return { eyebrow: "Pharmacy Catalog", title: "Shop All Products", subtitle: "Prescription medications and supplements for every pet." };
   })();
 
   return (
