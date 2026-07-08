@@ -23,7 +23,7 @@ export default function PetAdvisor() {
   }, []);
 
   return (
-    <div className="py-10 md:py-16 bg-porcelain min-h-screen">
+    <div className="py-6 md:py-16 bg-porcelain min-h-screen">
       <div className="max-w-7xl mx-auto px-5 md:px-8">
         <div className="mb-8 md:mb-12">
           <div className="flex items-center gap-2 text-sage text-xs font-semibold tracking-wider uppercase mb-3">
@@ -65,14 +65,14 @@ export default function PetAdvisor() {
               <p className="text-xs text-ink/40 uppercase tracking-wider font-semibold mb-3">
                 Select a Pet
               </p>
-              <div className="flex flex-wrap gap-3">
+              <div className="flex gap-2 md:gap-3 overflow-x-auto no-scrollbar -mx-1 px-1 pb-1">
                 {pets.map((pet) => {
                   const active = selectedPet?.id === pet.id;
                   return (
                     <button
                       key={pet.id}
                       onClick={() => setSelectedPet(pet)}
-                      className={`flex items-center gap-3 px-4 py-3 rounded-2xl border-2 transition-all ${
+                      className={`flex items-center gap-3 px-4 py-3 rounded-2xl border-2 transition-all flex-shrink-0 ${
                         active
                           ? "border-sage bg-sage/5"
                           : "border-border bg-white hover:border-sage/40"
@@ -106,7 +106,7 @@ export default function PetAdvisor() {
                 })}
                 <Link
                   to="/dashboard"
-                  className="flex items-center gap-2 px-4 py-3 rounded-2xl border-2 border-dashed border-border text-ink/40 hover:text-sage hover:border-sage/40 transition-all text-sm font-medium"
+                  className="flex items-center gap-2 px-4 py-3 rounded-2xl border-2 border-dashed border-border text-ink/40 hover:text-sage hover:border-sage/40 transition-all text-sm font-medium flex-shrink-0"
                 >
                   <Plus className="w-4 h-4" /> Add Pet
                 </Link>

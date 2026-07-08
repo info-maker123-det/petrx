@@ -1,66 +1,19 @@
-import React, { useState } from "react";
+import React from "react";
 import ReactMarkdown from "react-markdown";
 import { useNavigate } from "react-router-dom";
-import { User, ChevronDown, ChevronRight, Loader2, Check, AlertCircle } from "lucide-react";
+import { User, Loader2 } from "lucide-react";
 import LogoMark from "./LogoMark";
 
-function FunctionDisplay({ toolCall }) {
-  const [expanded, setExpanded] = useState(false);
+// Tool calls are internal to the agent. We only show a subtle "working" indicator
+// while a call is in flight; completed/failed calls are hidden from the user.
+function ToolCallIndicator({ toolCall }) {
   const status = toolCall.status || "";
   const isPending = ["pending", "running", "in_progress"].includes(status);
-  const isFailed = ["failed", "error"].includes(status);
-
-  let parsedResults = toolCall.results;
-  try {
-    if (typeof toolCall.results === "string") parsedResults = JSON.parse(toolCall.results);
-  } catch (e) {
-    /* keep raw */
-  }
-
-  const dp = toolCall.display_projection || {};
-  const hideDetails = dp.hide_details && dp.details_redacted;
-  const label = isFailed
-    ? dp.error_label || "Failed"
-    : isPending
-    ? dp.active_label || "Working…"
-    : dp.label || "Completed";
-  const toolName = (toolCall.name || "tool").replace(/_/g, " ");
-  const StatusIcon = isFailed ? AlertCircle : isPending ? Loader2 : Check;
-
+  if (!isPending) return null;
   return (
-    <div className="mt-2.5 text-xs">
-      <button
-        onClick={() => !hideDetails && setExpanded(!expanded)}
-        disabled={hideDetails}
-        className="flex items-center gap-2 px-2.5 py-1.5 bg-secondary rounded-lg text-ink/60 hover:text-ink transition-colors"
-      >
-        {!hideDetails && (expanded ? <ChevronDown className="w-3 h-3" /> : <ChevronRight className="w-3 h-3" />)}
-        <StatusIcon
-          className={`w-3 h-3 ${isPending ? "animate-spin" : ""} ${isFailed ? "text-red-500" : "text-sage"}`}
-        />
-        <span className="capitalize">{toolName}</span>
-        <span className="text-ink/40">· {label}</span>
-      </button>
-      {expanded && !hideDetails && (
-        <div className="mt-1.5 ml-5 space-y-1.5">
-          {toolCall.arguments_string && (
-            <div>
-              <p className="text-ink/40 uppercase tracking-wider text-[10px] mb-0.5">Parameters</p>
-              <pre className="bg-secondary p-2 rounded-lg overflow-x-auto text-[11px] text-ink/70 whitespace-pre-wrap break-words">
-                {toolCall.arguments_string}
-              </pre>
-            </div>
-          )}
-          {parsedResults != null && (
-            <div>
-              <p className="text-ink/40 uppercase tracking-wider text-[10px] mb-0.5">Result</p>
-              <pre className="bg-secondary p-2 rounded-lg overflow-x-auto text-[11px] text-ink/70 whitespace-pre-wrap break-words">
-                {typeof parsedResults === "string" ? parsedResults : JSON.stringify(parsedResults, null, 2)}
-              </pre>
-            </div>
-          )}
-        </div>
-      )}
+    <div className="mt-2.5 text-xs flex items-center gap-2 text-ink/40">
+      <Loader2 className="w-3 h-3 animate-spin text-sage" />
+      <span>Searching the catalog…</span>
     </div>
   );
 }
@@ -79,9 +32,9 @@ export default function AdvisorMessageBubble({ message }) {
     );
 
   return (
-    <div className={`flex gap-3 ${isUser ? "justify-end" : "justify-start"}`}>
+    <div className={`flex gap-2 md:gap-3 ${isUser ? "justify-end" : "justify-start"}`}>
       {!isUser && <Avatar />}
-      <div className="max-w-[80%]">
+      <div className="max-w-[85%] md:max-w-[80%]">
         <div
           className={`px-4 py-3 rounded-2xl ${
             isUser ? "bg-ink text-white rounded-tr-sm" : "bg-white border border-border text-ink rounded-tl-sm"
@@ -120,7 +73,7 @@ export default function AdvisorMessageBubble({ message }) {
               </div>
             ))}
           {message.tool_calls?.map((tc, idx) => (
-            <FunctionDisplay key={idx} toolCall={tc} />
+            <ToolCallIndicator key={idx} toolCall={tc} />
           ))}
         </div>
       </div>

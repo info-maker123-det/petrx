@@ -47,8 +47,31 @@ export default function AdvisorChat({ pet }) {
   const [sending, setSending] = useState(false);
   const [error, setError] = useState(null);
   const contextSentRef = useRef(false);
-  const scrollRef = useRef(null);
   const containerRef = useRef(null);
+  // Holds user message contents that were sent but not yet confirmed by the server.
+  // Prevents the realtime subscription (which may fire with stale state) from wiping them.
+  const pendingRef = useRef([]);
+
+  const mergeWithPending = (serverMsgs) => {
+    const merged = [...(serverMsgs || [])];
+    const stillPending = [];
+    for (const content of pendingRef.current) {
+      const exists = merged.some((m) => m.role === "user" && m.content === content);
+      if (exists) continue;
+      merged.push({ role: "user", content });
+      stillPending.push(content);
+    }
+    pendingRef.current = stillPending;
+    return merged;
+  };
+
+  const applyServerMessages = (serverMsgs) => {
+    const merged = mergeWithPending(serverMsgs);
+    setMessages(merged);
+    const last = merged[merged.length - 1];
+    const assistantHasText = last?.role === "assistant" && last.content?.trim();
+    if (assistantHasText) setSending(false);
+  };
 
   useEffect(() => {
     if (!pet?.id) return;
@@ -61,9 +84,9 @@ export default function AdvisorChat({ pet }) {
       setError(null);
       setConversation(null);
       contextSentRef.current = false;
+      pendingRef.current = [];
       try {
         let conv = null;
-        // Resume an existing conversation for this pet so the history is preserved
         try {
           const existing = await base44.agents.listConversations({ agent_name: "medication_advisor" });
           const list = Array.isArray(existing) ? existing : existing?.conversations || [];
@@ -87,16 +110,12 @@ export default function AdvisorChat({ pet }) {
         if (cancelled) return;
         setConversation(conv);
         if (conv.messages?.length) {
-          setMessages(conv.messages);
+          applyServerMessages(conv.messages);
           contextSentRef.current = true;
         }
         unsub = base44.agents.subscribeToConversation(conv.id, (data) => {
           if (cancelled) return;
-          const msgs = data.messages || [];
-          setMessages(msgs);
-          const last = msgs[msgs.length - 1];
-          const stillWorking = last?.role === "assistant" && last.tool_calls?.some((tc) => ["pending", "running", "in_progress"].includes(tc.status));
-          if (last?.role === "assistant" && !stillWorking) setSending(false);
+          applyServerMessages(data.messages || []);
         });
       } catch (e) {
         if (!cancelled) setError(e.message || "Failed to start conversation");
@@ -109,6 +128,7 @@ export default function AdvisorChat({ pet }) {
       cancelled = true;
       unsub();
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pet?.id]);
 
   const send = async (text) => {
@@ -123,26 +143,24 @@ export default function AdvisorChat({ pet }) {
       messageContent = `Here is my pet's profile for context:\n\n${profile}\n\nMy question: ${content}`;
       contextSentRef.current = true;
     }
-    // Optimistically show the user message immediately
+
+    // Track this message so it stays visible until the server confirms it.
+    pendingRef.current = [...pendingRef.current, messageContent];
     setMessages((prev) => [...prev, { role: "user", content: messageContent }]);
 
     try {
       await base44.agents.addMessage(conversation, { role: "user", content: messageContent });
-      // Safety net: if the real-time subscription misses the reply, poll once after a delay
+      // Safety net: if the realtime subscription misses the reply, poll once after a delay.
       setTimeout(async () => {
         try {
           const fresh = await base44.agents.getConversation(conversation.id);
-          const msgs = fresh.messages || [];
-          if (msgs.length) {
-            setMessages(msgs);
-            const last = msgs[msgs.length - 1];
-            if (last?.role === "assistant") setSending(false);
-          }
+          applyServerMessages(fresh.messages || []);
         } catch (_) { /* subscription will handle it */ }
-      }, 15000);
+      }, 12000);
     } catch (e) {
       setError(e.message || "Failed to send message");
       setSending(false);
+      pendingRef.current = pendingRef.current.filter((c) => c !== messageContent);
     }
   };
 
@@ -151,19 +169,21 @@ export default function AdvisorChat({ pet }) {
     if (el) el.scrollTo({ top: el.scrollHeight, behavior: "smooth" });
   }, [messages, sending]);
 
-  const showTyping = sending && messages[messages.length - 1]?.role === "user";
+  const lastMsg = messages[messages.length - 1];
+  const assistantHasText = lastMsg?.role === "assistant" && lastMsg.content?.trim();
+  const showTyping = sending && !assistantHasText;
   const showStarters = messages.length === 0 && !initializing && !sending;
 
   return (
-    <div className="flex flex-col h-[600px] cellular-card overflow-hidden">
-      <div ref={containerRef} className="flex-1 overflow-y-auto p-5 md:p-6 space-y-5 bg-secondary/30">
+    <div className="flex flex-col h-[68vh] min-h-[440px] md:h-[600px] cellular-card overflow-hidden">
+      <div ref={containerRef} className="flex-1 overflow-y-auto no-scrollbar p-4 md:p-6 space-y-4 md:space-y-5 bg-secondary/30">
         {initializing ? (
           <div className="flex flex-col items-center justify-center h-full text-center">
             <Loader2 className="w-6 h-6 text-sage animate-spin mb-3" />
             <p className="text-sm text-ink/50">Setting up advisor for {pet.name}…</p>
           </div>
         ) : showStarters ? (
-          <div className="flex flex-col items-center justify-center h-full text-center px-4">
+          <div className="flex flex-col items-center justify-center h-full text-center px-3">
             <div className="w-14 h-14 rounded-full bg-sage/10 flex items-center justify-center mb-4">
               <Sparkles className="w-7 h-7 text-sage" />
             </div>
@@ -190,8 +210,8 @@ export default function AdvisorChat({ pet }) {
               <AdvisorMessageBubble key={idx} message={m} />
             ))}
             {showTyping && (
-              <div className="flex gap-3 justify-start">
-                <LogoMark size={32} className="mt-1" />
+              <div className="flex gap-2 md:gap-3 justify-start">
+                <LogoMark size={32} className="mt-1 flex-shrink-0" />
                 <div className="px-4 py-3 bg-white border border-border rounded-2xl rounded-tl-sm">
                   <div className="flex gap-1">
                     <span className="w-1.5 h-1.5 bg-sage/40 rounded-full animate-bounce" style={{ animationDelay: "0ms" }} />
@@ -203,10 +223,9 @@ export default function AdvisorChat({ pet }) {
             )}
           </>
         )}
-        <div ref={scrollRef} />
       </div>
 
-      <div className="p-4 border-t border-border bg-white">
+      <div className="p-3 md:p-4 border-t border-border bg-white">
         <div className="flex gap-2">
           <input
             type="text"
@@ -220,12 +239,12 @@ export default function AdvisorChat({ pet }) {
             }}
             placeholder={conversation ? `Ask about ${pet.name}'s care…` : "Starting…"}
             disabled={!conversation || sending}
-            className="flex-1 px-4 py-3 bg-secondary rounded-xl text-sm border border-transparent focus:border-sage focus:outline-none transition-all disabled:opacity-50"
+            className="flex-1 min-w-0 px-4 py-3 bg-secondary rounded-xl text-sm border border-transparent focus:border-sage focus:outline-none transition-all disabled:opacity-50"
           />
           <button
             onClick={() => send()}
             disabled={!conversation || sending || !input.trim()}
-            className="px-4 py-3 bg-sage text-white rounded-xl hover:bg-[#3d5a66] transition-colors disabled:opacity-50 flex items-center justify-center"
+            className="px-4 py-3 bg-sage text-white rounded-xl hover:bg-[#3d5a66] transition-colors disabled:opacity-50 flex items-center justify-center flex-shrink-0"
           >
             <Send className="w-4 h-4" />
           </button>
