@@ -6,7 +6,10 @@ const VISITOR_KEY = "petrx_visitor_id";
 const SESSION_KEY = "petrx_session_id";
 
 function genId(prefix) {
-  return prefix + "_" + Math.random().toString(36).substring(2, 12) + Date.now().toString(36);
+  const arr = new Uint8Array(16);
+  crypto.getRandomValues(arr);
+  const hex = Array.from(arr).map((b) => b.toString(16).padStart(2, "0")).join("");
+  return prefix + "_" + hex;
 }
 
 function getVisitorId() {

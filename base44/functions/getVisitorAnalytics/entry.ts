@@ -7,8 +7,30 @@ Deno.serve(async (req) => {
     if (!user) return Response.json({ error: 'Unauthorized' }, { status: 401 });
     if (user.role !== 'admin') return Response.json({ error: 'Forbidden' }, { status: 403 });
 
-    const visits = await base44.asServiceRole.entities.SiteVisit.list('-created_date', 1000);
-    const list = visits || [];
+    // Paginate through visits via date cursor for comprehensive analytics
+    let allVisits = [];
+    let cursor = null;
+    const MAX_PAGES = 5; // up to 5000 records
+
+    for (let page = 0; page < MAX_PAGES; page++) {
+      let batch;
+      if (cursor) {
+        batch = await base44.asServiceRole.entities.SiteVisit.filter(
+          { created_date: { $lt: cursor } },
+          '-created_date',
+          1000
+        );
+      } else {
+        batch = await base44.asServiceRole.entities.SiteVisit.list('-created_date', 1000);
+      }
+      if (!batch || batch.length === 0) break;
+      allVisits = allVisits.concat(batch);
+      if (batch.length < 1000) break;
+      cursor = batch[batch.length - 1].created_date;
+    }
+
+    const list = allVisits;
+    const hasMore = allVisits.length === 5000;
 
     const now = Date.now();
     const fiveMinAgo = now - 5 * 60 * 1000;
@@ -67,6 +89,7 @@ Deno.serve(async (req) => {
       deviceBreakdown: devMap,
       browserBreakdown: brMap,
       recentVisitors,
+      hasMore,
     });
   } catch (error) {
     return Response.json({ error: error.message }, { status: 500 });

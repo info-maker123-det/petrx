@@ -45,20 +45,12 @@ export default function Checkout() {
     }
     setPlacing(true);
     try {
-      const order_number = "PRX-" + Date.now().toString().slice(-8);
-      const order = await base44.entities.Order.create({
-        order_number,
-        items,
-        subtotal,
-        shipping_cost: shippingCost,
-        total,
-        ...form,
-        has_prescription_items: hasPrescriptionItems,
-        status: "pending",
-        payment_status: "pending",
+      const response = await base44.functions.invoke("createOrder", {
+        items: items.map((i) => ({ productId: i.productId, quantity: i.quantity, autoship: i.autoship })),
+        shipping: form,
       });
       clearCart();
-      setPlaced(order);
+      setPlaced(response.data);
     } catch (e) {
       setError("Something went wrong placing your order. Please try again.");
     }
