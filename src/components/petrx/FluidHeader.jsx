@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Search, ShoppingBag, Menu, X, Phone, ShieldCheck } from "lucide-react";
+import { Search, ShoppingBag, Menu, X, Phone, ShieldCheck, User } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useCart } from "@/lib/cartContext";
 import Logo from "@/components/petrx/Logo";
@@ -71,12 +71,14 @@ export default function FluidHeader() {
     <>
       {/* Trust Strip */}
       <div className="bg-[#1A1C1E] text-white">
-        <div className="max-w-7xl mx-auto px-5 md:px-8 py-2 flex items-center justify-between text-xs">
-          <div className="flex items-center gap-4 md:gap-6">
-            <span className="flex items-center gap-1.5">
+        <div className="max-w-7xl mx-auto px-5 md:px-8 py-2.5 flex items-center justify-between text-xs">
+          <div className="flex items-center gap-3 md:gap-5">
+            <span className="flex items-center gap-1.5 font-medium">
               <ShieldCheck className="w-3.5 h-3.5 text-sage" /> Licensed CA Pharmacy
             </span>
+            <span className="h-3 w-px bg-white/15 hidden sm:block" />
             <span className="hidden sm:flex items-center gap-1.5 text-white/50">Pharmacist-Verified</span>
+            <span className="h-3 w-px bg-white/15 hidden md:block" />
             <span className="hidden md:flex items-center gap-1.5 text-white/50">HIPAA-Secure</span>
           </div>
           <a href="tel:+18885551234" className="flex items-center gap-1.5 text-white/70 hover:text-sage transition-colors">
@@ -87,13 +89,13 @@ export default function FluidHeader() {
 
       {/* Main Header */}
       <header
-        className={`sticky top-0 z-50 transition-all duration-500 bg-porcelain/95 backdrop-blur-md ${
-          scrolled ? "shadow-sm border-b border-border py-3" : "py-4"
+        className={`sticky top-0 z-50 transition-all duration-300 bg-porcelain/95 backdrop-blur-md border-b ${
+          scrolled ? "border-border shadow-sm py-2.5" : "border-transparent py-4"
         }`}
       >
         <div className="max-w-7xl mx-auto px-5 md:px-8 flex items-center justify-between gap-6">
           {/* Logo */}
-          <Logo className={`transition-all duration-500 ${scrolled ? "scale-90" : "scale-100"}`} />
+          <Logo />
 
           {/* Desktop Nav */}
           <nav className="hidden lg:flex items-center gap-7">
@@ -113,27 +115,22 @@ export default function FluidHeader() {
 
           {/* Search + Account + Cart */}
           <div className="flex items-center gap-3">
-            <motion.div
-              className={`hidden md:flex items-center transition-all duration-500 ${
-                scrolled ? "w-48" : "w-40"
-              }`}
-              layout
-            >
+            <div className="hidden md:flex items-center w-56">
               <div className="relative w-full">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-sage" />
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-ink/30" />
                 <input
                   type="text"
-                  placeholder={scrolled ? "Search medications..." : "Search"}
-                  className="w-full pl-9 pr-4 py-2 bg-secondary rounded-xl text-sm border border-transparent focus:border-sage focus:outline-none transition-all placeholder:text-muted-foreground"
+                  placeholder="Search medications..."
+                  className="w-full pl-9 pr-4 py-2 bg-secondary rounded-xl text-sm border border-transparent focus:border-sage focus:bg-white focus:outline-none transition-all placeholder:text-muted-foreground"
                 />
               </div>
-            </motion.div>
+            </div>
 
             <Link
               to="/dashboard"
-              className="hidden lg:inline-flex items-center px-5 py-2 bg-ink text-white rounded-xl text-sm font-semibold hover:bg-ink/90 transition-colors"
+              className="hidden lg:inline-flex items-center gap-2 px-4 py-2 border border-border rounded-xl text-sm font-medium text-ink hover:border-sage hover:text-sage transition-colors"
             >
-              My Account
+              <User className="w-4 h-4" /> Account
             </Link>
 
             <button onClick={openCart} className="relative p-2 hover:bg-secondary rounded-xl transition-colors">
