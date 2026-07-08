@@ -148,6 +148,9 @@ export default function Footer() {
                 {link.label}
               </Link>
             ))}
+            <Link to="/admin" className="text-white/15 hover:text-sage transition-colors text-xs tracking-wider" title="Staff access">
+              Staff
+            </Link>
           </div>
         </div>
       </div>
