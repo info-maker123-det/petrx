@@ -13,6 +13,18 @@
       "allowed_operations": [
         "read"
       ]
+    },
+    {
+      "entity_name": "Order",
+      "allowed_operations": [
+        "read"
+      ]
+    },
+    {
+      "entity_name": "Prescription",
+      "allowed_operations": [
+        "read"
+      ]
     }
   ],
   "context_files": [],
