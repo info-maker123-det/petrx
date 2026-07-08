@@ -30,9 +30,9 @@ export default function ProductCard({ product, index = 0 }) {
         onMouseEnter={() => setHovered(true)}
         onMouseLeave={() => setHovered(false)}
       >
-        <div className="relative aspect-square bg-gradient-to-br from-secondary to-white flex items-center justify-center overflow-hidden">
+        <div className="relative aspect-square bg-[#FBFBF9] flex items-center justify-center overflow-hidden p-8">
           {product.image_url ? (
-            <img src={product.image_url} alt={product.name} className="w-full h-full object-cover absolute inset-0" />
+            <img src={product.image_url} alt={product.name} className="max-w-full max-h-full object-contain transition-transform duration-700 group-hover:scale-105" />
           ) : (
             <div className="w-24 h-24 rounded-[24px] bg-sage/10 flex items-center justify-center">
               <PawPrint className="w-10 h-10 text-sage/30" />
