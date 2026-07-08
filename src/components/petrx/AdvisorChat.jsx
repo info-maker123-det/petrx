@@ -86,9 +86,17 @@ export default function AdvisorChat({ pet }) {
 
         if (cancelled) return;
         setConversation(conv);
-        if (conv.messages?.length) setMessages(conv.messages);
+        if (conv.messages?.length) {
+          setMessages(conv.messages);
+          contextSentRef.current = true;
+        }
         unsub = base44.agents.subscribeToConversation(conv.id, (data) => {
-          if (!cancelled) setMessages(data.messages || []);
+          if (cancelled) return;
+          const msgs = data.messages || [];
+          setMessages(msgs);
+          const last = msgs[msgs.length - 1];
+          const stillWorking = last?.role === "assistant" && last.tool_calls?.some((tc) => ["pending", "running", "in_progress"].includes(tc.status));
+          if (last?.role === "assistant" && !stillWorking) setSending(false);
         });
       } catch (e) {
         if (!cancelled) setError(e.message || "Failed to start conversation");
@@ -108,21 +116,32 @@ export default function AdvisorChat({ pet }) {
     if (!content || !conversation || sending) return;
     setInput("");
     setSending(true);
+
+    let messageContent = content;
+    if (!contextSentRef.current) {
+      const profile = buildPetProfile(pet);
+      messageContent = `Here is my pet's profile for context:\n\n${profile}\n\nMy question: ${content}`;
+      contextSentRef.current = true;
+    }
+    // Optimistically show the user message immediately
+    setMessages((prev) => [...prev, { role: "user", content: messageContent }]);
+
     try {
-      let messageContent = content;
-      if (!contextSentRef.current) {
-        const profile = buildPetProfile(pet);
-        messageContent = `Here is my pet's profile for context:\n\n${profile}\n\nMy question: ${content}`;
-        contextSentRef.current = true;
-      }
-      const updated = await base44.agents.addMessage(conversation, {
-        role: "user",
-        content: messageContent,
-      });
-      setMessages(updated.messages || []);
+      await base44.agents.addMessage(conversation, { role: "user", content: messageContent });
+      // Safety net: if the real-time subscription misses the reply, poll once after a delay
+      setTimeout(async () => {
+        try {
+          const fresh = await base44.agents.getConversation(conversation.id);
+          const msgs = fresh.messages || [];
+          if (msgs.length) {
+            setMessages(msgs);
+            const last = msgs[msgs.length - 1];
+            if (last?.role === "assistant") setSending(false);
+          }
+        } catch (_) { /* subscription will handle it */ }
+      }, 15000);
     } catch (e) {
       setError(e.message || "Failed to send message");
-    } finally {
       setSending(false);
     }
   };
