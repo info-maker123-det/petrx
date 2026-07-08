@@ -18,7 +18,7 @@ function ToolCallIndicator({ toolCall }) {
   );
 }
 
-export default function AdvisorMessageBubble({ message }) {
+function AdvisorMessageBubble({ message }) {
   const navigate = useNavigate();
   const isUser = message.role === "user";
 
@@ -81,3 +81,14 @@ export default function AdvisorMessageBubble({ message }) {
     </div>
   );
 }
+
+// Memoize so completed messages don't re-render (and re-parse markdown) on
+// every streaming token of the latest assistant reply.
+export default React.memo(AdvisorMessageBubble, (prev, next) => {
+  const p = prev.message, n = next.message;
+  if (p.role !== n.role) return false;
+  if ((p.content || "") !== (n.content || "")) return false;
+  const pt = p.tool_calls || [], nt = n.tool_calls || [];
+  if (pt.length !== nt.length) return false;
+  return pt.every((tc, i) => (tc.status || "") === (nt[i]?.status || ""));
+});

@@ -48,27 +48,58 @@ export default function AdvisorChat({ pet }) {
   const [error, setError] = useState(null);
   const contextSentRef = useRef(false);
   const containerRef = useRef(null);
+  // Tracks the current message list outside React state so the subscription
+  // handler can reliably compare against the latest — never losing messages.
+  const messagesRef = useRef([]);
   // Holds user message contents that were sent but not yet confirmed by the server.
-  // Prevents the realtime subscription (which may fire with stale state) from wiping them.
   const pendingRef = useRef([]);
 
-  const mergeWithPending = (serverMsgs) => {
-    const merged = [...(serverMsgs || [])];
+  const applyServerMessages = (serverMsgs) => {
+    const serverList = serverMsgs || [];
+    const current = messagesRef.current;
+
+    // Build the merged list from server data, appending any pending user
+    // messages that the server hasn't confirmed yet (exact content match).
+    const merged = [...serverList];
     const stillPending = [];
     for (const content of pendingRef.current) {
-      const exists = merged.some((m) => m.role === "user" && m.content === content);
+      const exists = merged.some(
+        (m) => m.role === "user" && (m.content || "").trim() === content.trim()
+      );
       if (exists) continue;
-      merged.push({ role: "user", content });
+      // Don't duplicate if already visible locally
+      const inCurrent = current.some(
+        (m) => m.role === "user" && (m.content || "").trim() === content.trim()
+      );
+      if (!inCurrent) merged.push({ role: "user", content });
       stillPending.push(content);
     }
     pendingRef.current = stillPending;
-    return merged;
-  };
 
-  const applyServerMessages = (serverMsgs) => {
-    const merged = mergeWithPending(serverMsgs);
-    setMessages(merged);
-    const last = merged[merged.length - 1];
+    let next;
+    if (merged.length >= current.length) {
+      // Server returned full history (or more) — trust it.
+      next = merged;
+    } else {
+      // Server returned fewer messages than we're showing (partial/streaming
+      // snapshot). NEVER discard what's already on screen — keep current
+      // messages and only update the last assistant message for streaming.
+      next = [...current];
+      const lastMerged = merged[merged.length - 1];
+      if (lastMerged?.role === "assistant") {
+        const lastNext = next[next.length - 1];
+        if (lastNext?.role === "assistant") {
+          next[next.length - 1] = lastMerged;
+        } else {
+          next.push(lastMerged);
+        }
+      }
+    }
+
+    messagesRef.current = next;
+    setMessages(next);
+
+    const last = next[next.length - 1];
     const assistantHasText = last?.role === "assistant" && last.content?.trim();
     if (assistantHasText) setSending(false);
   };
@@ -81,6 +112,7 @@ export default function AdvisorChat({ pet }) {
     (async () => {
       setInitializing(true);
       setMessages([]);
+      messagesRef.current = [];
       setError(null);
       setConversation(null);
       contextSentRef.current = false;
@@ -146,7 +178,9 @@ export default function AdvisorChat({ pet }) {
 
     // Track this message so it stays visible until the server confirms it.
     pendingRef.current = [...pendingRef.current, messageContent];
-    setMessages((prev) => [...prev, { role: "user", content: messageContent }]);
+    const next = [...messagesRef.current, { role: "user", content: messageContent }];
+    messagesRef.current = next;
+    setMessages(next);
 
     try {
       await base44.agents.addMessage(conversation, { role: "user", content: messageContent });
