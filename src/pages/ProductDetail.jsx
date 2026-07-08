@@ -84,7 +84,9 @@ export default function ProductDetail() {
 
           {/* Info Clusters */}
           <div>
-            <p className="text-sage text-sm font-semibold tracking-wider uppercase mb-2">{product.brand}</p>
+            <Link to={`/shop?brand=${encodeURIComponent(product.brand)}`} className="block text-sage text-sm font-semibold tracking-wider uppercase mb-2 hover:underline">
+              {product.brand}
+            </Link>
             <h1 className="font-display text-3xl md:text-4xl text-ink mb-4 leading-tight">{product.name}</h1>
 
             {/* Rating */}
@@ -250,15 +252,15 @@ export default function ProductDetail() {
                 </div>
                 <div>
                   <p className="text-ink/40 text-xs uppercase tracking-wider mb-1">Brand</p>
-                  <p className="text-ink font-medium">{product.brand || "—"}</p>
+                  <Link to={`/shop?brand=${encodeURIComponent(product.brand)}`} className="text-ink font-medium hover:underline">{product.brand || "—"}</Link>
                 </div>
                 <div>
                   <p className="text-ink/40 text-xs uppercase tracking-wider mb-1">Category</p>
-                  <p className="text-ink font-medium">{product.category || "—"}</p>
+                  <Link to={`/shop?category=${encodeURIComponent(product.category)}`} className="text-ink font-medium hover:underline">{product.category || "—"}</Link>
                 </div>
                 <div>
                   <p className="text-ink/40 text-xs uppercase tracking-wider mb-1">For</p>
-                  <p className="text-ink font-medium capitalize">{product.pet_type || "—"}</p>
+                  <Link to={`/shop?pet=${product.pet_type}`} className="text-ink font-medium capitalize hover:underline">{product.pet_type || "—"}</Link>
                 </div>
               </div>
             </div>

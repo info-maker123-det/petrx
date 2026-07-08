@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { useCart } from "@/lib/cartContext";
 import { Star, ShoppingBag, Check, PawPrint } from "lucide-react";
+import FilterLink from "./FilterLink";
 
 const enhanceImage = (url) => {
   if (!url) return url;
@@ -63,9 +64,13 @@ export default function ProductCard({ product, index = 0 }) {
             </div>
           )}
 
-          <div className="absolute top-4 right-4 px-3 py-1 bg-sage/10 text-sage text-xs font-medium rounded-full">
+          <FilterLink
+            param="category"
+            value={product.category}
+            className="absolute top-4 right-4 px-3 py-1 bg-sage/10 text-sage text-xs font-medium rounded-full hover:opacity-80 z-10"
+          >
             {product.category}
-          </div>
+          </FilterLink>
 
           <motion.div
             initial={false}
@@ -85,7 +90,13 @@ export default function ProductCard({ product, index = 0 }) {
         </div>
 
         <div className="p-5 md:p-6">
-          <p className="text-sage text-xs font-semibold tracking-wider uppercase mb-2">{product.brand}</p>
+          <FilterLink
+            param="brand"
+            value={product.brand}
+            className="block text-left text-sage text-xs font-semibold tracking-wider uppercase mb-2 hover:underline"
+          >
+            {product.brand}
+          </FilterLink>
           <h3 className="font-display text-lg text-ink mb-3 leading-tight line-clamp-2">{product.name}</h3>
 
           <div className="flex items-center gap-2 mb-4">

@@ -23,6 +23,12 @@ export default function Shop() {
     if (pet && ["dog", "cat", "horse"].includes(pet)) setPetType(pet);
     const type = params.get("type");
     if (type === "rx" || type === "otc") setProductType(type);
+    const brandParam = params.get("brand");
+    if (brandParam) setBrand(brandParam);
+    const categoryParam = params.get("category");
+    if (categoryParam) setCategory(categoryParam);
+    const issueParam = params.get("issue");
+    if (issueParam) setHealthIssue(issueParam);
     base44.entities.Product
       .list("-rating", 1000)
       .then((data) => setProducts(Array.isArray(data) ? data : []))
