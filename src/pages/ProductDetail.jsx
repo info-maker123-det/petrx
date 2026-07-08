@@ -30,14 +30,22 @@ export default function ProductDetail() {
   const [loading, setLoading] = useState(true);
   const [autoship, setAutoship] = useState(true);
   const [supplyMonths, setSupplyMonths] = useState(1);
-  const [weight, setWeight] = useState("24to50");
+  const [weight, setWeight] = useState(null);
   const [added, setAdded] = useState(false);
 
   useEffect(() => {
     setLoading(true);
     base44.entities.Product
       .get(id)
-      .then((p) => setProduct(p))
+      .then((p) => {
+        setProduct(p);
+        if (p?.variants?.length > 0) {
+          const wbs = [...new Set(p.variants.map((v) => v.weight_band))].filter((w) => w && w !== "All weights");
+          const scs = [...new Set(p.variants.map((v) => v.supply_months))].filter((s) => s > 0).sort((a, b) => a - b);
+          if (wbs.length > 0) setWeight(wbs[0]);
+          if (scs.length > 0) setSupplyMonths(scs[0]);
+        }
+      })
       .catch(() => setProduct(null))
       .finally(() => setLoading(false));
   }, [id]);
@@ -59,26 +67,40 @@ export default function ProductDetail() {
       </div>
     );
 
-  const perUnit = autoship ? product.price * 0.95 : product.price;
-  const totalPrice = perUnit * supplyMonths;
-  const autoshipSavings = (product.price - product.price * 0.95) * supplyMonths;
+  // Real variant data sourced from PetRx Shopify
+  const variants = product.variants || [];
+  const hasVariants = variants.length > 0;
 
-  // Real veterinary weight tiers — shown only for weight-dosed medications
-  const DOG_WEIGHTS = [
-    { label: "Up to 10 lbs", value: "upto10" },
-    { label: "10.1–24 lbs", value: "10to24" },
-    { label: "24.1–50 lbs", value: "24to50" },
-    { label: "50.1–100 lbs", value: "50to100" },
-    { label: "100+ lbs", value: "over100" },
-  ];
-  const CAT_WEIGHTS = [
-    { label: "Up to 10 lbs", value: "upto10" },
-    { label: "10.1–20 lbs", value: "10to20" },
-  ];
-  const HORSE_WEIGHTS = [
-    { label: "Up to 600 lbs", value: "upto600" },
-    { label: "600–1,200 lbs", value: "600to1200" },
-  ];
+  const weightBands = hasVariants
+    ? [...new Set(variants.map((v) => v.weight_band))].filter((w) => w && w !== "All weights")
+    : [];
+  const supplyCounts = hasVariants
+    ? [...new Set(variants.map((v) => v.supply_months))].filter((s) => s > 0).sort((a, b) => a - b)
+    : [];
+
+  const hasWeightSelection = weightBands.length > 1;
+  const hasSupplySelection = supplyCounts.length > 1;
+
+  const selectedVariant = hasVariants
+    ? variants.find(
+        (v) =>
+          (!hasWeightSelection || v.weight_band === weight) &&
+          (!hasSupplySelection || v.supply_months === supplyMonths)
+      ) || variants[0]
+    : null;
+
+  let totalPrice, basePrice, autoshipSavings, perUnit;
+  if (hasVariants && selectedVariant) {
+    basePrice = selectedVariant.price;
+    perUnit = basePrice;
+    totalPrice = autoship ? basePrice * 0.95 : basePrice;
+    autoshipSavings = basePrice - basePrice * 0.95;
+  } else {
+    perUnit = product.price;
+    basePrice = product.price * supplyMonths;
+    totalPrice = autoship ? basePrice * 0.95 : basePrice;
+    autoshipSavings = product.price * supplyMonths * 0.05;
+  }
 
   const WEIGHT_DOSED_CATEGORIES = [
     "Flea, Tick & Heartworm",
@@ -87,20 +109,20 @@ export default function ProductDetail() {
     "Joint & Pain",
     "Heartworm",
   ];
-  const isWeightDosed =
-    WEIGHT_DOSED_CATEGORIES.includes(product.category) ||
-    (product.weight_class && product.weight_class !== "All weights" && product.weight_class !== "Dogs 8 weeks+");
-  const weightOptions =
-    product.pet_type === "cat" ? CAT_WEIGHTS : product.pet_type === "horse" ? HORSE_WEIGHTS : DOG_WEIGHTS;
+  const showWeightSelector = hasWeightSelection || (!hasVariants && WEIGHT_DOSED_CATEGORIES.includes(product.category));
 
-  const supplyOptions = [
+  const fallbackSupplyOptions = [
     { months: 1, label: "1-Month", desc: null },
     { months: 3, label: "3-Month", desc: "Most Popular" },
     { months: 6, label: "6-Month", desc: "Best Value" },
   ];
 
   const handleAdd = () => {
-    addItem(product, supplyMonths, autoship);
+    addItem(
+      { ...product, selected_variant: selectedVariant },
+      hasVariants ? 1 : supplyMonths,
+      autoship
+    );
     setAdded(true);
     setTimeout(() => setAdded(false), 2000);
   };
@@ -173,13 +195,13 @@ export default function ProductDetail() {
             <div className="flex items-baseline gap-3 mb-2 flex-wrap">
               <span className="font-display text-4xl text-ink">${totalPrice.toFixed(2)}</span>
               {autoship && (
-                <span className="text-ink/40 line-through text-lg">${(product.price * supplyMonths).toFixed(2)}</span>
+                <span className="text-ink/40 line-through text-lg">${basePrice.toFixed(2)}</span>
               )}
             </div>
             {autoship ? (
-              <p className="text-sage text-sm font-semibold mb-8">Save ${autoshipSavings.toFixed(2)} with AutoShip · ${perUnit.toFixed(2)}/month</p>
+              <p className="text-sage text-sm font-semibold mb-8">Save ${autoshipSavings.toFixed(2)} with AutoShip{hasVariants ? ` · $${(perUnit * 0.95).toFixed(2)}` : ` · $${perUnit.toFixed(2)}/month`}</p>
             ) : (
-              <p className="text-ink/40 text-sm mb-8">${perUnit.toFixed(2)}/month</p>
+              <p className="text-ink/40 text-sm mb-8">${perUnit.toFixed(2)}{hasVariants ? "" : "/month"}</p>
             )}
 
             {/* Subscription Engine */}
@@ -208,8 +230,8 @@ export default function ProductDetail() {
                       </div>
                     </div>
                     <div className="text-right">
-                      <p className="text-sm font-bold text-sage">${(product.price * 0.95 * supplyMonths).toFixed(2)}</p>
-                      <p className="text-xs text-ink/40 line-through">${(product.price * supplyMonths).toFixed(2)}</p>
+                      <p className="text-sm font-bold text-sage">${(basePrice * 0.95).toFixed(2)}</p>
+                      <p className="text-xs text-ink/40 line-through">${basePrice.toFixed(2)}</p>
                     </div>
                   </button>
                   <button
@@ -227,28 +249,28 @@ export default function ProductDetail() {
                         <p className="text-xs text-ink/40 mt-0.5">Ships once, no subscription</p>
                       </div>
                     </div>
-                    <span className="text-sm font-semibold text-ink">${(product.price * supplyMonths).toFixed(2)}</span>
+                    <span className="text-sm font-semibold text-ink">${basePrice.toFixed(2)}</span>
                   </button>
                 </div>
               </div>
             )}
 
-            {/* Weight / Dosage Selector — only for weight-dosed medications */}
-            {isWeightDosed && (
+            {/* Weight / Dosage Selector — uses real variant weight bands from Shopify */}
+            {showWeightSelector && (
               <div className="cellular-card p-5 mb-5">
                 <p className="text-xs text-ink/40 uppercase tracking-wider font-semibold mb-3">Select Your Pet's Weight</p>
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
-                  {weightOptions.map((opt) => {
-                    const active = weight === opt.value;
+                  {(hasVariants ? weightBands : []).map((wb) => {
+                    const active = weight === wb;
                     return (
                       <button
-                        key={opt.value}
-                        onClick={() => setWeight(opt.value)}
+                        key={wb}
+                        onClick={() => setWeight(wb)}
                         className={`flex flex-col items-center gap-1 py-4 px-2 rounded-2xl border-2 transition-all ${
                           active ? "border-sage bg-sage/5" : "border-border hover:border-sage/40"
                         }`}
                       >
-                        <span className={`text-sm font-semibold ${active ? "text-sage" : "text-ink"}`}>{opt.label}</span>
+                        <span className={`text-sm font-semibold ${active ? "text-sage" : "text-ink"}`}>{wb}</span>
                       </button>
                     );
                   })}
@@ -259,33 +281,40 @@ export default function ProductDetail() {
               </div>
             )}
 
-            {/* Supply Size Selector */}
-            <div className="mb-5">
-              <p className="text-xs text-ink/40 uppercase tracking-wider font-semibold mb-3">Supply Size</p>
-              <div className="grid grid-cols-3 gap-2.5">
-                {supplyOptions.map((opt) => {
-                  const active = supplyMonths === opt.months;
-                  return (
-                    <button
-                      key={opt.months}
-                      onClick={() => setSupplyMonths(opt.months)}
-                      className={`flex flex-col items-center gap-1 py-4 rounded-2xl border-2 transition-all relative ${
-                        active ? "border-sage bg-sage/5" : "border-border hover:border-sage/40"
-                      }`}
-                    >
-                      {opt.desc && active && (
-                        <span className="absolute -top-2 px-2 py-0.5 bg-sage text-white rounded-full text-[9px] font-bold uppercase tracking-wide">{opt.desc}</span>
-                      )}
-                      <span className={`text-sm font-semibold ${active ? "text-sage" : "text-ink"}`}>{opt.label}</span>
-                      <span className="text-xs text-ink/40">${(perUnit * opt.months).toFixed(2)} total</span>
-                      {opt.months > 1 && autoship && (
-                        <span className="text-[10px] text-sage font-medium">Save ${((product.price - product.price * 0.95) * opt.months).toFixed(2)} w/ AutoShip</span>
-                      )}
-                    </button>
-                  );
-                })}
+            {/* Supply Size Selector — uses real variant supply counts or fallback */}
+            {(hasVariants ? hasSupplySelection : true) && (
+              <div className="mb-5">
+                <p className="text-xs text-ink/40 uppercase tracking-wider font-semibold mb-3">Supply Size</p>
+                <div className={`grid gap-2.5 ${hasVariants ? "grid-cols-" + Math.min(supplyCounts.length, 4) : "grid-cols-3"}`}>
+                  {(hasVariants ? supplyCounts.map((m) => ({ months: m, label: `${m}-Month`, desc: m === 6 ? "Best Value" : m === 3 ? "Most Popular" : null })) : fallbackSupplyOptions).map((opt) => {
+                    const active = supplyMonths === opt.months;
+                    const optVariant = hasVariants
+                      ? variants.find((v) => (!hasWeightSelection || v.weight_band === weight) && v.supply_months === opt.months)
+                      : null;
+                    const optPrice = optVariant ? optVariant.price : perUnit * opt.months;
+                    const optAutoship = optPrice * 0.95;
+                    return (
+                      <button
+                        key={opt.months}
+                        onClick={() => setSupplyMonths(opt.months)}
+                        className={`flex flex-col items-center gap-1 py-4 rounded-2xl border-2 transition-all relative ${
+                          active ? "border-sage bg-sage/5" : "border-border hover:border-sage/40"
+                        }`}
+                      >
+                        {opt.desc && active && (
+                          <span className="absolute -top-2 px-2 py-0.5 bg-sage text-white rounded-full text-[9px] font-bold uppercase tracking-wide">{opt.desc}</span>
+                        )}
+                        <span className={`text-sm font-semibold ${active ? "text-sage" : "text-ink"}`}>{opt.label}</span>
+                        <span className="text-xs text-ink/40">${optPrice.toFixed(2)}</span>
+                        {autoship && (
+                          <span className="text-[10px] text-sage font-medium">${optAutoship.toFixed(2)} w/ AutoShip</span>
+                        )}
+                      </button>
+                    );
+                  })}
+                </div>
               </div>
-            </div>
+            )}
 
             {/* Add to Cart */}
             <button
