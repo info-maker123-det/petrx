@@ -3,6 +3,7 @@ import { base44 } from "@/api/base44Client";
 import AdvisorMessageBubble from "./AdvisorMessageBubble";
 import { Send, Loader2, Sparkles } from "lucide-react";
 import LogoMark from "./LogoMark";
+import { buildProductContext } from "@/lib/advisorProductContext";
 
 function buildPetProfile(pet) {
   const lines = [];
@@ -47,6 +48,7 @@ export default function AdvisorChat({ pet }) {
   const [sending, setSending] = useState(false);
   const [error, setError] = useState(null);
   const contextSentRef = useRef(false);
+  const productContextRef = useRef("");
   const containerRef = useRef(null);
   // Tracks the current message list outside React state so the subscription
   // handler can reliably compare against the latest — never losing messages.
@@ -55,53 +57,27 @@ export default function AdvisorChat({ pet }) {
   const pendingRef = useRef([]);
 
   const applyServerMessages = (serverMsgs) => {
-    const serverList = serverMsgs || [];
+    const server = serverMsgs || [];
     const current = messagesRef.current;
 
-    // Build the merged list from server data, appending any pending user
-    // messages that the server hasn't confirmed yet (exact content match).
-    const merged = [...serverList];
-    const stillPending = [];
-    for (const content of pendingRef.current) {
-      const exists = merged.some(
-        (m) => m.role === "user" && (m.content || "").trim() === content.trim()
-      );
-      if (exists) continue;
-      // Don't duplicate if already visible locally
-      const inCurrent = current.some(
-        (m) => m.role === "user" && (m.content || "").trim() === content.trim()
-      );
-      if (!inCurrent) merged.push({ role: "user", content });
-      stillPending.push(content);
-    }
-    pendingRef.current = stillPending;
+    // Only accept the server snapshot if it includes ALL user messages we're
+    // showing. If it's missing any (race with addMessage), keep current —
+    // this prevents the user's just-sent bubble from disappearing.
+    const currentUsers = current
+      .filter((m) => m.role === "user")
+      .map((m) => (m.content || "").trim());
+    const serverUsers = server
+      .filter((m) => m.role === "user")
+      .map((m) => (m.content || "").trim());
+    const allPresent = currentUsers.every((c) => serverUsers.includes(c));
 
-    let next;
-    if (merged.length >= current.length) {
-      // Server returned full history (or more) — trust it.
-      next = merged;
-    } else {
-      // Server returned fewer messages than we're showing (partial/streaming
-      // snapshot). NEVER discard what's already on screen — keep current
-      // messages and only update the last assistant message for streaming.
-      next = [...current];
-      const lastMerged = merged[merged.length - 1];
-      if (lastMerged?.role === "assistant") {
-        const lastNext = next[next.length - 1];
-        if (lastNext?.role === "assistant") {
-          next[next.length - 1] = lastMerged;
-        } else {
-          next.push(lastMerged);
-        }
-      }
-    }
-
+    const next = allPresent ? server : current;
     messagesRef.current = next;
     setMessages(next);
+    pendingRef.current = pendingRef.current.filter((c) => serverUsers.includes(c.trim()));
 
     const last = next[next.length - 1];
-    const assistantHasText = last?.role === "assistant" && last.content?.trim();
-    if (assistantHasText) setSending(false);
+    if (last?.role === "assistant" && last.content?.trim()) setSending(false);
   };
 
   useEffect(() => {
@@ -116,8 +92,13 @@ export default function AdvisorChat({ pet }) {
       setError(null);
       setConversation(null);
       contextSentRef.current = false;
+      productContextRef.current = "";
       pendingRef.current = [];
       try {
+        const productCtx = await buildProductContext(pet).catch(() => "");
+        if (cancelled) return;
+        productContextRef.current = productCtx;
+
         let conv = null;
         try {
           const existing = await base44.agents.listConversations({ agent_name: "medication_advisor" });
@@ -172,7 +153,8 @@ export default function AdvisorChat({ pet }) {
     let messageContent = content;
     if (!contextSentRef.current) {
       const profile = buildPetProfile(pet);
-      messageContent = `Here is my pet's profile for context:\n\n${profile}\n\nMy question: ${content}`;
+      const products = productContextRef.current;
+      messageContent = `PET PROFILE:\n${profile}\n\n${products}\n\nMy question: ${content}`;
       contextSentRef.current = true;
     }
 
