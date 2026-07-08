@@ -117,22 +117,31 @@ export default function Checkout() {
   // Empty cart
   if (items.length === 0)
     return (
-      <div className="py-32 text-center bg-porcelain">
-        <div className="w-16 h-16 rounded-full bg-secondary flex items-center justify-center mx-auto mb-4">
-          <ShoppingBag className="w-7 h-7 text-ink/30" />
+      <div className="py-20 md:py-32 bg-porcelain">
+        <div className="max-w-xl mx-auto px-5 md:px-8 text-center">
+          <div className="w-16 h-16 rounded-2xl bg-sage/10 flex items-center justify-center mx-auto mb-6">
+            <ShoppingBag className="w-7 h-7 text-sage" />
+          </div>
+          <p className="text-sage text-sm font-semibold tracking-widest uppercase mb-2">Empty Cart</p>
+          <h1 className="font-display text-3xl md:text-4xl text-ink mb-3">Your cart is waiting</h1>
+          <p className="text-ink/50 mb-8 max-w-md mx-auto">
+            Browse our pharmacy catalog to find your pet's medications and supplements.
+          </p>
+          <Link to="/shop" className="inline-flex items-center gap-2 px-6 py-3 bg-sage text-white rounded-full text-sm font-semibold hover:bg-[#3d5a66] transition-colors">
+            Browse the Catalog <ArrowRight className="w-4 h-4" />
+          </Link>
         </div>
-        <p className="font-display text-2xl text-ink mb-2">Your cart is empty</p>
-        <p className="text-ink/40 mb-6">Add medications to get started.</p>
-        <Link to="/" className="px-6 py-3 bg-sage text-white rounded-full text-sm font-semibold hover:bg-[#3d5a66] transition-colors">
-          Browse Products
-        </Link>
       </div>
     );
 
   return (
     <div className="py-12 md:py-16 bg-porcelain">
       <div className="max-w-7xl mx-auto px-5 md:px-8">
-        <h1 className="font-display text-3xl md:text-4xl text-ink mb-8">Checkout</h1>
+        <div className="mb-10">
+          <p className="text-sage text-sm font-semibold tracking-widest uppercase mb-3">Secure Checkout</p>
+          <h1 className="font-display text-3xl md:text-4xl lg:text-5xl text-ink leading-tight mb-3">Checkout</h1>
+          <p className="text-ink/50 max-w-md">Review your items and enter your shipping details. All transactions are encrypted and secure.</p>
+        </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-5 gap-10">
           {/* Left: Shipping + Prescription Status */}

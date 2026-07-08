@@ -48,17 +48,18 @@ export default function CartDrawer() {
 
             {items.length === 0 ? (
               <div className="flex-1 flex flex-col items-center justify-center px-6 text-center">
-                <div className="w-16 h-16 rounded-full bg-secondary flex items-center justify-center mb-4">
-                  <ShoppingBag className="w-7 h-7 text-ink/30" />
+                <div className="w-16 h-16 rounded-2xl bg-sage/10 flex items-center justify-center mb-5">
+                  <ShoppingBag className="w-7 h-7 text-sage" />
                 </div>
-                <p className="font-display text-lg text-ink mb-1">Your cart is empty</p>
-                <p className="text-sm text-ink/40 mb-6">Browse our pharmacy to find your pet's medications.</p>
+                <p className="text-sage text-xs font-semibold tracking-widest uppercase mb-2">Empty Cart</p>
+                <p className="font-display text-xl text-ink mb-2">Your cart is empty</p>
+                <p className="text-sm text-ink/40 mb-6 max-w-xs">Browse our pharmacy to find your pet's medications and supplements.</p>
                 <Link
-                  to="/"
+                  to="/shop"
                   onClick={closeCart}
-                  className="px-6 py-3 bg-sage text-white rounded-full text-sm font-semibold hover:bg-[#3d5a66] transition-colors"
+                  className="inline-flex items-center gap-2 px-6 py-3 bg-sage text-white rounded-full text-sm font-semibold hover:bg-[#3d5a66] transition-colors"
                 >
-                  Shop Products
+                  Browse the Catalog <ArrowRight className="w-4 h-4" />
                 </Link>
               </div>
             ) : (
