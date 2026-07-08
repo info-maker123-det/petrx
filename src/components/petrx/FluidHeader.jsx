@@ -156,7 +156,7 @@ export default function FluidHeader() {
               transition={{ duration: 0.3 }}
               className="lg:hidden overflow-hidden border-t border-border"
             >
-              <div className="px-5 py-6 space-y-1">
+              <div className="px-5 py-6 space-y-1 max-h-[calc(100vh-100px)] overflow-y-auto">
                 {renderNavLinks(true)}
                 <Link
                   to="/dashboard"
@@ -168,7 +168,7 @@ export default function FluidHeader() {
                 <Link
                   to="/admin"
                   onClick={() => setMobileOpen(false)}
-                  className="block py-3 px-4 text-ink/50 hover:text-ink rounded-xl text-sm font-medium text-center"
+                  className="relative z-10 block py-3 px-4 text-ink/50 hover:text-ink rounded-xl text-sm font-medium text-center"
                 >
                   Staff Portal
                 </Link>
