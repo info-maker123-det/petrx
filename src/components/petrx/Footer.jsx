@@ -15,7 +15,7 @@ const PHARMACY_LINKS = [
 const COMPANY_LINKS = [
   { label: "About Us", to: "/about" },
   { label: "How It Works", href: "#" },
-  { label: "AutoShip Program", href: "#autoship" },
+  { label: "AutoShip Program", to: "/autoship" },
   { label: "Prescription Policy", href: "#" },
   { label: "Shipping & Returns", to: "/shipping" },
 ];
