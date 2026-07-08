@@ -5,7 +5,6 @@ const asStr = (v) => (Array.isArray(v) ? v.join(', ') : v == null ? '' : String(
 function stripHtml(html) {
   if (html == null) return '';
   return String(html)
-  return html
     .replace(/<[^>]*>/g, ' ')
     .replace(/&nbsp;/g, ' ')
     .replace(/&amp;/g, '&')

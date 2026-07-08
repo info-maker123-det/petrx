@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { base44 } from "@/api/base44Client";
 import { Printer, Send, CheckCircle, XCircle, Truck, Package, RefreshCw, AlertCircle, Loader2, Stethoscope, Phone, Mail, MapPin, Upload, FileCheck } from "lucide-react";
 import { effectiveRxStatus, CUSTOMER_STATUS_MAP, printHtml } from "@/lib/adminUtils";
+import PrivateFileLink from "@/components/admin/PrivateFileLink";
 import { generateVetVerificationPacket, generateSisterPharmacyPacket } from "@/lib/prescriptionPackets";
 
 const METHODS = [
@@ -203,9 +204,7 @@ export default function PrescriptionWorkflow({ rx, onUpdate }) {
               {rx.verified_prescription_file_url ? (
                 <div className="flex items-center gap-2 p-3 bg-green-50 border border-green-200 rounded-xl">
                   <FileCheck className="w-4 h-4 text-green-600 flex-shrink-0" />
-                  <a href={rx.verified_prescription_file_url} target="_blank" rel="noopener noreferrer" className="text-xs text-blue-600 hover:underline truncate flex-1">
-                    Verified Rx on file — click to view
-                  </a>
+                  <PrivateFileLink fileUri={rx.verified_prescription_file_url} label="Verified Rx on file — click to view" className="text-xs truncate flex-1" hideIcon />
                   <span className="text-xs text-green-600 font-medium">✓ Uploaded</span>
                 </div>
               ) : (
@@ -226,8 +225,8 @@ export default function PrescriptionWorkflow({ rx, onUpdate }) {
                       setVerifiedFileName(file.name);
                       setUploadingVerified(true);
                       try {
-                        const { file_url } = await base44.integrations.Core.UploadFile({ file });
-                        await base44.entities.Prescription.update(rx.id, { verified_prescription_file_url: file_url });
+                        const { file_uri } = await base44.integrations.Core.UploadPrivateFile({ file });
+                        await base44.entities.Prescription.update(rx.id, { verified_prescription_file_url: file_uri });
                         onUpdate();
                       } catch (err) {
                         setError("Failed to upload verified Rx file");

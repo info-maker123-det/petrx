@@ -5,6 +5,7 @@ import { ArrowLeft, PawPrint, Pill, Stethoscope, FileText, Paperclip, User } fro
 import { effectiveRxStatus, getRxStatusConfig, formatDateTime } from "@/lib/adminUtils";
 import PrescriptionWorkflow from "@/components/admin/PrescriptionWorkflow";
 import PrescriptionTimeline from "@/components/admin/PrescriptionTimeline";
+import PrivateFileLink from "@/components/admin/PrivateFileLink";
 
 function InfoSection({ icon: Icon, title, children }) {
   return (
@@ -117,9 +118,7 @@ export default function PrescriptionDetail() {
 
           {rx.prescription_file_url && (
             <InfoSection icon={Paperclip} title="Uploaded Prescription">
-              <a href={rx.prescription_file_url} target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 text-sm text-blue-600 hover:underline">
-                <FileText className="w-4 h-4" /> View uploaded file
-              </a>
+              <PrivateFileLink fileUri={rx.prescription_file_url} label="View uploaded file" />
             </InfoSection>
           )}
 

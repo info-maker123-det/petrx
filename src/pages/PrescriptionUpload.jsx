@@ -138,8 +138,8 @@ export default function PrescriptionUpload() {
           setSubmitting(false);
           return;
         }
-        const { file_url } = await base44.integrations.Core.UploadFile({ file });
-        prescription_file_url = file_url;
+        const { file_uri } = await base44.integrations.Core.UploadPrivateFile({ file });
+        prescription_file_url = file_uri;
       }
       const record = await base44.entities.Prescription.create({
         ...form,

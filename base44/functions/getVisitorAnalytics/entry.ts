@@ -7,7 +7,7 @@ Deno.serve(async (req) => {
     if (!user) return Response.json({ error: 'Unauthorized' }, { status: 401 });
     if (user.role !== 'admin') return Response.json({ error: 'Forbidden' }, { status: 403 });
 
-    const visits = await base44.asServiceRole.entities.SiteVisit.list('-created_date', 500);
+    const visits = await base44.asServiceRole.entities.SiteVisit.list('-created_date', 1000);
     const list = visits || [];
 
     const now = Date.now();

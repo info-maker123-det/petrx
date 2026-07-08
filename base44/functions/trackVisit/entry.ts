@@ -1,5 +1,17 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.31';
 
+// In-memory geo cache: IP -> { city, state, country, ts }
+const geoCache = new Map();
+const GEO_CACHE_TTL = 24 * 60 * 60 * 1000; // 24 hours
+
+// In-memory rate limiter: key -> ts
+const recentVisits = new Map();
+const RATE_LIMIT_WINDOW = 30 * 1000; // 30 seconds
+
+function truncate(v, max) {
+  return v ? String(v).slice(0, max) : '';
+}
+
 Deno.serve(async (req) => {
   try {
     const base44 = createClientFromRequest(req);
@@ -8,6 +20,28 @@ Deno.serve(async (req) => {
 
     if (!page || !visitor_id) {
       return Response.json({ error: 'Missing page or visitor_id' }, { status: 400 });
+    }
+
+    // Input validation — limit lengths to prevent abuse
+    const safePage = truncate(page, 500);
+    const safeVisitorId = truncate(visitor_id, 100);
+    const safeSessionId = truncate(session_id, 100);
+    const safeReferrer = truncate(referrer, 2000);
+
+    // Basic rate limiting — dedupe same visitor + page within window
+    const rateKey = `${safeVisitorId}:${safePage}`;
+    const now = Date.now();
+    const lastSeen = recentVisits.get(rateKey);
+    if (lastSeen && (now - lastSeen) < RATE_LIMIT_WINDOW) {
+      return Response.json({ ok: true, deduped: true });
+    }
+    recentVisits.set(rateKey, now);
+
+    // Cleanup old rate limit entries periodically
+    if (recentVisits.size > 5000) {
+      for (const [k, ts] of recentVisits) {
+        if ((now - ts) > RATE_LIMIT_WINDOW) recentVisits.delete(k);
+      }
     }
 
     // Extract IP from common proxy headers
@@ -45,32 +79,40 @@ Deno.serve(async (req) => {
       }
     } catch { /* anonymous visitor */ }
 
-    // Geolocate IP (skip private/local IPs)
+    // Geolocate IP with caching — skip private/local IPs
     let city = '', state = '', country = '';
     const isPrivate = !ip || ip === 'unknown' || ip.startsWith('127.') || ip.startsWith('10.') || ip.startsWith('192.168.') || ip.startsWith('172.16.');
     if (!isPrivate) {
-      try {
-        const geoRes = await fetch(`https://ipwho.is/${ip}`);
-        if (geoRes.ok) {
-          const geo = await geoRes.json();
-          if (geo.success) {
-            city = geo.city || '';
-            state = geo.region || '';
-            country = geo.country || '';
+      const cached = geoCache.get(ip);
+      if (cached && (now - cached.ts) < GEO_CACHE_TTL) {
+        city = cached.city;
+        state = cached.state;
+        country = cached.country;
+      } else {
+        try {
+          const geoRes = await fetch(`https://ipwho.is/${ip}`);
+          if (geoRes.ok) {
+            const geo = await geoRes.json();
+            if (geo.success) {
+              city = geo.city || '';
+              state = geo.region || '';
+              country = geo.country || '';
+            }
           }
-        }
-      } catch { /* geolocation failed — still record visit */ }
+        } catch { /* geolocation failed — still record visit */ }
+        geoCache.set(ip, { city, state, country, ts: now });
+      }
     }
 
     await base44.asServiceRole.entities.SiteVisit.create({
-      visitor_id,
-      session_id: session_id || '',
-      page,
-      ip_address: ip,
+      visitor_id: safeVisitorId,
+      session_id: safeSessionId,
+      page: safePage,
+      ip_address: truncate(ip, 50),
       city, state, country,
       device_type,
       browser, os,
-      referrer: referrer || '',
+      referrer: safeReferrer,
       user_email,
       is_logged_in,
     });
