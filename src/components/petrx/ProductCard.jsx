@@ -84,7 +84,7 @@ export default function ProductCard({ product, index = 0 }) {
 
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-lg font-semibold text-ink">From ${product.price}</p>
+              <p className="text-lg font-semibold text-ink">From ${Number(product.price).toFixed(2)}</p>
               <p className="text-xs text-ink/40">{product.price_range}</p>
             </div>
             <button

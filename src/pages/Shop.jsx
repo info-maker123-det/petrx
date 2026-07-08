@@ -2,13 +2,15 @@ import React, { useState, useEffect, useMemo } from "react";
 import { base44 } from "@/api/base44Client";
 import ProductCard from "@/components/petrx/ProductCard";
 import ShopSidebar from "@/components/petrx/ShopSidebar";
-import { Search, PawPrint, SlidersHorizontal, X } from "lucide-react";
+import { Search, PawPrint, SlidersHorizontal, X, RotateCcw } from "lucide-react";
 
 export default function Shop() {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [category, setCategory] = useState("All");
   const [petType, setPetType] = useState("all");
+  const [productType, setProductType] = useState("all");
+  const [brand, setBrand] = useState("all");
   const [search, setSearch] = useState("");
   const [visible, setVisible] = useState(24);
   const [showFilters, setShowFilters] = useState(false);
@@ -21,19 +23,37 @@ export default function Shop() {
       .finally(() => setLoading(false));
   }, []);
 
-  useEffect(() => { setVisible(24); }, [category, petType, search]);
+  useEffect(() => { setVisible(24); }, [category, petType, productType, brand, search]);
 
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase();
     return products.filter((p) => {
       if (category !== "All" && p.category !== category) return false;
       if (petType !== "all" && p.pet_type !== petType && p.pet_type !== "all") return false;
+      if (productType === "rx" && !p.requires_prescription) return false;
+      if (productType === "otc" && p.requires_prescription) return false;
+      if (brand !== "all" && p.brand !== brand) return false;
       if (q && !`${p.name} ${p.brand} ${p.category}`.toLowerCase().includes(q)) return false;
       return true;
     });
-  }, [products, category, petType, search]);
+  }, [products, category, petType, productType, brand, search]);
+
+  const hasFilters = category !== "All" || petType !== "all" || productType !== "all" || brand !== "all" || search;
+
+  const clearFilters = () => {
+    setCategory("All");
+    setPetType("all");
+    setProductType("all");
+    setBrand("all");
+    setSearch("");
+  };
 
   const shown = filtered.slice(0, visible);
+
+  const sidebarProps = {
+    products, category, setCategory, petType, setPetType,
+    productType, setProductType, brand, setBrand,
+  };
 
   return (
     <div className="min-h-screen bg-porcelain">
@@ -42,7 +62,7 @@ export default function Shop() {
           <p className="text-sage text-sm font-semibold tracking-widest uppercase mb-2">Pharmacy Catalog</p>
           <h1 className="font-display text-3xl md:text-4xl lg:text-5xl text-ink">Shop All Products</h1>
           <p className="text-ink/50 mt-3 max-w-xl">
-            Prescription medications and supplements for every pet — browse by category or search by name.
+            {loading ? "Loading catalog…" : `${products.length} prescription medications and supplements for every pet.`}
           </p>
         </div>
 
@@ -65,9 +85,17 @@ export default function Shop() {
         </div>
 
         <div className="flex gap-10">
-          <aside className="hidden lg:block w-56 flex-shrink-0">
+          <aside className="hidden lg:block w-60 flex-shrink-0">
             <div className="sticky top-28">
-              <ShopSidebar category={category} setCategory={setCategory} petType={petType} setPetType={setPetType} />
+              <ShopSidebar {...sidebarProps} />
+              {hasFilters && (
+                <button
+                  onClick={clearFilters}
+                  className="mt-6 flex items-center gap-1.5 text-xs text-sage hover:text-[#3d5a66] font-medium"
+                >
+                  <RotateCcw className="w-3 h-3" /> Clear all filters
+                </button>
+              )}
             </div>
           </aside>
 
@@ -78,15 +106,25 @@ export default function Shop() {
                   <h2 className="font-display text-xl">Filters</h2>
                   <button onClick={() => setShowFilters(false)} className="p-2 hover:bg-secondary rounded-full"><X className="w-5 h-5" /></button>
                 </div>
-                <ShopSidebar category={category} setCategory={setCategory} petType={petType} setPetType={setPetType} onClose={() => setShowFilters(false)} />
+                <ShopSidebar {...sidebarProps} onClose={() => setShowFilters(false)} />
               </div>
             </div>
           )}
 
           <div className="flex-1 min-w-0">
-            <p className="text-sm text-ink/50 mb-6">
-              {loading ? "Loading…" : `${filtered.length} product${filtered.length !== 1 ? "s" : ""}`}
-            </p>
+            <div className="flex items-center justify-between mb-6">
+              <p className="text-sm text-ink/50">
+                {loading ? "Loading…" : `${filtered.length} product${filtered.length !== 1 ? "s" : ""}`}
+              </p>
+              {hasFilters && (
+                <button
+                  onClick={clearFilters}
+                  className="lg:hidden flex items-center gap-1.5 text-xs text-sage font-medium"
+                >
+                  <RotateCcw className="w-3 h-3" /> Clear
+                </button>
+              )}
+            </div>
 
             {loading ? (
               <div className="flex items-center justify-center py-20">
@@ -97,7 +135,10 @@ export default function Shop() {
                 <div className="w-16 h-16 rounded-full bg-sage/10 flex items-center justify-center mb-4">
                   <PawPrint className="w-7 h-7 text-sage/50" />
                 </div>
-                <p className="text-ink/50 text-sm">No products match your search. Try a different filter.</p>
+                <p className="text-ink/50 text-sm mb-4">No products match your filters.</p>
+                <button onClick={clearFilters} className="px-6 py-2.5 bg-sage text-white rounded-full text-sm font-semibold hover:bg-[#3d5a66] transition-colors">
+                  Clear Filters
+                </button>
               </div>
             ) : (
               <>
