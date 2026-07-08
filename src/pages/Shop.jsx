@@ -128,7 +128,7 @@ export default function Shop() {
 
         <div className="flex gap-10">
           <aside className="hidden lg:block w-60 flex-shrink-0">
-            <div className="sticky top-28">
+            <div className="sticky top-28 max-h-[calc(100vh-8rem)] overflow-y-auto no-scrollbar pr-1">
               <ShopSidebar {...sidebarProps} />
               {hasFilters && (
                 <button
