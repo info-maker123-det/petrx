@@ -18,6 +18,8 @@ import ResetPassword from '@/pages/ResetPassword';
 import ProtectedRoute from '@/components/ProtectedRoute';
 import { CartProvider } from '@/lib/cartContext';
 import Layout from '@/components/petrx/Layout';
+import Shop from './pages/Shop';
+import Dashboard from './pages/Dashboard';
 // Add page imports here
 
 const AuthenticatedApp = () => {
@@ -53,11 +55,13 @@ const AuthenticatedApp = () => {
         <Route path="/reset-password" element={<ResetPassword />} />
         <Route element={<Layout />}>
           <Route path="/" element={<Home />} />
+          <Route path="/shop" element={<Shop />} />
           <Route path="/product/:id" element={<ProductDetail />} />
           <Route element={<ProtectedRoute unauthenticatedElement={<Navigate to="/login" replace />} />}>
             <Route path="/contact" element={<Contact />} />
             <Route path="/prescription" element={<PrescriptionUpload />} />
             <Route path="/checkout" element={<Checkout />} />
+            <Route path="/dashboard" element={<Dashboard />} />
           </Route>
         </Route>
         <Route path="*" element={<PageNotFound />} />

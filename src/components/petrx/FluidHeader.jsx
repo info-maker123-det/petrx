@@ -6,11 +6,12 @@ import { useCart } from "@/lib/cartContext";
 import Logo from "@/components/petrx/Logo";
 
 const NAV_LINKS = [
-  { label: "Shop", type: "section", target: "#shop-by-pet" },
+  { label: "Shop", type: "route", target: "/shop" },
   { label: "Pharmacy", type: "section", target: "#products" },
   { label: "AutoShip", type: "section", target: "#autoship" },
   { label: "About", type: "section", target: "#why-petrx" },
   { label: "Prescriptions", type: "route", target: "/prescription" },
+  { label: "My Account", type: "route", target: "/dashboard" },
   { label: "Contact", type: "route", target: "/contact" },
 ];
 
