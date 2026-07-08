@@ -3,10 +3,12 @@ import { Link } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
 import PetCard from "@/components/petrx/PetCard";
 import AddPetModal from "@/components/petrx/AddPetModal";
-import { Plus, PawPrint, Package, FileText, ChevronRight, Stethoscope } from "lucide-react";
+import PetHealthOverview from "@/components/petrx/PetHealthOverview";
+import { Plus, PawPrint, Package, FileText, ChevronRight, Stethoscope, HeartPulse } from "lucide-react";
 
 const TABS = [
   { key: "pets", label: "My Pets", icon: PawPrint },
+  { key: "health", label: "Pet Health", icon: HeartPulse },
   { key: "orders", label: "Orders", icon: Package },
   { key: "prescriptions", label: "Prescriptions", icon: FileText },
 ];
@@ -144,6 +146,19 @@ export default function Dashboard() {
                 ))}
               </div>
             )}
+          </div>
+        ) : tab === "health" ? (
+          <div>
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="font-display text-2xl text-ink">Patient Overview</h2>
+              <Link
+                to="/advisor"
+                className="inline-flex items-center gap-2 px-5 py-2.5 border border-border rounded-full text-sm font-semibold text-ink hover:border-sage hover:text-sage transition-colors"
+              >
+                <Stethoscope className="w-4 h-4" /> Open Advisor
+              </Link>
+            </div>
+            <PetHealthOverview pets={pets} />
           </div>
         ) : tab === "orders" ? (
           <div>
