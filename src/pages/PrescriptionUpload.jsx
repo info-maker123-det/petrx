@@ -2,9 +2,10 @@ import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { base44 } from "@/api/base44Client";
-import { Upload, FileText, Check, ArrowRight, Stethoscope, PawPrint, MapPin, Phone, Mail, Printer, X } from "lucide-react";
+import { Upload, FileText, Check, ArrowRight, Stethoscope, PawPrint, MapPin, Phone, Mail, Printer, X, HeartPulse, AlertCircle } from "lucide-react";
 import MedicationSearch from "@/components/petrx/MedicationSearch";
 import VetSearch from "@/components/petrx/VetSearch";
+import PrescriptionSteps from "@/components/petrx/PrescriptionSteps";
 
 export default function PrescriptionUpload() {
   const [submitting, setSubmitting] = useState(false);
@@ -103,6 +104,9 @@ export default function PrescriptionUpload() {
             Our pharmacists will verify your prescription with {submitted.vet_clinic_name}. You'll receive an email
             update once it's approved — usually within 24–48 hours.
           </p>
+          <div className="mb-8">
+            <PrescriptionSteps active={1} />
+          </div>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
             <Link to="/" className="px-6 py-3 bg-sage text-white rounded-full text-sm font-semibold hover:bg-[#3d5a66] transition-colors">
               Continue Shopping
@@ -155,6 +159,8 @@ export default function PrescriptionUpload() {
           </p>
         </div>
 
+        <PrescriptionSteps active={0} />
+
         <form onSubmit={handleSubmit} className="cellular-card p-6 md:p-8 space-y-8">
           {/* Pet Info */}
           <div>
@@ -179,6 +185,36 @@ export default function PrescriptionUpload() {
                   ))}
                 </select>
               </div>
+              {(() => {
+                const pet = pets.find((p) => p.id === selectedPetId);
+                const conds = pet?.medical_conditions || [];
+                if (!conds.length && !pet?.allergies) return null;
+                return (
+                  <div className="md:col-span-2 p-4 bg-sage/5 rounded-2xl border-[0.5px] border-sage/20 space-y-2">
+                    <p className="text-xs text-ink/50 font-medium uppercase tracking-wider">
+                      {pet.name}'s Health Profile (shared with our pharmacists)
+                    </p>
+                    {conds.length > 0 && (
+                      <div className="flex items-start gap-1.5 flex-wrap">
+                        <HeartPulse className="w-3.5 h-3.5 text-ochre mt-0.5 flex-shrink-0" />
+                        {conds.map((c) => (
+                          <span key={c} className="px-2 py-0.5 bg-ochre/10 text-ochre rounded-full text-[11px] font-medium">
+                            {c}
+                          </span>
+                        ))}
+                      </div>
+                    )}
+                    {pet?.allergies && (
+                      <div className="flex items-start gap-1.5">
+                        <AlertCircle className="w-3.5 h-3.5 text-destructive mt-0.5 flex-shrink-0" />
+                        <p className="text-xs text-ink/60">
+                          <span className="font-medium text-destructive">Allergies:</span> {pet.allergies}
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                );
+              })()}
               <div className="md:col-span-2">
                 <label className="text-xs text-ink/50 font-medium uppercase tracking-wider">Medication Name *</label>
                 <div className="mt-1">

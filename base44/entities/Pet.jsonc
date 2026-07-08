@@ -18,6 +18,17 @@
     "breed": {
       "type": "string"
     },
+    "sex": {
+      "type": "string",
+      "enum": [
+        "male",
+        "female"
+      ]
+    },
+    "spayed_neutered": {
+      "type": "boolean",
+      "default": false
+    },
     "weight": {
       "type": "number"
     },
@@ -34,6 +45,15 @@
       "format": "date"
     },
     "photo_url": {
+      "type": "string"
+    },
+    "medical_conditions": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "allergies": {
       "type": "string"
     },
     "medications": {
