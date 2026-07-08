@@ -55,10 +55,10 @@ export default function FeaturedProducts() {
     <section id="products">
       {/* Tab bar */}
       <div className="bg-porcelain border-y border-border">
-        <div className="max-w-7xl mx-auto px-5 md:px-8 py-8 flex flex-col md:flex-row md:items-center md:justify-between gap-6">
+        <div className="max-w-7xl mx-auto px-5 md:px-8 py-6 md:py-8 flex flex-col md:flex-row md:items-center md:justify-between gap-4 md:gap-6">
           <div>
             <p className="text-sage text-sm font-semibold tracking-widest uppercase mb-2">Curated by Pharmacists</p>
-            <h2 className="font-display text-3xl md:text-4xl text-ink">Shop the Catalog</h2>
+            <h2 className="font-display text-2xl md:text-4xl text-ink">Shop the Catalog</h2>
           </div>
           <div className="flex flex-wrap gap-1.5 p-1.5 bg-secondary rounded-full self-start md:self-auto">
             {TABS.map((tab) => {
@@ -91,34 +91,34 @@ export default function FeaturedProducts() {
           transition={{ duration: 0.25 }}
         >
           {activeTab === "pharma" && (
-            <div className="bg-[#FBF7F0] pt-10 md:pt-14">
+            <div className="bg-[#FBF7F0] pt-8 md:pt-14">
               <div className="max-w-7xl mx-auto px-5 md:px-8">
                 <GuidedShop petType={petType} setPetType={setPetType} healthIssue={healthIssue} setHealthIssue={setHealthIssue} excludeIssues={["supplements"]} />
               </div>
-              <PharmaCatalog products={filteredRx} loading={loading} linkParams={shopLinkParams()} />
+              <PharmaCatalog products={filteredRx} loading={loading} linkParams={shopLinkParams()} mobileScroll />
             </div>
           )}
           {activeTab === "supplements" && (
-            <div className="bg-[#F4F8F6] pt-10 md:pt-14">
+            <div className="bg-[#F4F8F6] pt-8 md:pt-14">
               <div className="max-w-7xl mx-auto px-5 md:px-8">
                 <GuidedShop petType={petType} setPetType={setPetType} healthIssue={healthIssue} setHealthIssue={setHealthIssue} />
               </div>
-              <SupplementsCatalog products={filteredOtc} loading={loading} linkParams={shopLinkParams()} />
+              <SupplementsCatalog products={filteredOtc} loading={loading} linkParams={shopLinkParams()} mobileScroll />
             </div>
           )}
           {activeTab === "all" && (
             <div className="bg-white">
-              <div className="max-w-7xl mx-auto px-5 md:px-8 py-20 md:py-28">
-                <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4 mb-10">
+              <div className="max-w-7xl mx-auto px-5 md:px-8 py-12 md:py-28">
+                <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4 mb-8 md:mb-10">
                   <div>
                     <p className="text-ink/40 text-sm font-semibold tracking-widest uppercase mb-2">Prescriptions &amp; Supplements</p>
-                    <h3 className="font-display text-3xl md:text-4xl text-ink">The full catalog</h3>
+                    <h3 className="font-display text-2xl md:text-4xl text-ink">The full catalog</h3>
                   </div>
                   <Link to="/shop" className="flex items-center gap-2 text-sm font-semibold text-sage hover:gap-3 transition-all">
                     Open the shop <ArrowRight className="w-4 h-4" />
                   </Link>
                 </div>
-                <CatalogGrid products={allProducts} loading={loading} columns={3} emptyText="Products are loading." />
+                <CatalogGrid products={allProducts} loading={loading} columns={3} emptyText="Products are loading." mobileScroll />
               </div>
             </div>
           )}

@@ -53,7 +53,7 @@ export default function ProductCard({ product, index = 0 }) {
               alt={product.name}
               loading="lazy"
               onError={() => setImgError(true)}
-              className="w-full h-full object-contain p-8 transition-transform duration-700 group-hover:scale-105"
+              className="w-full h-full object-contain p-4 sm:p-8 transition-transform duration-700 group-hover:scale-105"
             />
           ) : (
             <div className="absolute inset-0 flex items-center justify-center">
@@ -94,7 +94,7 @@ export default function ProductCard({ product, index = 0 }) {
           </motion.div>
         </div>
 
-        <div className="p-5 md:p-6">
+        <div className="p-4 sm:p-5 md:p-6">
           <FilterLink
             param="brand"
             value={product.brand}
@@ -102,7 +102,7 @@ export default function ProductCard({ product, index = 0 }) {
           >
             {product.brand}
           </FilterLink>
-          <h3 className="font-display text-lg text-ink mb-3 leading-tight line-clamp-2">{product.name}</h3>
+          <h3 className="font-display text-sm sm:text-lg text-ink mb-3 leading-tight line-clamp-2">{product.name}</h3>
 
           <div className="flex items-center gap-2 mb-4">
             <div className="flex items-center gap-0.5">

@@ -25,7 +25,7 @@ export default function HeroSection() {
       </div>
 
       <div className="relative max-w-7xl mx-auto px-5 md:px-8">
-        <div className="py-20 md:py-32 lg:py-40 max-w-2xl">
+        <div className="py-14 md:py-32 lg:py-40 max-w-2xl">
           {/* Badge */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -53,7 +53,7 @@ export default function HeroSection() {
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, delay: 0.2 }}
-            className="text-lg text-ink/60 mb-10 max-w-lg leading-relaxed"
+            className="text-base md:text-lg text-ink/60 mb-8 md:mb-10 max-w-lg leading-relaxed"
           >
             Prescription management, pharmacist consultations, and doorstep delivery —
             all on one secure platform built for your pet's health.
@@ -64,16 +64,16 @@ export default function HeroSection() {
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, delay: 0.3 }}
-            className="flex flex-wrap items-center gap-4 mb-12"
+            className="flex flex-wrap items-center gap-3 md:gap-4 mb-10 md:mb-12"
           >
-            <Link to="/shop" className="inline-flex items-center gap-2 px-8 py-4 bg-sage text-white rounded-2xl text-base font-semibold hover:bg-[#3d5a66] transition-colors shadow-lg shadow-sage/10">
+            <Link to="/shop" className="inline-flex items-center gap-2 px-6 py-3.5 md:px-8 md:py-4 bg-sage text-white rounded-2xl text-sm md:text-base font-semibold hover:bg-[#3d5a66] transition-colors shadow-lg shadow-sage/10">
               Browse the catalog
               <ArrowRight className="w-4 h-4" />
             </Link>
-            <Link to="/prescription" className="inline-flex items-center gap-2 px-8 py-4 bg-white text-ink rounded-2xl text-base font-semibold border border-border hover:border-sage hover:text-sage transition-colors">
+            <Link to="/prescription" className="inline-flex items-center gap-2 px-6 py-3.5 md:px-8 md:py-4 bg-white text-ink rounded-2xl text-sm md:text-base font-semibold border border-border hover:border-sage hover:text-sage transition-colors">
               Submit a prescription
             </Link>
-            <Link to="/advisor" className="inline-flex items-center gap-2 px-6 py-4 bg-white text-sage rounded-2xl text-sm font-semibold border border-sage/30 hover:border-sage hover:bg-sage/5 transition-colors">
+            <Link to="/advisor" className="inline-flex items-center gap-2 px-5 py-3.5 md:px-6 md:py-4 bg-white text-sage rounded-2xl text-sm font-semibold border border-sage/30 hover:border-sage hover:bg-sage/5 transition-colors">
               <Stethoscope className="w-4 h-4" /> Chat with Advisor
             </Link>
           </motion.div>
@@ -83,7 +83,7 @@ export default function HeroSection() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, delay: 0.5 }}
-            className="flex flex-wrap items-center gap-6 md:gap-8"
+            className="flex flex-wrap items-center gap-4 md:gap-8"
           >
             {TRUST_BADGES.map(({ icon: Icon, label }) => (
               <div key={label} className="flex items-center gap-2.5 text-ink/60">

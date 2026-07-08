@@ -85,7 +85,7 @@ export default function Shop() {
 
   return (
     <div className="min-h-screen bg-porcelain">
-      <div className="max-w-7xl mx-auto px-5 md:px-8 py-12 md:py-16">
+      <div className="max-w-7xl mx-auto px-5 md:px-8 py-8 md:py-16">
         <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4 mb-12">
           <div>
             <p className="text-sage text-sm font-semibold tracking-widest uppercase mb-3">{heading.eyebrow}</p>
@@ -184,7 +184,7 @@ export default function Shop() {
               </div>
             ) : (
               <>
-                <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
+                <div className="grid grid-cols-2 sm:grid-cols-2 xl:grid-cols-3 gap-3 sm:gap-6">
                   {shown.map((p, i) => (
                     <ProductCard key={p.id} product={p} index={i} />
                   ))}

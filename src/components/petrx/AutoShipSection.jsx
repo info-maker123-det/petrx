@@ -13,9 +13,9 @@ const BENEFITS = [
 
 export default function AutoShipSection() {
   return (
-    <section id="autoship" className="py-24 md:py-36 bg-porcelain">
+    <section id="autoship" className="py-14 md:py-36 bg-porcelain">
       <div className="max-w-7xl mx-auto px-5 md:px-8">
-        <div className="grid grid-cols-1 lg:grid-cols-5 gap-12 lg:gap-16 items-center">
+        <div className="grid grid-cols-1 lg:grid-cols-5 gap-8 lg:gap-16 items-center">
           {/* Image — 2/5 width */}
           <motion.div
             initial={{ opacity: 0, x: -40 }}
@@ -42,17 +42,17 @@ export default function AutoShipSection() {
             className="lg:col-span-3"
           >
             <p className="text-sage text-sm font-semibold tracking-widest uppercase mb-3">Subscribe & Save</p>
-            <h2 className="font-display text-3xl md:text-4xl lg:text-5xl text-ink mb-6 leading-tight">
+            <h2 className="font-display text-3xl md:text-4xl lg:text-5xl text-ink mb-5 leading-tight">
               AutoShip:<br />
               <span className="text-sage italic">Set It & Forget It</span>
             </h2>
-            <p className="text-ink/50 text-base mb-10 max-w-lg leading-relaxed">
+            <p className="text-ink/50 text-base mb-8 max-w-lg leading-relaxed">
               Never run out of your pet's essential medications. AutoShip delivers what they need,
               when they need it — with savings on every order and no commitment.
             </p>
 
             {/* Benefits */}
-            <div className="space-y-6 mb-10">
+            <div className="space-y-5 md:space-y-6 mb-8 md:mb-10">
               {BENEFITS.map(({ icon: Icon, title, desc }) => (
                 <div key={title} className="flex gap-4">
                   <div className="w-11 h-11 rounded-2xl bg-sage/10 flex items-center justify-center flex-shrink-0">

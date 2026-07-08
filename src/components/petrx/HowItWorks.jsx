@@ -25,10 +25,10 @@ const STEPS = [
 
 export default function HowItWorks() {
   return (
-    <section className="py-24 md:py-36 bg-white">
+    <section className="py-14 md:py-36 bg-white">
       <div className="max-w-7xl mx-auto px-5 md:px-8">
         {/* Section Header */}
-        <div className="text-center mb-20">
+        <div className="text-center mb-10 md:mb-20">
           <p className="text-sage text-sm font-semibold tracking-widest uppercase mb-3">From Order to Doorstep</p>
           <h2 className="font-display text-3xl md:text-4xl lg:text-5xl text-ink mb-4">
             How It Works
@@ -39,7 +39,7 @@ export default function HowItWorks() {
         </div>
 
         {/* Steps */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-6">
+        <div className="flex md:grid md:grid-cols-3 gap-6 md:gap-6 overflow-x-auto md:overflow-visible no-scrollbar snap-x snap-mandatory md:snap-none -mx-5 px-5 md:mx-0 md:px-0 pb-2 md:pb-0">
           {STEPS.map(({ icon: Icon, step, title, desc }, i) => (
             <motion.div
               key={step}
@@ -47,7 +47,7 @@ export default function HowItWorks() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.5, delay: i * 0.15 }}
-              className="relative text-center px-6"
+              className="relative text-center px-6 w-[80vw] max-w-[360px] md:w-auto md:max-w-none flex-shrink-0 md:flex-shrink snap-start"
             >
               {/* Connector Line (desktop) */}
               {i < STEPS.length - 1 && (
