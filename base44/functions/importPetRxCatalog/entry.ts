@@ -1,7 +1,10 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.31';
 
+const asStr = (v) => (Array.isArray(v) ? v.join(', ') : v == null ? '' : String(v));
+
 function stripHtml(html) {
-  if (!html) return '';
+  if (html == null) return '';
+  return String(html)
   return html
     .replace(/<[^>]*>/g, ' ')
     .replace(/&nbsp;/g, ' ')
@@ -15,8 +18,8 @@ function stripHtml(html) {
 }
 
 function deriveCategory(tags, title) {
-  const t = (tags || '').toLowerCase();
-  const ttl = (title || '').toLowerCase();
+  const t = asStr(tags).toLowerCase();
+  const ttl = asStr(title).toLowerCase();
   if (t.includes('flea') || t.includes('tick')) {
     return t.includes('heartworm') ? 'Flea, Tick & Heartworm' : 'Flea & Tick';
   }
@@ -40,7 +43,7 @@ function deriveCategory(tags, title) {
 }
 
 function derivePetType(tags) {
-  const t = (tags || '').toLowerCase();
+  const t = asStr(tags).toLowerCase();
   const hasDog = t.includes('dog');
   const hasCat = t.includes('cat');
   const hasHorse = t.includes('horse');
@@ -87,7 +90,7 @@ Deno.serve(async (req) => {
     // Map to Product entity schema
     const mapped = allProducts
       .map((p) => {
-        const tags = p.tags || '';
+        const tags = asStr(p.tags);
         const variants = p.variants || [];
         const prices = variants
           .map((v) => parseFloat(v.price))
@@ -102,13 +105,13 @@ Deno.serve(async (req) => {
         const desc = stripHtml(p.body_html).slice(0, 800);
         const imageUrl = p.images && p.images.length > 0 ? p.images[0].src : '';
         const requiresRx = tags.toLowerCase().includes('rxmed') || tags.toLowerCase().includes('petrx pharmacy');
-        const handleLower = (p.handle || '').toLowerCase();
+        const handleLower = asStr(p.handle).toLowerCase();
         const featured = FEATURED_KEYS.some((k) => handleLower.includes(k));
 
         return {
-          name: (p.title || '').slice(0, 200),
-          slug: p.handle || '',
-          brand: p.vendor || '',
+          name: asStr(p.title).slice(0, 200),
+          slug: asStr(p.handle),
+          brand: asStr(p.vendor),
           description: desc,
           category: deriveCategory(tags, p.title),
           pet_type: derivePetType(tags),
@@ -127,16 +130,6 @@ Deno.serve(async (req) => {
         };
       })
       .filter(Boolean);
-
-    // TEMP: return before entity ops to isolate error
-    return Response.json({
-      status: 'mapped',
-      fetched: allProducts.length,
-      mapped: mapped.length,
-      featured: mapped.filter((m) => m.featured).length,
-      sample: mapped[0],
-      debug,
-    });
 
     // Clear existing products
     await base44.asServiceRole.entities.Product.deleteMany({});
