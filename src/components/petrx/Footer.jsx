@@ -42,7 +42,7 @@ export default function Footer() {
           </div>
           <a
             href="#"
-            className="inline-flex items-center gap-3 px-8 py-4 bg-sage text-white rounded-full font-semibold text-base hover:bg-[#3d5a66] transition-colors flex-shrink-0"
+            className="inline-flex items-center gap-3 px-8 py-4 bg-sage text-white rounded-full font-semibold text-base hover:bg-[#3d5a66] transition-colors flex-shrink-0 shadow-lg shadow-brand-magenta/20"
           >
             Get Started
           </a>

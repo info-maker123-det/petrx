@@ -31,7 +31,7 @@ export default function HeroSection() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
-            className="inline-flex items-center gap-2 px-4 py-1.5 bg-white/80 backdrop-blur-sm border border-sage/20 text-sage text-sm font-medium rounded-full mb-8"
+            className="inline-flex items-center gap-2 px-4 py-1.5 bg-white/80 backdrop-blur-sm border border-brand-magenta/25 text-brand-magenta text-sm font-medium rounded-full mb-8"
           >
             <ShieldCheck className="w-3.5 h-3.5" />
             Licensed Online Pet Pharmacy
@@ -66,7 +66,7 @@ export default function HeroSection() {
             transition={{ duration: 0.7, delay: 0.3 }}
             className="flex flex-wrap items-center gap-3 md:gap-4 mb-10 md:mb-12"
           >
-            <Link to="/shop" className="inline-flex items-center gap-2 px-6 py-3.5 md:px-8 md:py-4 bg-sage text-white rounded-2xl text-sm md:text-base font-semibold hover:bg-[#3d5a66] transition-colors shadow-lg shadow-sage/10">
+            <Link to="/shop" className="inline-flex items-center gap-2 px-6 py-3.5 md:px-8 md:py-4 bg-sage text-white rounded-2xl text-sm md:text-base font-semibold hover:bg-[#3d5a66] transition-colors shadow-lg shadow-brand-magenta/20">
               Browse the catalog
               <ArrowRight className="w-4 h-4" />
             </Link>

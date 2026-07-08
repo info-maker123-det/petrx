@@ -58,7 +58,7 @@ export default function FeaturedProducts() {
       <div className="bg-porcelain border-y border-border">
         <div className="max-w-7xl mx-auto px-5 md:px-8 py-6 md:py-8 flex flex-col md:flex-row md:items-center md:justify-between gap-4 md:gap-6">
           <div>
-            <p className="text-sage text-sm font-semibold tracking-widest uppercase mb-2">Curated by Pharmacists</p>
+            <p className="text-brand-magenta text-sm font-semibold tracking-widest uppercase mb-2">Curated by Pharmacists</p>
             <h2 className="font-display text-2xl md:text-4xl text-ink">Shop the Catalog</h2>
           </div>
           <div className="flex flex-wrap gap-1.5 p-1.5 bg-secondary rounded-full self-start md:self-auto">
@@ -119,7 +119,7 @@ export default function FeaturedProducts() {
                     Open the shop <ArrowRight className="w-4 h-4" />
                   </Link>
                 </div>
-                <CatalogGrid products={allProducts.slice(0, visibleAll)} loading={loading} columns={3} emptyText="Products are loading." />
+                <CatalogGrid products={allProducts.slice(0, visibleAll)} loading={loading} columns={3} mobileScroll emptyText="Products are loading." />
                 {visibleAll < allProducts.length && (
                   <div className="flex justify-center mt-10">
                     <button onClick={() => setVisibleAll((v) => v + 18)} className="px-8 py-3.5 bg-white border-[0.5px] border-border rounded-full text-sm font-semibold text-ink hover:border-sage hover:text-sage transition-colors">
