@@ -1,0 +1,90 @@
+{
+  "name": "Product",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string"
+    },
+    "slug": {
+      "type": "string"
+    },
+    "brand": {
+      "type": "string"
+    },
+    "description": {
+      "type": "string"
+    },
+    "category": {
+      "type": "string",
+      "enum": [
+        "Heart Health",
+        "Allergy Relief",
+        "Flea & Tick",
+        "Flea, Tick & Heartworm",
+        "Joint & Pain",
+        "Pain & Inflammation",
+        "Supplements",
+        "Dental",
+        "Eye & Ear",
+        "Behavioral"
+      ],
+      "default": "Supplements"
+    },
+    "pet_type": {
+      "type": "string",
+      "enum": [
+        "dog",
+        "cat",
+        "horse",
+        "all"
+      ],
+      "default": "dog"
+    },
+    "price": {
+      "type": "number"
+    },
+    "price_range": {
+      "type": "string"
+    },
+    "requires_prescription": {
+      "type": "boolean",
+      "default": false
+    },
+    "active_ingredient": {
+      "type": "string"
+    },
+    "dosage_type": {
+      "type": "string"
+    },
+    "weight_class": {
+      "type": "string"
+    },
+    "image_url": {
+      "type": "string"
+    },
+    "rating": {
+      "type": "number",
+      "default": 4.5
+    },
+    "review_count": {
+      "type": "number",
+      "default": 0
+    },
+    "in_stock": {
+      "type": "boolean",
+      "default": true
+    },
+    "autoship_eligible": {
+      "type": "boolean",
+      "default": true
+    },
+    "featured": {
+      "type": "boolean",
+      "default": false
+    }
+  },
+  "required": [
+    "name",
+    "price"
+  ]
+}

@@ -1,0 +1,199 @@
+import React, { useState } from "react";
+import { Link } from "react-router-dom";
+import { motion } from "framer-motion";
+import { base44 } from "@/api/base44Client";
+import { Upload, FileText, Check, ArrowRight, Stethoscope, PawPrint } from "lucide-react";
+
+export default function PrescriptionUpload() {
+  const [submitting, setSubmitting] = useState(false);
+  const [submitted, setSubmitted] = useState(null);
+  const [error, setError] = useState("");
+  const [fileName, setFileName] = useState("");
+  const [form, setForm] = useState({
+    pet_name: "",
+    pet_species: "dog",
+    medication_name: "",
+    vet_clinic_name: "",
+    vet_name: "",
+    vet_phone: "",
+    vet_email: "",
+    vet_address: "",
+    notes: "",
+  });
+
+  const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
+
+  const handleFile = (e) => {
+    const file = e.target.files?.[0];
+    if (file) setFileName(file.name);
+  };
+
+  const valid = form.pet_name && form.medication_name && form.vet_clinic_name;
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError("");
+    if (!valid) {
+      setError("Please fill in your pet's name, medication, and vet clinic.");
+      return;
+    }
+    setSubmitting(true);
+    try {
+      let prescription_file_url = "";
+      const fileInput = document.getElementById("prescription-file");
+      const file = fileInput?.files?.[0];
+      if (file) {
+        const { file_url } = await base44.integrations.Core.UploadFile({ file });
+        prescription_file_url = file_url;
+      }
+      const record = await base44.entities.Prescription.create({
+        ...form,
+        prescription_file_url,
+        status: "pending",
+      });
+      setSubmitted(record);
+    } catch (err) {
+      setError("Something went wrong submitting your prescription. Please try again.");
+    }
+    setSubmitting(false);
+  };
+
+  if (submitted)
+    return (
+      <div className="py-20 md:py-32 bg-porcelain">
+        <div className="max-w-2xl mx-auto px-5 md:px-8 text-center">
+          <motion.div
+            initial={{ scale: 0 }}
+            animate={{ scale: 1 }}
+            transition={{ type: "spring", damping: 12 }}
+            className="w-20 h-20 rounded-full bg-green-100 flex items-center justify-center mx-auto mb-6"
+          >
+            <Check className="w-10 h-10 text-green-600" />
+          </motion.div>
+          <p className="text-sage text-sm font-semibold tracking-widest uppercase mb-2">Prescription Received</p>
+          <h1 className="font-display text-3xl md:text-4xl text-ink mb-3">We're on it</h1>
+          <p className="text-ink/50 mb-8 max-w-md mx-auto">
+            Our pharmacists will verify your prescription with {submitted.vet_clinic_name}. You'll receive an email
+            update once it's approved — usually within 24–48 hours.
+          </p>
+          <div className="flex flex-col sm:flex-row gap-3 justify-center">
+            <Link to="/" className="px-6 py-3 bg-sage text-white rounded-full text-sm font-semibold hover:bg-[#3d5a66] transition-colors">
+              Continue Shopping
+            </Link>
+            <Link to="/contact" className="px-6 py-3 border-[0.5px] border-border rounded-full text-sm font-semibold text-ink hover:bg-secondary transition-colors">
+              Contact Us
+            </Link>
+          </div>
+        </div>
+      </div>
+    );
+
+  return (
+    <div className="py-12 md:py-16 bg-porcelain">
+      <div className="max-w-3xl mx-auto px-5 md:px-8">
+        <div className="text-center mb-10">
+          <div className="w-14 h-14 rounded-2xl bg-sage/10 flex items-center justify-center mx-auto mb-4">
+            <FileText className="w-7 h-7 text-sage" />
+          </div>
+          <p className="text-sage text-sm font-semibold tracking-widest uppercase mb-2">Prescription</p>
+          <h1 className="font-display text-3xl md:text-4xl text-ink mb-3">Submit Your Prescription</h1>
+          <p className="text-ink/50 max-w-md mx-auto">
+            Upload your vet's prescription or provide your clinic's details and we'll contact them directly.
+          </p>
+        </div>
+
+        <form onSubmit={handleSubmit} className="cellular-card p-6 md:p-8 space-y-8">
+          {/* Pet Info */}
+          <div>
+            <div className="flex items-center gap-2 mb-4">
+              <PawPrint className="w-5 h-5 text-sage" />
+              <h2 className="font-display text-xl text-ink">Pet Information</h2>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="text-xs text-ink/50 font-medium uppercase tracking-wider">Pet's Name *</label>
+                <input name="pet_name" value={form.pet_name} onChange={handleChange} className="mt-1 w-full px-4 py-3 bg-secondary rounded-2xl border-[0.5px] border-transparent focus:border-sage focus:outline-none transition-all" />
+              </div>
+              <div>
+                <label className="text-xs text-ink/50 font-medium uppercase tracking-wider">Species</label>
+                <select name="pet_species" value={form.pet_species} onChange={handleChange} className="mt-1 w-full px-4 py-3 bg-secondary rounded-2xl border-[0.5px] border-transparent focus:border-sage focus:outline-none transition-all">
+                  <option value="dog">Dog</option>
+                  <option value="cat">Cat</option>
+                  <option value="horse">Horse</option>
+                  <option value="other">Other</option>
+                </select>
+              </div>
+              <div className="md:col-span-2">
+                <label className="text-xs text-ink/50 font-medium uppercase tracking-wider">Medication Name *</label>
+                <input name="medication_name" value={form.medication_name} onChange={handleChange} placeholder="e.g. Vetmedin 5mg" className="mt-1 w-full px-4 py-3 bg-secondary rounded-2xl border-[0.5px] border-transparent focus:border-sage focus:outline-none transition-all" />
+              </div>
+            </div>
+          </div>
+
+          {/* Vet Info */}
+          <div>
+            <div className="flex items-center gap-2 mb-4">
+              <Stethoscope className="w-5 h-5 text-sage" />
+              <h2 className="font-display text-xl text-ink">Veterinarian Information</h2>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="text-xs text-ink/50 font-medium uppercase tracking-wider">Clinic Name *</label>
+                <input name="vet_clinic_name" value={form.vet_clinic_name} onChange={handleChange} className="mt-1 w-full px-4 py-3 bg-secondary rounded-2xl border-[0.5px] border-transparent focus:border-sage focus:outline-none transition-all" />
+              </div>
+              <div>
+                <label className="text-xs text-ink/50 font-medium uppercase tracking-wider">Vet's Name</label>
+                <input name="vet_name" value={form.vet_name} onChange={handleChange} className="mt-1 w-full px-4 py-3 bg-secondary rounded-2xl border-[0.5px] border-transparent focus:border-sage focus:outline-none transition-all" />
+              </div>
+              <div>
+                <label className="text-xs text-ink/50 font-medium uppercase tracking-wider">Phone</label>
+                <input name="vet_phone" value={form.vet_phone} onChange={handleChange} className="mt-1 w-full px-4 py-3 bg-secondary rounded-2xl border-[0.5px] border-transparent focus:border-sage focus:outline-none transition-all" />
+              </div>
+              <div>
+                <label className="text-xs text-ink/50 font-medium uppercase tracking-wider">Email</label>
+                <input name="vet_email" type="email" value={form.vet_email} onChange={handleChange} className="mt-1 w-full px-4 py-3 bg-secondary rounded-2xl border-[0.5px] border-transparent focus:border-sage focus:outline-none transition-all" />
+              </div>
+              <div className="md:col-span-2">
+                <label className="text-xs text-ink/50 font-medium uppercase tracking-wider">Clinic Address</label>
+                <input name="vet_address" value={form.vet_address} onChange={handleChange} className="mt-1 w-full px-4 py-3 bg-secondary rounded-2xl border-[0.5px] border-transparent focus:border-sage focus:outline-none transition-all" />
+              </div>
+            </div>
+          </div>
+
+          {/* File Upload */}
+          <div>
+            <h2 className="font-display text-xl text-ink mb-2">Upload Prescription</h2>
+            <p className="text-sm text-ink/40 mb-4">
+              Optional — if you have a copy, upload it now. Otherwise we'll contact your vet directly.
+            </p>
+            <label
+              htmlFor="prescription-file"
+              className="flex flex-col items-center justify-center gap-2 p-8 border-2 border-dashed border-border rounded-2xl cursor-pointer hover:border-sage hover:bg-sage/5 transition-all"
+            >
+              <Upload className="w-7 h-7 text-sage" />
+              <span className="text-sm font-medium text-ink">{fileName || "Click to upload"}</span>
+              <span className="text-xs text-ink/40">PDF, JPG, or PNG up to 10MB</span>
+              <input id="prescription-file" type="file" accept=".pdf,.jpg,.jpeg,.png" onChange={handleFile} className="hidden" />
+            </label>
+          </div>
+
+          {/* Notes */}
+          <div>
+            <label className="text-xs text-ink/50 font-medium uppercase tracking-wider">Additional Notes</label>
+            <textarea name="notes" value={form.notes} onChange={handleChange} rows={3} placeholder="Any details about your pet's condition or prescription..." className="mt-1 w-full px-4 py-3 bg-secondary rounded-2xl border-[0.5px] border-transparent focus:border-sage focus:outline-none transition-all resize-none" />
+          </div>
+
+          {error && <p className="text-sm text-destructive">{error}</p>}
+
+          <button
+            type="submit"
+            disabled={submitting}
+            className="w-full flex items-center justify-center gap-2 py-4 bg-sage text-white rounded-full font-semibold text-sm hover:bg-[#3d5a66] transition-colors disabled:opacity-50"
+          >
+            {submitting ? "Submitting..." : <>Submit Prescription <ArrowRight className="w-4 h-4" /></>}
+          </button>
+        </form>
+      </div>
+    </div>
+  );
+}

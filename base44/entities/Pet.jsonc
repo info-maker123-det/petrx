@@ -1,0 +1,41 @@
+{
+  "name": "Pet",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string"
+    },
+    "species": {
+      "type": "string",
+      "enum": [
+        "dog",
+        "cat",
+        "horse",
+        "other"
+      ],
+      "default": "dog"
+    },
+    "breed": {
+      "type": "string"
+    },
+    "weight": {
+      "type": "number"
+    },
+    "weight_unit": {
+      "type": "string",
+      "enum": [
+        "lbs",
+        "kg"
+      ],
+      "default": "lbs"
+    },
+    "date_of_birth": {
+      "type": "string",
+      "format": "date"
+    }
+  },
+  "required": [
+    "name",
+    "species"
+  ]
+}

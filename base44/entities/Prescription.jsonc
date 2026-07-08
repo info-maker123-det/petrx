@@ -1,0 +1,59 @@
+{
+  "name": "Prescription",
+  "type": "object",
+  "properties": {
+    "pet_name": {
+      "type": "string"
+    },
+    "pet_species": {
+      "type": "string",
+      "enum": [
+        "dog",
+        "cat",
+        "horse",
+        "other"
+      ],
+      "default": "dog"
+    },
+    "medication_name": {
+      "type": "string"
+    },
+    "vet_clinic_name": {
+      "type": "string"
+    },
+    "vet_name": {
+      "type": "string"
+    },
+    "vet_phone": {
+      "type": "string"
+    },
+    "vet_email": {
+      "type": "string"
+    },
+    "vet_address": {
+      "type": "string"
+    },
+    "prescription_file_url": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "in_review",
+        "approved",
+        "rejected",
+        "fulfilled"
+      ],
+      "default": "pending"
+    },
+    "notes": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "pet_name",
+    "medication_name",
+    "vet_clinic_name"
+  ]
+}
