@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Search, ShoppingBag, Menu, X, Phone, ShieldCheck, User } from "lucide-react";
+import { ShoppingBag, Menu, X, Phone, ShieldCheck, User } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useCart } from "@/lib/cartContext";
 import Logo from "@/components/petrx/Logo";
@@ -113,19 +113,8 @@ export default function FluidHeader() {
             )}
           </nav>
 
-          {/* Search + Account + Cart */}
+          {/* Account + Cart */}
           <div className="flex items-center gap-3">
-            <div className="hidden md:flex items-center w-56">
-              <div className="relative w-full">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-ink/30" />
-                <input
-                  type="text"
-                  placeholder="Search medications..."
-                  className="w-full pl-9 pr-4 py-2 bg-secondary rounded-xl text-sm border border-transparent focus:border-sage focus:bg-white focus:outline-none transition-all placeholder:text-muted-foreground"
-                />
-              </div>
-            </div>
-
             <Link
               to="/dashboard"
               className="hidden lg:inline-flex items-center gap-2 px-4 py-2 border border-border rounded-xl text-sm font-medium text-ink hover:border-sage hover:text-sage transition-colors"
@@ -163,14 +152,6 @@ export default function FluidHeader() {
               className="lg:hidden overflow-hidden border-t border-border"
             >
               <div className="px-5 py-6 space-y-1">
-                <div className="relative mb-4">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-sage" />
-                  <input
-                    type="text"
-                    placeholder="Search medications..."
-                    className="w-full pl-9 pr-4 py-3 bg-secondary rounded-xl text-sm border border-transparent focus:border-sage focus:outline-none"
-                  />
-                </div>
                 {renderNavLinks(true)}
                 <Link
                   to="/dashboard"
