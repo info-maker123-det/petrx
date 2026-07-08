@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useRef } from "react";
 import { base44 } from "@/api/base44Client";
 import AdvisorMessageBubble from "./AdvisorMessageBubble";
-import { Send, Loader2, Bot, Sparkles } from "lucide-react";
+import { Send, Loader2, Sparkles } from "lucide-react";
+import LogoMark from "./LogoMark";
 
 function buildPetProfile(pet) {
   const lines = [];
@@ -61,15 +62,31 @@ export default function AdvisorChat({ pet }) {
       setConversation(null);
       contextSentRef.current = false;
       try {
-        const conv = await base44.agents.createConversation({
-          agent_name: "medication_advisor",
-          metadata: {
-            name: `Advisor — ${pet.name}`,
-            description: `Product suggestions for ${pet.name}`,
-          },
-        });
+        let conv = null;
+        // Resume an existing conversation for this pet so the history is preserved
+        try {
+          const existing = await base44.agents.listConversations({ agent_name: "medication_advisor" });
+          const list = Array.isArray(existing) ? existing : existing?.conversations || [];
+          const match = list.find((c) => c.metadata?.pet_id === pet.id);
+          if (match) conv = await base44.agents.getConversation(match.id);
+        } catch (e) { /* ignore — will create a new conversation */ }
+
+        if (cancelled) return;
+
+        if (!conv) {
+          conv = await base44.agents.createConversation({
+            agent_name: "medication_advisor",
+            metadata: {
+              name: `Advisor — ${pet.name}`,
+              description: `Product suggestions for ${pet.name}`,
+              pet_id: pet.id,
+            },
+          });
+        }
+
         if (cancelled) return;
         setConversation(conv);
+        if (conv.messages?.length) setMessages(conv.messages);
         unsub = base44.agents.subscribeToConversation(conv.id, (data) => {
           if (!cancelled) setMessages(data.messages || []);
         });
@@ -155,9 +172,7 @@ export default function AdvisorChat({ pet }) {
             ))}
             {showTyping && (
               <div className="flex gap-3 justify-start">
-                <div className="flex-shrink-0 w-8 h-8 rounded-full bg-sage/10 flex items-center justify-center mt-1">
-                  <Bot className="w-4 h-4 text-sage" />
-                </div>
+                <LogoMark size={32} className="mt-1" />
                 <div className="px-4 py-3 bg-white border border-border rounded-2xl rounded-tl-sm">
                   <div className="flex gap-1">
                     <span className="w-1.5 h-1.5 bg-sage/40 rounded-full animate-bounce" style={{ animationDelay: "0ms" }} />

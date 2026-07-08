@@ -1,7 +1,8 @@
 import React, { useState } from "react";
 import ReactMarkdown from "react-markdown";
 import { useNavigate } from "react-router-dom";
-import { Bot, User, ChevronDown, ChevronRight, Loader2, Check, AlertCircle } from "lucide-react";
+import { User, ChevronDown, ChevronRight, Loader2, Check, AlertCircle } from "lucide-react";
+import LogoMark from "./LogoMark";
 
 function FunctionDisplay({ toolCall }) {
   const [expanded, setExpanded] = useState(false);
@@ -68,15 +69,14 @@ export default function AdvisorMessageBubble({ message }) {
   const navigate = useNavigate();
   const isUser = message.role === "user";
 
-  const Avatar = () => (
-    <div
-      className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center mt-1 ${
-        isUser ? "bg-ink/10" : "bg-sage/10"
-      }`}
-    >
-      {isUser ? <User className="w-4 h-4 text-ink" /> : <Bot className="w-4 h-4 text-sage" />}
-    </div>
-  );
+  const Avatar = () =>
+    isUser ? (
+      <div className="flex-shrink-0 w-8 h-8 rounded-full bg-ink/10 flex items-center justify-center mt-1">
+        <User className="w-4 h-4 text-ink" />
+      </div>
+    ) : (
+      <LogoMark size={32} className="mt-1" />
+    );
 
   return (
     <div className={`flex gap-3 ${isUser ? "justify-end" : "justify-start"}`}>
