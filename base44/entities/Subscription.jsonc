@@ -47,6 +47,11 @@
         "cancelled"
       ],
       "default": "active"
+    },
+    "description": {
+      "type": "string",
+      "maxLength": 1000,
+      "description": "Optional notes describing this AutoShip subscription \u2014 dosing instructions, refill reminders, or care context."
     }
   },
   "required": [

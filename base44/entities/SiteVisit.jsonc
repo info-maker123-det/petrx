@@ -47,6 +47,11 @@
     "is_logged_in": {
       "type": "boolean",
       "default": false
+    },
+    "description": {
+      "type": "string",
+      "maxLength": 1000,
+      "description": "Optional context note about this site visit \u2014 campaign source, entry intent, or observed behavior."
     }
   },
   "required": [

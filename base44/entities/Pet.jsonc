@@ -75,6 +75,11 @@
           }
         }
       }
+    },
+    "description": {
+      "type": "string",
+      "maxLength": 1000,
+      "description": "A short biography for the pet \u2014 temperament, daily routine, and special care considerations."
     }
   },
   "required": [

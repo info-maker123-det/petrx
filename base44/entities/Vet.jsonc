@@ -32,6 +32,11 @@
     },
     "website": {
       "type": "string"
+    },
+    "description": {
+      "type": "string",
+      "maxLength": 1000,
+      "description": "A brief, SEO-friendly overview of the veterinary clinic \u2014 services offered, medical specialties, and care philosophy."
     }
   },
   "required": [

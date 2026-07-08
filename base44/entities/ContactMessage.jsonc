@@ -26,6 +26,11 @@
         "resolved"
       ],
       "default": "new"
+    },
+    "description": {
+      "type": "string",
+      "maxLength": 1000,
+      "description": "Internal summary or context note about this contact inquiry for staff reference and follow-up."
     }
   },
   "required": [
