@@ -17,7 +17,7 @@ const COMPANY_LINKS = [
   { label: "How It Works", href: "#" },
   { label: "AutoShip Program", href: "#autoship" },
   { label: "Prescription Policy", href: "#" },
-  { label: "Shipping & Returns", href: "#" },
+  { label: "Shipping & Returns", to: "/shipping" },
 ];
 
 const LEGAL_LINKS = [
@@ -98,7 +98,7 @@ export default function Footer() {
                       {link.label}
                     </Link>
                   ) : (
-                    <a href={link.href} className="text-white/40 hover:text-sage transition-colors text-sm">
+                    <a href={link.href ?? "#"} className="text-white/40 hover:text-sage transition-colors text-sm">
                       {link.label}
                     </a>
                   )}

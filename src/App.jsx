@@ -26,6 +26,7 @@ import PrivacyPolicy from './pages/PrivacyPolicy';
 import TermsOfService from './pages/TermsOfService';
 import Accessibility from './pages/Accessibility';
 import About from './pages/About';
+import ShippingReturns from './pages/ShippingReturns';
 // Add page imports here
 
 const AuthenticatedApp = () => {
@@ -66,6 +67,7 @@ const AuthenticatedApp = () => {
           <Route path="/privacy" element={<PrivacyPolicy />} />
           <Route path="/terms" element={<TermsOfService />} />
           <Route path="/accessibility" element={<Accessibility />} />
+          <Route path="/shipping" element={<ShippingReturns />} />
           <Route path="/product/:id" element={<ProductDetail />} />
           <Route element={<ProtectedRoute unauthenticatedElement={<Navigate to="/login" replace />} />}>
             <Route path="/contact" element={<Contact />} />
