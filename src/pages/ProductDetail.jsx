@@ -14,6 +14,13 @@ import {
   Truck,
 } from "lucide-react";
 import SimilarProducts from "@/components/petrx/SimilarProducts";
+import {
+  Accordion,
+  AccordionItem,
+  AccordionTrigger,
+  AccordionContent,
+} from "@/components/ui/accordion";
+import { ShieldAlert, Info, FileText } from "lucide-react";
 
 export default function ProductDetail() {
   const { id } = useParams();
@@ -230,44 +237,95 @@ export default function ProductDetail() {
               </button>
             </div>
 
-            {/* Description */}
+            {/* Collapsible info sections */}
             <div className="diagnostic-line pt-8">
-              <h3 className="font-display text-lg text-ink mb-3">Product Details</h3>
-              <p className="text-ink/60 text-sm leading-relaxed mb-6">{product.description}</p>
+              <Accordion type="single" collapsible defaultValue="details" className="w-full">
+                <AccordionItem value="details" className="border-border">
+                  <AccordionTrigger className="text-ink font-display text-lg hover:no-underline">
+                    <span className="flex items-center gap-2">
+                      <FileText className="w-4 h-4 text-sage" /> Product Details
+                    </span>
+                  </AccordionTrigger>
+                  <AccordionContent className="text-ink/60 text-sm leading-relaxed">
+                    <p className="mb-4">{product.description}</p>
+                    {product.usage && (
+                      <div className="p-4 bg-sage/5 rounded-2xl">
+                        <p className="text-ink/40 text-xs uppercase tracking-wider mb-1">Indications / Usage</p>
+                        <p className="text-ink text-sm font-medium leading-relaxed">{product.usage}</p>
+                      </div>
+                    )}
+                  </AccordionContent>
+                </AccordionItem>
 
-              {product.usage && (
-                <div className="mb-6 p-4 bg-sage/5 rounded-2xl">
-                  <p className="text-ink/40 text-xs uppercase tracking-wider mb-1">Indications / Usage</p>
-                  <p className="text-ink text-sm font-medium leading-relaxed">{product.usage}</p>
-                </div>
-              )}
+                <AccordionItem value="safety" className="border-border">
+                  <AccordionTrigger className="text-ink font-display text-lg hover:no-underline">
+                    <span className="flex items-center gap-2">
+                      <ShieldAlert className="w-4 h-4 text-ochre" /> Safety Info
+                    </span>
+                  </AccordionTrigger>
+                  <AccordionContent className="text-ink/60 text-sm leading-relaxed space-y-3">
+                    {product.requires_prescription ? (
+                      <p>
+                        <strong className="text-ink">Prescription required.</strong> This medication requires a valid
+                        prescription from a licensed veterinarian. Our pharmacists will verify your prescription before
+                        dispensing. Do not administer without veterinary supervision.
+                      </p>
+                    ) : (
+                      <p>
+                        <strong className="text-ink">Over-the-counter supplement.</strong> For animal use only. Keep out
+                        of reach of children and other animals. In case of accidental overdose, contact a health
+                        professional immediately.
+                      </p>
+                    )}
+                    <p>
+                      <strong className="text-ink">Warnings:</strong> For use in animals only. Not for human use. Keep
+                      out of reach of children. Do not use if product appears tampered with or seal is broken. Store at
+                      controlled room temperature unless otherwise directed.
+                    </p>
+                    <p>
+                      <strong className="text-ink">Cautions:</strong> If your pet experiences any adverse reactions,
+                      discontinue use and consult your veterinarian. Always inform your veterinarian of any other
+                      medications your pet is taking before starting a new treatment.
+                    </p>
+                  </AccordionContent>
+                </AccordionItem>
 
-              <div className="grid grid-cols-2 gap-4 text-sm">
-                <div>
-                  <p className="text-ink/40 text-xs uppercase tracking-wider mb-1">Active Ingredient</p>
-                  <p className="text-ink font-medium">{product.active_ingredient || "—"}</p>
-                </div>
-                <div>
-                  <p className="text-ink/40 text-xs uppercase tracking-wider mb-1">Dosage Type</p>
-                  <p className="text-ink font-medium">{product.dosage_type || "—"}</p>
-                </div>
-                <div>
-                  <p className="text-ink/40 text-xs uppercase tracking-wider mb-1">Weight Class</p>
-                  <p className="text-ink font-medium">{product.weight_class || "—"}</p>
-                </div>
-                <div>
-                  <p className="text-ink/40 text-xs uppercase tracking-wider mb-1">Brand</p>
-                  <Link to={`/shop?brand=${encodeURIComponent(product.brand)}`} className="text-ink font-medium hover:underline">{product.brand || "—"}</Link>
-                </div>
-                <div>
-                  <p className="text-ink/40 text-xs uppercase tracking-wider mb-1">Category</p>
-                  <Link to={`/shop?category=${encodeURIComponent(product.category)}`} className="text-ink font-medium hover:underline">{product.category || "—"}</Link>
-                </div>
-                <div>
-                  <p className="text-ink/40 text-xs uppercase tracking-wider mb-1">For</p>
-                  <Link to={`/shop?pet=${product.pet_type}`} className="text-ink font-medium capitalize hover:underline">{product.pet_type || "—"}</Link>
-                </div>
-              </div>
+                <AccordionItem value="additional" className="border-border">
+                  <AccordionTrigger className="text-ink font-display text-lg hover:no-underline">
+                    <span className="flex items-center gap-2">
+                      <Info className="w-4 h-4 text-sage" /> Additional Info
+                    </span>
+                  </AccordionTrigger>
+                  <AccordionContent className="text-sm">
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <p className="text-ink/40 text-xs uppercase tracking-wider mb-1">Active Ingredient</p>
+                        <p className="text-ink font-medium">{product.active_ingredient || "—"}</p>
+                      </div>
+                      <div>
+                        <p className="text-ink/40 text-xs uppercase tracking-wider mb-1">Dosage Type</p>
+                        <p className="text-ink font-medium">{product.dosage_type || "—"}</p>
+                      </div>
+                      <div>
+                        <p className="text-ink/40 text-xs uppercase tracking-wider mb-1">Weight Class</p>
+                        <p className="text-ink font-medium">{product.weight_class || "—"}</p>
+                      </div>
+                      <div>
+                        <p className="text-ink/40 text-xs uppercase tracking-wider mb-1">Brand</p>
+                        <Link to={`/shop?brand=${encodeURIComponent(product.brand)}`} className="text-ink font-medium hover:underline">{product.brand || "—"}</Link>
+                      </div>
+                      <div>
+                        <p className="text-ink/40 text-xs uppercase tracking-wider mb-1">Category</p>
+                        <Link to={`/shop?category=${encodeURIComponent(product.category)}`} className="text-ink font-medium hover:underline">{product.category || "—"}</Link>
+                      </div>
+                      <div>
+                        <p className="text-ink/40 text-xs uppercase tracking-wider mb-1">For</p>
+                        <Link to={`/shop?pet=${product.pet_type}`} className="text-ink font-medium capitalize hover:underline">{product.pet_type || "—"}</Link>
+                      </div>
+                    </div>
+                  </AccordionContent>
+                </AccordionItem>
+              </Accordion>
             </div>
           </div>
         </div>
