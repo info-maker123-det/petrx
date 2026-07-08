@@ -21,6 +21,7 @@ export default function FeaturedProducts() {
   const [activeTab, setActiveTab] = useState("all");
   const [petType, setPetType] = useState("all");
   const [healthIssue, setHealthIssue] = useState(null);
+  const [visibleAll, setVisibleAll] = useState(18);
 
   useEffect(() => {
     Promise.all([
@@ -33,7 +34,7 @@ export default function FeaturedProducts() {
     });
   }, []);
 
-  const allProducts = [...rx.slice(0, 9), ...otc.slice(0, 9)];
+  const allProducts = [...rx, ...otc];
 
   const issueCats = healthIssue ? HEALTH_ISSUES.find((i) => i.id === healthIssue)?.categories : null;
   const matchesGuide = (p) => {
@@ -118,7 +119,14 @@ export default function FeaturedProducts() {
                     Open the shop <ArrowRight className="w-4 h-4" />
                   </Link>
                 </div>
-                <CatalogGrid products={allProducts} loading={loading} columns={3} emptyText="Products are loading." mobileScroll />
+                <CatalogGrid products={allProducts.slice(0, visibleAll)} loading={loading} columns={3} emptyText="Products are loading." mobileScroll />
+                {visibleAll < allProducts.length && (
+                  <div className="flex justify-center mt-10">
+                    <button onClick={() => setVisibleAll((v) => v + 18)} className="px-8 py-3.5 bg-white border-[0.5px] border-border rounded-full text-sm font-semibold text-ink hover:border-sage hover:text-sage transition-colors">
+                      Load More
+                    </button>
+                  </div>
+                )}
               </div>
             </div>
           )}
