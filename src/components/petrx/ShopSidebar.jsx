@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React, { useMemo, useState } from "react";
 import { ChevronDown } from "lucide-react";
 import BrandFilter from "./BrandFilter";
 
@@ -34,9 +34,8 @@ export default function ShopSidebar({
   );
 
   return (
-    <div className="flex flex-col gap-8">
-      {/* Product Type */}
-      <FilterGroup title="Product Type">
+    <div className="flex flex-col gap-1">
+      <FilterGroup title="Product Type" defaultOpen>
         {PRODUCT_TYPES.map((t) => (
           <FilterButton
             key={t.key}
@@ -47,8 +46,7 @@ export default function ShopSidebar({
         ))}
       </FilterGroup>
 
-      {/* Animal */}
-      <FilterGroup title="Shop by Animal">
+      <FilterGroup title="Shop by Animal" defaultOpen>
         {PET_TYPES.map((pt) => (
           <FilterButton
             key={pt.key}
@@ -59,31 +57,34 @@ export default function ShopSidebar({
         ))}
       </FilterGroup>
 
-      {/* Health Issue / Category */}
       <FilterGroup title="Health Issue">
-        <div className="max-h-52 overflow-y-auto pr-1 space-y-0.5">
-          {categories.map((c) => (
-            <FilterButton
-              key={c}
-              active={category === c}
-              onClick={() => { setCategory(c); onClose?.(); }}
-              label={c}
-            />
-          ))}
-        </div>
+        {categories.map((c) => (
+          <FilterButton
+            key={c}
+            active={category === c}
+            onClick={() => { setCategory(c); onClose?.(); }}
+            label={c}
+          />
+        ))}
       </FilterGroup>
 
-      {/* Brand */}
       <BrandFilter brands={brands} brand={brand} setBrand={setBrand} onClose={onClose} />
     </div>
   );
 }
 
-function FilterGroup({ title, children }) {
+function FilterGroup({ title, children, defaultOpen = false }) {
+  const [open, setOpen] = useState(defaultOpen);
   return (
-    <div>
-      <h3 className="text-xs font-semibold uppercase tracking-widest text-ink/40 mb-3">{title}</h3>
-      <div className="space-y-0.5">{children}</div>
+    <div className="border-b border-border/60 last:border-0">
+      <button
+        onClick={() => setOpen((o) => !o)}
+        className="flex items-center justify-between w-full py-3"
+      >
+        <h3 className="text-xs font-semibold uppercase tracking-widest text-ink/40">{title}</h3>
+        <ChevronDown className={`w-4 h-4 text-ink/40 transition-transform ${open ? "" : "-rotate-90"}`} />
+      </button>
+      {open && <div className="space-y-0.5 pb-3">{children}</div>}
     </div>
   );
 }
