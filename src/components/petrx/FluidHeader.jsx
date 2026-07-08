@@ -150,28 +150,26 @@ export default function FluidHeader() {
         <AnimatePresence>
           {mobileOpen && (
             <motion.div
-              initial={{ height: 0, opacity: 0 }}
-              animate={{ height: "auto", opacity: 1 }}
-              exit={{ height: 0, opacity: 0 }}
-              transition={{ duration: 0.3 }}
-              className="lg:hidden overflow-hidden border-t border-border"
+              initial={{ opacity: 0, y: -8 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -8 }}
+              transition={{ duration: 0.2 }}
+              className="lg:hidden border-t border-border"
             >
-              <div className="px-5 py-6 space-y-1 max-h-[calc(100vh-100px)] overflow-y-auto">
+              <div className="px-5 py-6 space-y-1 max-h-[calc(100vh-120px)] overflow-y-auto overscroll-contain">
                 {renderNavLinks(true)}
-                <Link
-                  to="/dashboard"
-                  onClick={() => setMobileOpen(false)}
-                  className="block py-3 px-4 mt-2 bg-ink text-white rounded-xl text-sm font-semibold text-center"
+                <button
+                  onClick={() => { setMobileOpen(false); navigate("/dashboard"); }}
+                  className="block w-full py-3 px-4 mt-2 bg-ink text-white rounded-xl text-sm font-semibold text-center"
                 >
                   My Account
-                </Link>
-                <Link
-                  to="/admin"
-                  onClick={() => setMobileOpen(false)}
-                  className="relative z-10 block py-3 px-4 text-ink/50 hover:text-ink rounded-xl text-sm font-medium text-center"
+                </button>
+                <button
+                  onClick={() => { setMobileOpen(false); navigate("/admin"); }}
+                  className="block w-full py-3 px-4 text-ink/50 hover:text-ink rounded-xl text-sm font-medium text-center"
                 >
                   Staff Portal
-                </Link>
+                </button>
               </div>
             </motion.div>
           )}
