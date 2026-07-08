@@ -1,13 +1,16 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import DogIcon from "./DogIcon";
+
+const LOGO_URL = "https://media.base44.com/images/public/6a4dc0dbd2a6ae29bc765da4/dc10b251f_Screenshot2026-07-08at35748AM.png";
 
 export default function Logo({ className = "", onDark = false, to = "/" }) {
-  const dogColor = onDark ? "text-white" : "text-brand-charcoal";
   return (
-    <Link to={to} aria-label="PetRx home" className={`inline-flex items-center gap-2 ${className}`}>
-      <DogIcon size={36} color="currentColor" strokeWidth={2.4} className={dogColor} />
-      <span className="font-logo font-bold text-[1.6rem] leading-none tracking-tight text-brand-magenta">PetRx</span>
+    <Link
+      to={to}
+      aria-label="PetRx home"
+      className={`inline-flex items-center overflow-hidden ${onDark ? "bg-white rounded-xl px-2.5 py-1" : ""} ${className}`}
+    >
+      <img src={LOGO_URL} alt="PetRx" className="h-8 md:h-9 w-auto" />
     </Link>
   );
 }
