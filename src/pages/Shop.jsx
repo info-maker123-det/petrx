@@ -2,6 +2,7 @@ import React, { useState, useEffect, useMemo } from "react";
 import { base44 } from "@/api/base44Client";
 import ProductCard from "@/components/petrx/ProductCard";
 import ShopSidebar from "@/components/petrx/ShopSidebar";
+import GuidedShop, { HEALTH_ISSUES } from "@/components/petrx/GuidedShop";
 import { Search, PawPrint, SlidersHorizontal, X, RotateCcw } from "lucide-react";
 
 export default function Shop() {
@@ -12,6 +13,7 @@ export default function Shop() {
   const [productType, setProductType] = useState("all");
   const [brand, setBrand] = useState("all");
   const [search, setSearch] = useState("");
+  const [healthIssue, setHealthIssue] = useState(null);
   const [visible, setVisible] = useState(24);
   const [showFilters, setShowFilters] = useState(false);
 
@@ -23,22 +25,24 @@ export default function Shop() {
       .finally(() => setLoading(false));
   }, []);
 
-  useEffect(() => { setVisible(24); }, [category, petType, productType, brand, search]);
+  useEffect(() => { setVisible(24); }, [category, petType, productType, brand, search, healthIssue]);
 
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase();
+    const issueCats = healthIssue ? HEALTH_ISSUES.find((i) => i.id === healthIssue)?.categories : null;
     return products.filter((p) => {
-      if (category !== "All" && p.category !== category) return false;
       if (petType !== "all" && p.pet_type !== petType && p.pet_type !== "all") return false;
       if (productType === "rx" && !p.requires_prescription) return false;
       if (productType === "otc" && p.requires_prescription) return false;
+      if (issueCats && !issueCats.includes(p.category)) return false;
+      if (!issueCats && category !== "All" && p.category !== category) return false;
       if (brand !== "all" && p.brand !== brand) return false;
       if (q && !`${p.name} ${p.brand} ${p.category}`.toLowerCase().includes(q)) return false;
       return true;
     });
-  }, [products, category, petType, productType, brand, search]);
+  }, [products, category, petType, productType, brand, search, healthIssue]);
 
-  const hasFilters = category !== "All" || petType !== "all" || productType !== "all" || brand !== "all" || search;
+  const hasFilters = category !== "All" || petType !== "all" || productType !== "all" || brand !== "all" || search || healthIssue;
 
   const clearFilters = () => {
     setCategory("All");
@@ -46,6 +50,7 @@ export default function Shop() {
     setProductType("all");
     setBrand("all");
     setSearch("");
+    setHealthIssue(null);
   };
 
   const shown = filtered.slice(0, visible);
@@ -62,9 +67,20 @@ export default function Shop() {
           <p className="text-sage text-sm font-semibold tracking-widest uppercase mb-2">Pharmacy Catalog</p>
           <h1 className="font-display text-3xl md:text-4xl lg:text-5xl text-ink">Shop All Products</h1>
           <p className="text-ink/50 mt-3 max-w-xl">
-            {loading ? "Loading catalog…" : `${products.length} prescription medications and supplements for every pet.`}
+            {loading
+              ? "Loading catalog…"
+              : petType !== "all"
+                ? `Showing products for your ${petType}${healthIssue ? ` — ${HEALTH_ISSUES.find((i) => i.id === healthIssue)?.label}` : ""}.`
+                : `${products.length} prescription medications and supplements for every pet.`}
           </p>
         </div>
+
+        <GuidedShop
+          petType={petType}
+          setPetType={setPetType}
+          healthIssue={healthIssue}
+          setHealthIssue={setHealthIssue}
+        />
 
         <div className="flex gap-3 mb-8">
           <div className="relative flex-1 max-w-md">
