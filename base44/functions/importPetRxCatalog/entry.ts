@@ -87,8 +87,24 @@ Deno.serve(async (req) => {
       debug += `page ${page}: ${products.length}; `;
     }
 
+    // Skip non-medication products (food, treats, cleaning supplies, lint rollers, area sprays)
+    const isNonMedication = (p) => {
+      const tags = asStr(p.tags).toLowerCase();
+      const title = asStr(p.title).toLowerCase();
+      const vendor = asStr(p.vendor).toLowerCase();
+      if (vendor.includes('blue natural') && vendor.includes('diet')) return true;
+      if (tags.includes('cleaning') || tags.includes('odor')) return true;
+      if (title.includes('treats') || title.includes('easy treat') || title.includes('pro-treat') || title.includes('rewards')) return true;
+      if (title.includes('area treatment') || title.includes('area spray')) return true;
+      if (title.includes('lint roller') || title.includes('hair roller')) return true;
+      if (title.includes('stain remover') || title.includes('odor eliminator') || title.includes('disinfectant')) return true;
+      if (title.includes('food') && (title.includes('dry') || title.includes('canned'))) return true;
+      return false;
+    };
+
     // Map to Product entity schema
     const mapped = allProducts
+      .filter((p) => !isNonMedication(p))
       .map((p) => {
         const tags = asStr(p.tags);
         const variants = p.variants || [];
