@@ -5,7 +5,7 @@ import PetCard from "@/components/petrx/PetCard";
 import AddPetModal from "@/components/petrx/AddPetModal";
 import PetHealthOverview from "@/components/petrx/PetHealthOverview";
 import PrescriptionTracker from "@/components/petrx/PrescriptionTracker";
-import { Plus, PawPrint, Package, FileText, ChevronRight, Stethoscope, HeartPulse, ChevronDown, RefreshCw } from "lucide-react";
+import { Plus, PawPrint, Package, FileText, ChevronRight, Stethoscope, HeartPulse, ChevronDown, RefreshCw, LogOut } from "lucide-react";
 
 const TABS = [
   { key: "pets", label: "My Pets", icon: PawPrint },
@@ -37,6 +37,16 @@ export default function Dashboard() {
   const [showAdd, setShowAdd] = useState(false);
   const [userName, setUserName] = useState("");
   const [expandedRx, setExpandedRx] = useState(null);
+  const [signingOut, setSigningOut] = useState(false);
+
+  const handleSignOut = async () => {
+    setSigningOut(true);
+    try {
+      await base44.auth.logout("/login");
+    } catch {
+      window.location.href = "/login";
+    }
+  };
 
   const load = async () => {
     setLoading(true);
@@ -96,6 +106,13 @@ export default function Dashboard() {
               >
                 <FileText className="w-4 h-4" /> Submit Prescription
               </Link>
+              <button
+                onClick={handleSignOut}
+                disabled={signingOut}
+                className="inline-flex items-center justify-center gap-2 px-4 py-3 text-white/50 hover:text-white text-sm font-medium transition-colors disabled:opacity-50"
+              >
+                <LogOut className="w-4 h-4" /> Sign Out
+              </button>
             </div>
           </div>
         </div>
