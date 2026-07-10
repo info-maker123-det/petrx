@@ -79,10 +79,10 @@ const AuthenticatedApp = () => {
           <Route path="/accessibility" element={<Accessibility />} />
           <Route path="/shipping" element={<ShippingReturns />} />
           <Route path="/product/:id" element={<ProductDetail />} />
+          <Route path="/checkout" element={<Checkout />} />
           <Route element={<ProtectedRoute unauthenticatedElement={<Navigate to="/login" replace />} />}>
             <Route path="/contact" element={<Contact />} />
             <Route path="/prescription" element={<PrescriptionUpload />} />
-            <Route path="/checkout" element={<Checkout />} />
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/advisor" element={<PetAdvisor />} />
             <Route path="/autoship" element={<AutoShip />} />

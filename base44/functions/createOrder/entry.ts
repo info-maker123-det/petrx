@@ -3,8 +3,14 @@ import { createClientFromRequest } from 'npm:@base44/sdk@0.8.31';
 Deno.serve(async (req) => {
   try {
     const base44 = createClientFromRequest(req);
-    const user = await base44.auth.me();
-    if (!user) return Response.json({ error: 'Unauthorized' }, { status: 401 });
+
+    // Auth is optional — guests can order supplements
+    let user = null;
+    try {
+      user = await base44.auth.me();
+    } catch {
+      user = null;
+    }
 
     const body = await req.json();
     const { items, shipping } = body;
@@ -51,11 +57,18 @@ Deno.serve(async (req) => {
       });
     }
 
+    // Guests cannot purchase prescription items
+    if (!user && hasPrescriptionItems) {
+      return Response.json({ error: 'Prescription items require authentication' }, { status: 403 });
+    }
+
     const shippingCost = subtotal >= 49 ? 0 : 5.95;
     const total = subtotal + shippingCost;
 
     const order_number = 'PRX-' + Date.now().toString().slice(-8);
-    const order = await base44.entities.Order.create({
+    // Use service role for guest orders, user-scoped for authenticated users
+    const orderClient = user ? base44.entities.Order : base44.asServiceRole.entities.Order;
+    const order = await orderClient.create({
       order_number,
       items: verifiedItems,
       subtotal: Math.round(subtotal * 100) / 100,

@@ -6,6 +6,8 @@ import { useCart } from "@/lib/cartContext";
 import Logo from "@/components/petrx/Logo";
 import MegaMenu from "@/components/petrx/MegaMenu";
 import ContactDropdown from "@/components/petrx/ContactDropdown";
+import AccountMenu from "@/components/petrx/AccountMenu";
+import { useAuth } from "@/lib/AuthContext";
 
 const NAV_LINKS = [
   { label: "Shop", type: "route", target: "/shop" },
@@ -22,6 +24,7 @@ export default function FluidHeader() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const { count, openCart } = useCart();
   const navigate = useNavigate();
+  const { isAuthenticated, logout } = useAuth();
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 60);
@@ -118,14 +121,7 @@ export default function FluidHeader() {
 
           {/* Account + Cart */}
           <div className="flex items-center gap-2 sm:gap-3">
-            <Link
-              to="/dashboard"
-              aria-label="My account"
-              className="inline-flex items-center justify-center w-9 h-9 sm:w-auto sm:h-auto sm:gap-2 sm:px-4 sm:py-2 border border-border rounded-xl text-sm font-medium text-ink hover:border-sage hover:text-sage transition-colors"
-            >
-              <User className="w-5 h-5 sm:w-4 sm:h-4" />
-              <span className="hidden sm:inline">Account</span>
-            </Link>
+            <AccountMenu />
 
             <button onClick={openCart} aria-label="Cart" className="relative p-2 hover:bg-secondary rounded-xl transition-colors">
               <ShoppingBag className="w-5 h-5 text-ink" />
@@ -178,13 +174,31 @@ export default function FluidHeader() {
                 </div>
                 <div className="flex-1 overflow-y-auto px-5 py-6 space-y-1 no-scrollbar">
                   {renderNavLinks(true)}
-                  <Link
-                    to="/dashboard"
-                    onClick={() => setMobileOpen(false)}
-                    className="block py-3 px-4 mt-3 bg-ink text-white rounded-xl text-sm font-semibold text-center"
-                  >
-                    My Account
-                  </Link>
+                  {isAuthenticated ? (
+                    <>
+                      <Link
+                        to="/dashboard"
+                        onClick={() => setMobileOpen(false)}
+                        className="block py-3 px-4 mt-3 bg-ink text-white rounded-xl text-sm font-semibold text-center"
+                      >
+                        My Account
+                      </Link>
+                      <button
+                        onClick={() => { setMobileOpen(false); logout(); }}
+                        className="block py-3 px-4 mt-2 text-red-600 hover:bg-red-50 rounded-xl text-sm font-semibold text-center"
+                      >
+                        Sign Out
+                      </button>
+                    </>
+                  ) : (
+                    <Link
+                      to="/login"
+                      onClick={() => setMobileOpen(false)}
+                      className="block py-3 px-4 mt-3 bg-ink text-white rounded-xl text-sm font-semibold text-center"
+                    >
+                      Sign In
+                    </Link>
+                  )}
                   <a
                     href="/admin"
                     onClick={() => setMobileOpen(false)}

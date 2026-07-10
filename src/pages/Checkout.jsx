@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { base44 } from "@/api/base44Client";
 import { useCart } from "@/lib/cartContext";
+import { useAuth } from "@/lib/AuthContext";
 import {
   ShieldAlert,
   Check,
@@ -11,12 +12,14 @@ import {
   MapPin,
   Stethoscope,
   ShoppingBag,
+  LogIn,
 } from "lucide-react";
 
 const US_STATES = ["CA", "NY", "TX", "FL", "IL", "PA", "OH", "GA", "NC", "MI", "NJ", "VA", "WA", "AZ", "MA", "TN", "IN", "MO", "MD", "WI", "CO", "MN", "OR", "Other"];
 
 export default function Checkout() {
-  const { items, subtotal, hasPrescriptionItems, clearCart } = useCart();
+  const { items, subtotal, hasPrescriptionItems, clearCart, removeItem } = useCart();
+  const { isAuthenticated, isLoadingAuth } = useAuth();
   const [placing, setPlacing] = useState(false);
   const [placed, setPlaced] = useState(null);
   const [form, setForm] = useState({
@@ -126,6 +129,39 @@ export default function Checkout() {
       </div>
     );
 
+  // Guest gate: prescription items require an account
+  if (!isLoadingAuth && !isAuthenticated && hasPrescriptionItems) {
+    return (
+      <div className="py-20 md:py-32 bg-porcelain">
+        <div className="max-w-2xl mx-auto px-5 md:px-8 text-center">
+          <div className="w-16 h-16 rounded-2xl bg-ochre/10 flex items-center justify-center mx-auto mb-6">
+            <ShieldAlert className="w-7 h-7 text-ochre" />
+          </div>
+          <p className="text-ochre text-sm font-semibold tracking-widest uppercase mb-2">Account Required</p>
+          <h1 className="font-display text-3xl md:text-4xl text-ink mb-3">Prescription items need verification</h1>
+          <p className="text-ink/50 mb-8 max-w-md mx-auto">
+            To purchase prescription medications, please sign in or create an account so we can verify your pet's prescription with your veterinarian.
+          </p>
+          <div className="flex flex-col sm:flex-row gap-3 justify-center">
+            <Link
+              to="/login"
+              className="inline-flex items-center gap-2 px-6 py-3 bg-sage text-white rounded-full text-sm font-semibold hover:bg-[#3d5a66] transition-colors"
+            >
+              <LogIn className="w-4 h-4" /> Sign In to Continue
+            </Link>
+            <button
+              onClick={() => items.filter((i) => i.requires_prescription).forEach((i) => removeItem(i.productId))}
+              className="inline-flex items-center gap-2 px-6 py-3 border border-border rounded-full text-sm font-semibold text-ink hover:border-sage hover:text-sage transition-colors"
+            >
+              Continue as Guest <ArrowRight className="w-4 h-4" />
+            </button>
+          </div>
+          <p className="text-xs text-ink/40 mt-4">Continuing as guest will remove prescription items from your cart.</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="py-12 md:py-16 bg-porcelain">
       <div className="max-w-7xl mx-auto px-5 md:px-8">
@@ -133,6 +169,12 @@ export default function Checkout() {
           <p className="text-sage text-sm font-semibold tracking-widest uppercase mb-3">Secure Checkout</p>
           <h1 className="font-display text-3xl md:text-4xl lg:text-5xl text-ink leading-tight mb-3">Checkout</h1>
           <p className="text-ink/50 max-w-md">Review your items and enter your shipping details. All transactions are encrypted and secure.</p>
+          {!isLoadingAuth && !isAuthenticated && (
+            <div className="mt-4 inline-flex items-center gap-2 px-4 py-2 bg-sage/5 border border-sage/20 rounded-full text-xs font-medium text-sage">
+              <LogIn className="w-3.5 h-3.5" />
+              Checking out as guest · <Link to="/login" className="underline">Sign in</Link> to track your order
+            </div>
+          )}
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-5 gap-10">
